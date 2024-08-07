@@ -27,7 +27,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Bcs\\SalsifytBundle\\": "src"
+            "Bcs\\SalsifyBundle\\": "src"
         },
         "classmap": [
             "src/Resources/contao"
