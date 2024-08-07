@@ -6,9 +6,14 @@ class Hooks
 {
     public function generatePage(&$objPageModel, $objLayout, &$objPage)
     {
-        echo "<pre>";
-        print_r($objPage);
-        echo "</pre>";
-        die();
+        
+        if($objPageModel->id == 58)
+        {
+            echo "<pre>";
+            print_r($objLayout);
+            echo "</pre>";
+            die();
+        }
+        
     }
 }
