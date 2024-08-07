@@ -17,12 +17,10 @@ class Hooks
             //echo "</pre>";
             //die();
 
-            
-
             $reader = new JsonReader();
             $reader->open("../salsify/product-feed.json");
 
-            while ($reader->read()) {
+            while ($reader->read("attributes")) {
                 printf("%s: %d <br>", $reader->name(), $reader->value());
             }
             $reader->close();
