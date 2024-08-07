@@ -23,9 +23,7 @@ class Hooks
             $reader->open("../salsify/product-feed.json");
 
             while ($reader->read()) {
-                if ($reader->type() === JsonReader::NUMBER) {
-                    printf("%s: %d\n", $reader->name(), $reader->value());
-                }
+                printf("%s: %d\n", $reader->name(), $reader->value());
             }
             $reader->close();
             
