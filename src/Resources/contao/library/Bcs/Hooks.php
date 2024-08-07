@@ -20,7 +20,8 @@ class Hooks
             $reader = new JsonReader();
             $reader->open("../salsify/product-feed.json");
 
-            while ($reader->read("attributes")) {
+            $reader->read("attributes")
+            while ($reader->read()) {
                 printf("%s: %d <br>", $reader->name(), $reader->value());
             }
             $reader->close();
