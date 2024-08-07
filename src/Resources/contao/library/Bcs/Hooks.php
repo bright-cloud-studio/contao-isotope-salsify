@@ -23,7 +23,7 @@ class Hooks
             $reader->open("../salsify/product-feed.json");
             
             while ($reader->read("salsify:id")) {
-                echo $reader->value(), "\n";
+                echo $reader->value(), "<br>";
             }
             
             $reader->close();
