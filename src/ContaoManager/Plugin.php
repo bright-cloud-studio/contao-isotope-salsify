@@ -15,7 +15,9 @@ use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 
 class Plugin implements BundlePluginInterface
 {
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function getBundles(ParserInterface $parser)
     {
         return [
