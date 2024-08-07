@@ -22,13 +22,13 @@ class Hooks
             $reader = new JsonReader();
             $reader->open("../salsify/product-feed.json");
             
-            while ($reader->read("attribute")) {
+            while ($reader->read("attributes")) {
                 echo $reader->value(), "\n";
             }
             
             $reader->close();
             
-            
+            die();
 
             
         }
