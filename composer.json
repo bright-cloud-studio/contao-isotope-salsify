@@ -20,7 +20,7 @@
     "require":{
         "php": "^7.4 || ^8.0",
         "contao/core-bundle": "^4.13",
-        "pcrov/JsonReader": "1.0.3"
+        "pcrov/jsonreader": "1.0.3"
     },
     "extra":{
         "contao-manager-plugin": "Bcs\\SalsifytBundle\\ContaoManager\\Plugin"
