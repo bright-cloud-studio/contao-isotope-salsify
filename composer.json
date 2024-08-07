@@ -23,7 +23,7 @@
         "pcrov/jsonreader": "1.0.3"
     },
     "extra":{
-        "contao-manager-plugin": "Bcs\\SalsifytBundle\\ContaoManager\\Plugin"
+        "contao-manager-plugin": "Bcs\\SalsifyBundle\\ContaoManager\\Plugin"
     },
     "autoload": {
         "psr-4": {
