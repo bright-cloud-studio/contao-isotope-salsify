@@ -6,7 +6,9 @@ class Hooks
 {
     public function generatePage(&$objPageModel, $objLayout, &$objPage)
     {
-        echo "HOOK HIT";
+        echo "<pre>";
+        print_r($objPage);
+        echo "</pre>";
         die();
     }
 }
