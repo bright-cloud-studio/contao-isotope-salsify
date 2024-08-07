@@ -25,7 +25,9 @@ class Hooks
             
             $reader->read(); // Step to the first element.
             do {
+                echo "<pre>";
                 print_r($reader->value());
+                echo "</pre>";
             } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
             
             $reader->close();
