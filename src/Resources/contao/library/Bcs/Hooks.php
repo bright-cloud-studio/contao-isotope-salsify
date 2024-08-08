@@ -19,21 +19,6 @@ class Hooks
             //echo "</pre>";
             //die();
 
-            
-            // Steps
-            // 1 - Unzip assets
-            // parse 'manifest' for assets
-
-
-            // Create Attributes
-
-            // Create Products
-
-            // Create Page for product
-
-
-            
-
             $reader = new JsonReader();
             $reader->open("../salsify/product-feed-paper_2024_04_12_16_45_01_UTC.json");
 
@@ -50,7 +35,6 @@ class Hooks
             $reader->close();
             
             die();
-
             
         }
         
