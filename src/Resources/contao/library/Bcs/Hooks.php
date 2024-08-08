@@ -35,16 +35,15 @@ class Hooks
             
             $reader->read(); // Step to the first element.
             do {
-                echo "<pre>";
                 $attr = $reader->value();
 
 
                 // First, see if this attribute exists
-                $existing_attr = AttributeOption::findOneBy(['tl_iso_attribute_option.label=?'],[$attr["id"]])->id;
+                $existing_attr = AttributeOption::findOneBy(['tl_iso_attribute_option.label=?'],[$attr["salsify:id"]])->id;
 
                 if(!$existing_attr)
                 {
-                    echo "DOESNT EXIST: " . $attr["id"] . "<br>";
+                    echo "DOESNT EXIST: " . $attr["salsify:id"] . "<br>";
 
                     $new_attr = new AttributeOption();
                     $new_attr->label = $attr["id"];
@@ -54,16 +53,9 @@ class Hooks
                     
                     
                 } else {
-                    echo "DOES EXIST: " . $attr["id"] . "<br>";
+                    echo "DOES EXIST: " . $attr["salsify:id"] . "<br>";
                 }
-                // If not, create it
 
-
-                // If so, update it
-                
-
-                
-                echo "</pre>";
             } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
 
 
