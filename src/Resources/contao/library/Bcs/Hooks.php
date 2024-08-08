@@ -3,6 +3,8 @@
 namespace Bcs;
 
 use pcrov\JsonReader\JsonReader;
+use Isotope\Model\Attribute;
+use Isotope\Model\AttributeOption;
 
 class Hooks
 {
@@ -21,6 +23,13 @@ class Hooks
             // Steps
             // 1 - Unzip assets
             // parse 'manifest' for assets
+
+
+            // Create Attributes
+
+            // Create Products
+
+            // Create Page for product
 
 
             
