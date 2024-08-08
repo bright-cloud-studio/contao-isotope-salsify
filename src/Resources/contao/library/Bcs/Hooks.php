@@ -44,9 +44,9 @@ class Hooks
 
                 if(!$existing_attr)
                 {
-                    echo "DOESNT EXIST<br>";
+                    echo "DOESNT EXIST: " . $data["id"] . "<br>";
                 } else {
-                    echo "DOES EXIST<br>"
+                    echo "DOESNT EXIST: " . $data["id"] . "<br>";
                 }
                 // If not, create it
 
