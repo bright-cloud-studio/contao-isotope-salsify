@@ -40,21 +40,21 @@ class Hooks
 
 
                 // First, see if this attribute exists
-                $existing_attr = AttributeOption::findOneBy(['tl_iso_attribute_option.label=?'],[$data["id"]])->id;
+                $existing_attr = AttributeOption::findOneBy(['tl_iso_attribute_option.label=?'],[$attr["id"]])->id;
 
                 if(!$existing_attr)
                 {
-                    echo "DOESNT EXIST: " . $data["id"] . "<br>";
+                    echo "DOESNT EXIST: " . $attr["id"] . "<br>";
 
-                    $attr = new AttributeOption();
-                    $attr->label = $data["id"];
-                    $attr->tstamp = time();
-                    $attr->published = 1;
-                    $attr->save();
+                    $new_attr = new AttributeOption();
+                    $new_attr->label = $attr["id"];
+                    $new_attr->tstamp = time();
+                    $new_attr->published = 1;
+                    $new_attr->save();
                     
                     
                 } else {
-                    echo "DOES EXIST: " . $data["id"] . "<br>";
+                    echo "DOES EXIST: " . $attr["id"] . "<br>";
                 }
                 // If not, create it
 
