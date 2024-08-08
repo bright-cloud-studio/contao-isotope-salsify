@@ -45,8 +45,16 @@ class Hooks
                 if(!$existing_attr)
                 {
                     echo "DOESNT EXIST: " . $data["id"] . "<br>";
+
+                    $attr = new AttributeOption();
+                    $attr->label = $data["id"];
+                    $attr->tstamp = time();
+                    $attr->published = 1;
+                    $attr->save();
+                    
+                    
                 } else {
-                    echo "DOESNT EXIST: " . $data["id"] . "<br>";
+                    echo "DOES EXIST: " . $data["id"] . "<br>";
                 }
                 // If not, create it
 
