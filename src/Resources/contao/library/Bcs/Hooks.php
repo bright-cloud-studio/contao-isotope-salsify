@@ -36,12 +36,18 @@ class Hooks
             $reader->read(); // Step to the first element.
             do {
                 echo "<pre>";
-                print_r($reader->value());
+                $attr = $reader->value();
 
 
                 // First, see if this attribute exists
+                $existing_attr = AttributeOption::findOneBy(['tl_iso_attribute_option.label=?'],[$data["id"]])->id;
 
-
+                if(!$existing_attr)
+                {
+                    echo "DOESNT EXIST<br>";
+                } else {
+                    echo "DOES EXIST<br>"
+                }
                 // If not, create it
 
 
