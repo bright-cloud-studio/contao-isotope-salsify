@@ -37,6 +37,18 @@ class Hooks
             do {
                 echo "<pre>";
                 print_r($reader->value());
+
+
+                // First, see if this attribute exists
+
+
+                // If not, create it
+
+
+                // If so, update it
+                
+
+                
                 echo "</pre>";
             } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
 
