@@ -2,6 +2,8 @@
 
 namespace Bcs;
 
+use ZipArchive;
+
 use pcrov\JsonReader\JsonReader; // Json streaming library
 use Contao\Database;
 use Isotope\Model\Attribute;
