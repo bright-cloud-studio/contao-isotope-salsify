@@ -52,7 +52,7 @@ class Hooks
                 // Create Attribute if it doesn't exist already
                 if(!$existing_attr)
                 {
-                    echo "DOESNT EXIST: " . $attr["salsify:id"] . "<br>";
+                    echo "New: " . $attr["salsify:id"] . "<br>";
 
                     $new_attr = new TextField();
                     $new_attr->tstamp = time();
@@ -66,7 +66,7 @@ class Hooks
                 }
                 // Update if this Attribute doesn't exist yet
                 else {
-                    echo "DOES EXIST: " . $attr["salsify:id"] . "<br>";
+                    echo "Old: " . $attr["salsify:id"] . "<br>";
                 }
 
             } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
