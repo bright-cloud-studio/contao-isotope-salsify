@@ -5,6 +5,7 @@ namespace Bcs;
 use pcrov\JsonReader\JsonReader; // Json streaming library
 use Contao\Database;
 use Isotope\Model\Attribute;
+use Isotope\Model\Attribute\TextField;
 use Isotope\Model\AttributeOption;
 use Isotope\Interfaces\IsotopeProduct;
 use Isotope\Isotope;
@@ -42,21 +43,18 @@ class Hooks
                 // Temporarly store our read values
                 $attr = $reader->value();
 
-                $field_name = str_replace(' ', '_', strtolower($attr["salsify:id"]));
+                // Take the id, convert to lowercase, replace spaces with underscores, truncate to max length of 30 characters
+                $field_name = substr(str_replace(' ', '_', strtolower($attr["salsify:id"])), 0, 30);
                 
                 // Try and find an existing version of this Attribute
-                $existing_attr = Attribute::findOneBy(['tl_iso_attribute_option.field_name=?'],[$field_name])->id;
+                $existing_attr = Attribute::findOneBy(['tl_iso_attribute.field_name=?'],[$field_name])->id;
                 
                 // Create Attribute if it doesn't exist already
                 if(!$existing_attr)
                 {
-                    echo "<pre>";
-                    //echo "DOESNT EXIST: " . $attr["salsify:id"] . "<br>";
-                    echo print_r($attr["salsify:id"]);
-                    echo "</pre>";
-                    die();
+                    echo "DOESNT EXIST: " . $attr["salsify:id"] . "<br>";
 
-                    $new_attr = new Attribute();
+                    $new_attr = new TextField();
                     $new_attr->tstamp = time();
                     $new_attr->name = $attr["salsify:id"];
                     $new_attr->field_name = $field_name;
