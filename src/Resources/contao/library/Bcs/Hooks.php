@@ -54,13 +54,13 @@ class Hooks
                 {
                     echo "New: " . $attr["salsify:id"] . "<br>";
 
-                    $new_attr = new TextField();
-                    $new_attr->tstamp = time();
-                    $new_attr->name = $attr["salsify:id"];
-                    $new_attr->field_name = $field_name;
-                    $new_attr->type = 'textarea';
-                    $new_attr->published = 1;
-                    $new_attr->save();
+                    //$new_attr = new TextField();
+                    //$new_attr->tstamp = time();
+                    //$new_attr->name = $attr["salsify:id"];
+                    //$new_attr->field_name = $field_name;
+                    //$new_attr->type = 'textarea';
+                    //$new_attr->published = 1;
+                    //$new_attr->save();
                     
                     
                 }
