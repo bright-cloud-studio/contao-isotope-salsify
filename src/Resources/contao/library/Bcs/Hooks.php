@@ -24,6 +24,26 @@ class Hooks
             $reader->open("../salsify/product-feed-paper_2024_04_12_16_45_01_UTC.json");
 
 
+
+
+
+            /*************************/
+            /* Unzip our Assets file */
+            /*************************/
+
+            $zip = new ZipArchive();
+            $zip->open('../salsify/asset-feed-paper_2024_04_12_16_45_01_UTC.zip');
+            $zip->extractTo('../files/salsify_assets');
+            $zip->close();
+
+            echo "<pre>";
+            echo print_r($zip);
+            echo "</pre>";
+            die();
+            
+            
+
+
             
             /************************/
             /* Process "Attributes" */
