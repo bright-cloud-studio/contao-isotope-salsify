@@ -53,9 +53,11 @@ class Hooks
                     echo "</pre>";
                     die();
 
-                    $new_attr = new AttributeOption();
-                    $new_attr->label = $attr["salsify:id"];
+                    $new_attr = new Attribute();
                     $new_attr->tstamp = time();
+                    $new_attr->name = $attr["salsify:id"];
+                    $new_attr->field_name = str_replace(' ', '_', strtolower($attr["salsify:id"]));
+                    $new_attr->type = 'textarea';
                     $new_attr->published = 1;
                     $new_attr->save();
                     
