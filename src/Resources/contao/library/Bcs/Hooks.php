@@ -6,6 +6,13 @@ use pcrov\JsonReader\JsonReader;
 use Isotope\Model\Attribute;
 use Isotope\Model\AttributeOption;
 
+use Contao\Database;
+
+use Isotope\Interfaces\IsotopeProduct;
+use Isotope\Isotope;
+
+use Isotope\Model\Product;
+
 class Hooks
 {
     public function generatePage(&$objPageModel, $objLayout, &$objPage)
@@ -46,7 +53,7 @@ class Hooks
                     echo "DOESNT EXIST: " . $attr["salsify:id"] . "<br>";
 
                     $new_attr = new AttributeOption();
-                    $new_attr->label = $attr["id"];
+                    $new_attr->label = $attr["salsify:id"];
                     $new_attr->tstamp = time();
                     $new_attr->published = 1;
                     $new_attr->save();
