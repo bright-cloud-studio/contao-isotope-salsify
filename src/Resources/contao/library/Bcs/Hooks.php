@@ -45,7 +45,7 @@ class Hooks
                 $field_name = str_replace(' ', '_', strtolower($attr["salsify:id"]));
                 
                 // Try and find an existing version of this Attribute
-                $existing_attr = Attribute::findOneBy(['tl_iso_attribute_option.field_name=?'],[$field_name)->id;
+                $existing_attr = Attribute::findOneBy(['tl_iso_attribute_option.field_name=?'],[$field_name]->id;
                 
                 // Create Attribute if it doesn't exist already
                 if(!$existing_attr)
