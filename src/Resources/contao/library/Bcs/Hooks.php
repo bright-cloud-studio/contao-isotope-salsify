@@ -2,15 +2,12 @@
 
 namespace Bcs;
 
-use pcrov\JsonReader\JsonReader;
+use pcrov\JsonReader\JsonReader; // Json streaming library
+use Contao\Database;
 use Isotope\Model\Attribute;
 use Isotope\Model\AttributeOption;
-
-use Contao\Database;
-
 use Isotope\Interfaces\IsotopeProduct;
 use Isotope\Isotope;
-
 use Isotope\Model\Product;
 
 class Hooks
@@ -21,36 +18,40 @@ class Hooks
         // If this is our "Contact - Success" test page
         if($objPageModel->id == 58)
         {
-            //echo "<pre>";
-            //print_r($objLayout);
-            //echo "</pre>";
-            //die();
-
+            // Manually open our 'test' file
             $reader = new JsonReader();
             $reader->open("../salsify/product-feed-paper_2024_04_12_16_45_01_UTC.json");
-
-
 
 
             
             /************************/
             /* Process "Attributes" */
             /************************/
-            
+
+            // Read the "attributes" object
             $reader->read("attributes");
-            $depth = $reader->depth(); // Check in a moment to break when the array is done.
-            
-            $reader->read(); // Step to the first element.
-            do {
+            // Store the initial depth so we know when to end
+            $depth = $reader->depth();
+            // Step to the first element within "attributes"
+            $reader->read();
+
+            // Do while there is data to be read
+            do
+            {
+
+                // Temporarly store our read values
                 $attr = $reader->value();
-
-
-                // First, see if this attribute exists
+                // Try and find an existing version of this Attribute
                 $existing_attr = AttributeOption::findOneBy(['tl_iso_attribute_option.label=?'],[$attr["salsify:id"]])->id;
-
+                
+                // Create Attribute if it doesn't exist already
                 if(!$existing_attr)
                 {
-                    echo "DOESNT EXIST: " . $attr["salsify:id"] . "<br>";
+                    echo "<pre>";
+                    //echo "DOESNT EXIST: " . $attr["salsify:id"] . "<br>";
+                    echo print_r($attr["salsify:id"]);
+                    echo "</pre>";
+                    die();
 
                     $new_attr = new AttributeOption();
                     $new_attr->label = $attr["salsify:id"];
@@ -59,7 +60,9 @@ class Hooks
                     $new_attr->save();
                     
                     
-                } else {
+                }
+                // Update if this Attribute doesn't exist yet
+                else {
                     echo "DOES EXIST: " . $attr["salsify:id"] . "<br>";
                 }
 
