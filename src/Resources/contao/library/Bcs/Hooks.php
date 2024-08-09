@@ -41,8 +41,11 @@ class Hooks
 
                 // Temporarly store our read values
                 $attr = $reader->value();
+
+                $field_name = str_replace(' ', '_', strtolower($attr["salsify:id"]));
+                
                 // Try and find an existing version of this Attribute
-                $existing_attr = AttributeOption::findOneBy(['tl_iso_attribute_option.label=?'],[$attr["salsify:id"]])->id;
+                $existing_attr = Attribute::findOneBy(['tl_iso_attribute_option.field_name=?'],[$field_name)->id;
                 
                 // Create Attribute if it doesn't exist already
                 if(!$existing_attr)
@@ -56,7 +59,7 @@ class Hooks
                     $new_attr = new Attribute();
                     $new_attr->tstamp = time();
                     $new_attr->name = $attr["salsify:id"];
-                    $new_attr->field_name = str_replace(' ', '_', strtolower($attr["salsify:id"]));
+                    $new_attr->field_name = $field_name;
                     $new_attr->type = 'textarea';
                     $new_attr->published = 1;
                     $new_attr->save();
