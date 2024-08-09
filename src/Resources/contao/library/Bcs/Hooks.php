@@ -25,31 +25,24 @@ class Hooks
             $reader = new JsonReader();
             $reader->open("../salsify/product-feed-paper_2024_04_12_16_45_01_UTC.json");
 
-
-
-
-
+            
             /*************************/
             /* Unzip our Assets file */
             /*************************/
 
+            // Create a PHP ZIP variable
             $zip = new ZipArchive();
+            // Open our ZIP file
             $zip->open('../salsify/asset-feed-paper_2024_04_12_16_45_01_UTC.zip');
-
+            // Get today's date to be used as the folder's name
             $folder_date =  date('m_d_y');
+            // Extract the ZIP file into our date folder
             $zip->extractTo('../files/salsify_assets/' . $folder_date);
+            // Close the ZIP out
             $zip->close();
 
-            echo "Zip Folder: " . "/files/salsify_assets/" . $folder_date . "<br>";
-            echo "<pre>";
-            echo print_r($zip);
-            echo "</pre>";
-            die();
-            
-            
 
 
-            
             /************************/
             /* Process "Attributes" */
             /************************/
