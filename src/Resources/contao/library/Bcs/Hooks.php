@@ -97,22 +97,14 @@ class Hooks
             } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
 
 
+            /******************************/
+            /* Process "Attribute Values" */
+            /******************************/
+            
 
-
-
-            /*****************************/
-            /* Process Attribute Options */
-            /*****************************/
-
-
-
-
-
-            /*****************************/
-            /* Process Assets "manifest" */
-            /*****************************/
-
-
+            /****************************/
+            /* Process "Digital Assets" */
+            /****************************/
 
             
             $reader->close();
