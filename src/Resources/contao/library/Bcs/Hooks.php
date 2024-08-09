@@ -37,9 +37,10 @@ class Hooks
             $zip->open('../salsify/asset-feed-paper_2024_04_12_16_45_01_UTC.zip');
 
             $folder_date =  date('m_d_y');
-            $zip->extractTo('../files/'. $folder_date .'salsify_assets');
+            $zip->extractTo('../files/salsify_assets/' . $folder_date);
             $zip->close();
 
+            echo "Zip Folder: " . "/files/salsify_assets/" . $folder_date . "<br>";
             echo "<pre>";
             echo print_r($zip);
             echo "</pre>";
