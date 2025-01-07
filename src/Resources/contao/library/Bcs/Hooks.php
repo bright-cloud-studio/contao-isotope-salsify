@@ -23,7 +23,7 @@ class Hooks
         {
             // Manually open our 'test' file
             $reader = new JsonReader();
-            $reader->open("../salsify/product-feed-paper_2024_04_12_16_45_01_UTC.json");
+            $reader->open("../salsify/Salsify_product-feed_2025_01_02_18_31_17_UTC.json");
 
             
             /*************************/
