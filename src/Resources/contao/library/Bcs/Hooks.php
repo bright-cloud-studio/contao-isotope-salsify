@@ -31,15 +31,15 @@ class Hooks
             /*************************/
 
             // Create a PHP ZIP variable
-            $zip = new ZipArchive();
+            //$zip = new ZipArchive();
             // Open our ZIP file
-            $zip->open('../salsify/asset-feed-paper_2024_04_12_16_45_01_UTC.zip');
+            //$zip->open('../salsify/asset-feed-paper_2024_04_12_16_45_01_UTC.zip');
             // Get today's date to be used as the folder's name
-            $folder_date =  date('m_d_y');
+            //$folder_date =  date('m_d_y');
             // Extract the ZIP file into our date folder
-            $zip->extractTo('../files/salsify_assets/' . $folder_date);
+            //$zip->extractTo('../files/salsify_assets/' . $folder_date);
             // Close the ZIP out
-            $zip->close();
+            //$zip->close();
 
 
 
@@ -48,13 +48,14 @@ class Hooks
             /************************/
 
             // Read the "attributes" object
-            $reader->read("attributes");
+            //$reader->read("attributes");
             // Store the initial depth so we know when to end
-            $depth = $reader->depth();
+            //$depth = $reader->depth();
             // Step to the first element within "attributes"
-            $reader->read();
+            //$reader->read();
 
             // Do while there is data to be read
+            /*
             do
             {
 
@@ -88,7 +89,7 @@ class Hooks
                 }
 
             } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
-
+            */
 
             /******************************/
             /* Process "Attribute Values" */
@@ -100,9 +101,9 @@ class Hooks
             /****************************/
 
             
-            $reader->close();
+            //$reader->close();
             
-            die();
+            //die();
             
         }
         
