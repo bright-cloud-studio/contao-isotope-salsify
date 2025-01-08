@@ -54,7 +54,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         (
             'fields'                  => array('date_created', 'district', 'school', 'psychologist', 'student'),
 			'format'                  => '%s %s %s %s %s',
-			'label_callback'          => array('tl_assignment', 'addIcon')
+			'label_callback'          => array('tl_salsify_request', 'addIcon')
         ),
         'global_operations' => array
         (
