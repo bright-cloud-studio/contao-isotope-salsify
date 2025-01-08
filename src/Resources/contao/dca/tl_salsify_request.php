@@ -67,11 +67,6 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         ),
         'operations' => array
         (
-            'salsify_attribute' => array
-            (
-                'href'                => 'do=salsify_attribute',
-                'icon'                => 'articles.svg'
-            ),
             'edit' => array
             (
                 'label'               => &$GLOBALS['TL_LANG']['tl_salsify_request']['edit'],
@@ -83,6 +78,11 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
                 'label'               => &$GLOBALS['TL_LANG']['tl_salsify_request']['show'],
                 'href'                => 'act=show',
                 'icon'                => 'show.gif'
+            ),
+            'salsify_attribute' => array
+            (
+                'href'                => 'do=salsify_attribute',
+                'icon'                => 'articles.svg'
             )
         )
     ),
