@@ -13,6 +13,9 @@ use Isotope\Interfaces\IsotopeProduct;
 use Isotope\Isotope;
 use Isotope\Model\Product;
 
+use Bcs\Model\SalsifyRequest;
+use Bcs\Model\SalsifyAttribute;
+
 
 
 class Hooks
@@ -41,14 +44,21 @@ class Hooks
                 foreach($array_parent as $array_child) {
 
                     // Create a Salsify Request to hold everything
+                    $request = new SalsifyRequest();
                     
                     foreach($array_child as $key => $val) {
+                        
                         echo "<strong>" . $key . "</strong> - " . $val[0];
                         echo "<br>";
 
                         // Create Salsify Attributes for each loop
+                        $attr = new SalsifyAttribute();
+                        $attr->attribute_key = $key;
+                        $attr->attribute_value = $val[0];
+                        $attr->save();
                         
                     }
+                    $request->save();
                     echo "<hr>";
                 }
 
