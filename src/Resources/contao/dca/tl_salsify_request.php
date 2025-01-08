@@ -22,7 +22,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     'config' => array
     (
         'dataContainer'               => DC_Table::class,
-        'ctable'                      => array('tl_transaction'),
+        'ctable'                      => array('tl_salsify_attribute'),
         'switchToEdit'                => false,
         'enableVersioning'            => true,
         'onload_callback' => array
@@ -78,16 +78,16 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             ),
             'edit' => array
             (
-                'label'               => &$GLOBALS['TL_LANG']['tl_assignment']['edit'],
+                'label'               => &$GLOBALS['TL_LANG']['tl_salsify_request']['edit'],
                 'href'                => 'act=edit',
                 'icon'                => 'edit.gif'
             ),
             'toggle' => array
 			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_assignment']['toggle'],
+				'label'               => &$GLOBALS['TL_LANG']['tl_salsify_request']['toggle'],
 				'icon'                => 'visible.gif',
 				'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-				'button_callback'     => array('Bcs\Backend\AssignmentBackend', 'toggleIcon')
+				'button_callback'     => array('Bcs\Backend\SalsifyRequestBackend', 'toggleIcon')
 			),
             'show' => array
             (
