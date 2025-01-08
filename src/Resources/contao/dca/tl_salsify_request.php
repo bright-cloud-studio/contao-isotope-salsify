@@ -67,9 +67,9 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         ),
         'operations' => array
         (
-            'salsify_request' => array
+            'salsify_attribute' => array
             (
-                'href'                => 'do=salsify_request',
+                'href'                => 'do=salsify_attribute',
                 'icon'                => 'articles.svg'
             ),
             'edit' => array
