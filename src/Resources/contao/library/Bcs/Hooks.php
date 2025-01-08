@@ -18,61 +18,39 @@ class Hooks
     public function generatePage(&$objPageModel, $objLayout, &$objPage)
     {
 
-        // If this is our "Contact - Success" test page
+        // TEMPORARY - IF OUR 'HIDDEN' TEST PAGE
         if($objPageModel->id == 58)
         {
-            // Manually open our 'test' file
+            
+            // Open and process file
             $reader = new JsonReader();
             $reader->open("../salsify/Salsify_product-feed_2025_01_02_18_31_17_UTC.json");
-
-
-
-            /************************/
-            /* Process "Attributes" */
-            /************************/
-            // Store the initial depth so we know when to end
             $depth = $reader->depth();
-            // Step to the first element within "attributes"
             $reader->read();
-
-            // Do while there is data to be read
             
+            // Process loaded XML data
             do
             {
-
-                // Temporarly store our read values
+            
+                // Load the first array, which is the overall wrapper of arrays
                 $array_parent = $reader->value();
                 
+                // Loop through children arrays, these are what store the actual values here
                 foreach($array_parent as $array_child) {
-                    
                     foreach($array_child as $key => $val) {
-                        echo "KEY: " . $key . "<br>";
-                        echo "VAL: " . $val[0];
+                        echo "<strong>" . $key . "</strong> - " . $val[0];
                         echo "<br>";
                     }
-                    
                     echo "<hr>";
-                    
                 }
 
-
             } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
-            
 
-            /******************************/
-            /* Process "Attribute Values" */
-            /******************************/
-            
-
-            /****************************/
-            /* Process "Digital Assets" */
-            /****************************/
 
             
             $reader->close();
-            
+            // TEMPORARY: Die so we can see the page with just our data on it
             die();
-            
         }
         
     }
