@@ -13,6 +13,8 @@ use Isotope\Interfaces\IsotopeProduct;
 use Isotope\Isotope;
 use Isotope\Model\Product;
 
+
+
 class Hooks
 {
     public function generatePage(&$objPageModel, $objLayout, &$objPage)
@@ -37,9 +39,15 @@ class Hooks
                 
                 // Loop through children arrays, these are what store the actual values here
                 foreach($array_parent as $array_child) {
+
+                    // Create a Salsify Request to hold everything
+                    
                     foreach($array_child as $key => $val) {
                         echo "<strong>" . $key . "</strong> - " . $val[0];
                         echo "<br>";
+
+                        // Create Salsify Attributes for each loop
+                        
                     }
                     echo "<hr>";
                 }
