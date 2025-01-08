@@ -1,9 +1,6 @@
 <?php
 
-/* Assignment - Parent to Transaction */
-
-use Bcs\Model\District;
-use Bcs\Model\Student;
+/* Isotope Salsify - Parent to Salsify Attribute */
 
 use Contao\Backend;
 use Contao\Database;
