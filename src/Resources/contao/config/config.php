@@ -15,3 +15,7 @@ $GLOBALS['TL_HOOKS']['generatePage'][] 		 = array('Bcs\Hooks', 'generatePage');
 $GLOBALS['TL_LANG']['MOD']['salsify'][0] = "Salsify";
 $GLOBALS['BE_MOD']['salsify']['salsify_request'] = array( 'tables' => array('tl_salsify_request') );
 $GLOBALS['BE_MOD']['salsify']['salsify_attribute'] = array( 'tables' => array('tl_salsify_attribute') );
+
+/* Models */
+$GLOBALS['TL_MODELS']['tl_salsify_request']         = 'Bcs\Model\SalsifyRequest';
+$GLOBALS['TL_MODELS']['tl_salsify_attribute']         = 'Bcs\Model\SalsifyAttribute';
