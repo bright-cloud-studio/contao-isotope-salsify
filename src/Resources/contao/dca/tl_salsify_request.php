@@ -31,7 +31,6 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'keys' => array
             (
                 'id' 	=> 	'primary',
-                'alias' =>  'index',
                 'pid'   => 'index'
             )
         )
