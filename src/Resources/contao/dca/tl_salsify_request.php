@@ -46,13 +46,13 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'showRootTrails'          => false,
             'icon'                    => 'pagemounts.svg',
             'flag'                    => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'fields'                  => array('date_created DESC'),
+            'fields'                  => array('id DESC'),
             'panelLayout'             => 'filter;sort,search,limit'
         ),
         'label' => array
         (
-            'fields'                  => array('date_created', 'district', 'school', 'psychologist', 'student'),
-			'format'                  => '%s %s %s %s %s',
+            'fields'                  => array('id', 'product_sku'),
+			'format'                  => 'ID: %s | SKU: %s',
 			'label_callback'          => array('tl_salsify_request', 'addIcon')
         ),
         'global_operations' => array
