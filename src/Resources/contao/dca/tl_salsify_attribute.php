@@ -30,7 +30,6 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'keys' => array
             (
                 'id' 	=> 	'primary',
-                'alias' =>  'index',
                 'pid'   =>  'index'
             )
         )
@@ -44,15 +43,15 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'mode'                    => DataContainer::MODE_UNSORTED,
             'rootPaste'               => false,
             'icon'                    => 'pagemounts.svg',
-            'defaultSearchField'      => 'date_submitted',
-            'flag'                    => DataContainer::SORT_DESC,
-            'fields'                  => array('date_submitted DESC'),
+            'defaultSearchField'      => 'attribute_key',
+            'flag'                    => DataContainer::SORT_ASC,
+            'fields'                  => array('attribute_key ASC'),
             'panelLayout'             => 'filter;sort,search,limit'
         ),
         'label' => array
         (
-            'fields'                  => array('date_submitted', 'psychologist'),
-			'format'                  => '%s -  %s',
+            'fields'                  => array('id', 'attribute_key'),
+			'format'                  => 'ID: %s -  KEY: %s',
 			'label_callback'          => array('tl_salsify_attribute', 'addIcon')
         ),
         'global_operations' => array
@@ -73,20 +72,6 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
                 'href'                => 'act=edit',
                 'icon'                => 'edit.gif'
             ),
-            'toggle' => array
-            (
-                'label'               => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['toggle'],
-                'icon'                => 'visible.gif',
-                'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback'     => array('Bcs\Backend\TransactionBackend', 'toggleIcon')
-            ),
-            'delete' => array
-            (
-                'label'               => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['delete'],
-                'href'                => 'act=delete',
-                'icon'                => 'delete.svg',
-                'attributes'          => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null) . '\'))return false;Backend.getScrollOffset()"'
-            ),
             'show' => array
             (
                 'label'               => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['show'],
@@ -99,7 +84,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{assignment_details_legend}, assignment_details;{transaction_legend},date_submitted, psychologist, service, price;{meeting_legend}, meeting_date, meeting_start, meeting_end, meeting_duration;{notes_legend},notes;{publish_legend},published;{internal_legend:hide}, lasid, sasid, originally_submitted;'
+        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value;'
     ),
  
     // Fields
@@ -125,29 +110,6 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         (
             'sql'                    	=> "int(10) unsigned NOT NULL default '0'"
         ),
-        'alias' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_transaction']['alias'],
-            'exclude'                 => true,
-            'inputType'               => 'text',
-            'search'                  => false,
-            'eval'                    => array('unique'=>true, 'rgxp'=>'alias', 'doNotCopy'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
-            'save_callback' => array
-            (
-                array('Bcs\Backend\SalsifyAttributeBackend', 'generateAlias')
-            ),
-            'sql'                     => "varchar(128) COLLATE utf8mb3_bin NOT NULL default ''"
-        ),
-        'published' => array
-        (
-            'exclude'                 => true,
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['published'],
-            'inputType'               => 'checkbox',
-            'eval'                    => array('submitOnChange'=>false, 'doNotCopy'=>true),
-            'sql'                     => "char(1) NOT NULL default ''"
-        ),
-
-
         
         // Salsify Attribute Fields
         'attribute_key' => array
