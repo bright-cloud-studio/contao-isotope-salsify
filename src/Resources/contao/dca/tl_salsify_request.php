@@ -101,14 +101,12 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        //'default'                     => '{assignment_legend}, date_created;'
-        'default'                     => '{salsify_request_legend}, email;{publish_legend},published;'
+        'default'                     => '{salsify_request_legend}, product_sku, email;{publish_legend},published;'
     ),
  
     // Fields
     'fields' => array
-    (
-        
+    (   
         // Contao Fields
         'id' => array
         (
@@ -120,7 +118,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
 		),
         'tstamp' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_assignment']['date'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['date'],
             'inputType'               => 'text',
 		    'sql'                     => "int(10) unsigned NOT NULL default '0'"
         ),
@@ -130,7 +128,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         ),
         'alias' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_assignment']['alias'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['alias'],
             'exclude'                 => true,
             'inputType'               => 'text',
             'search'                  => false,
@@ -138,17 +136,24 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'eval'                    => array('unique'=>true, 'rgxp'=>'alias', 'doNotCopy'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
             'save_callback' => array
             (
-                array('Bcs\Backend\AssignmentBackend', 'generateAlias')
+                array('Bcs\Backend\SalsifyRequestBackend', 'generateAlias')
             ),
             'sql'                     => "varchar(128) COLLATE utf8mb3_bin NOT NULL default ''"
-
+        ),
+        'published' => array
+        (
+            'exclude'                 => true,
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['published'],
+            'inputType'               => 'checkbox',
+            'eval'                    => array('submitOnChange'=>false, 'doNotCopy'=>true),
+            'sql'                     => "char(1) NOT NULL default ''"
         ),
 
         
         // Salsify Request Fields
-        'email' => array
+        'product_sku' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_assignment']['email'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['product_sku'],
             'inputType'               => 'text',
             'default'                 => '',
             'search'                  => false,
@@ -156,15 +161,17 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
             'sql'                     => "varchar(255) NOT NULL default ''"
         ),
-        
-        'published' => array
+        'email' => array
         (
-            'exclude'                 => true,
-            'label'                   => &$GLOBALS['TL_LANG']['tl_assignment']['published'],
-            'inputType'               => 'checkbox',
-            'eval'                    => array('submitOnChange'=>false, 'doNotCopy'=>true),
-            'sql'                     => "char(1) NOT NULL default ''"
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['email'],
+            'inputType'               => 'text',
+            'default'                 => '',
+            'search'                  => false,
+            'filter'                  => false,
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'                     => "varchar(255) NOT NULL default ''"
         )
+        
     )
 );
 
@@ -180,7 +187,7 @@ class tl_salsify_request extends Backend
 		}
 		if (Input::get('pid') == 0)
 		{
-			$GLOBALS['TL_DCA']['tl_assignment']['fields']['type']['default'] = 'root';
+			$GLOBALS['TL_DCA']['tl_salsify_request']['fields']['type']['default'] = 'root';
 		}
 		elseif (Input::get('mode') == 1)
 		{
@@ -191,7 +198,7 @@ class tl_salsify_request extends Backend
 
 			if ($objPage->pid == 0)
 			{
-				$GLOBALS['TL_DCA']['tl_assignment']['fields']['type']['default'] = 'root';
+				$GLOBALS['TL_DCA']['tl_salsify_request']['fields']['type']['default'] = 'root';
 			}
 		}
 	}
