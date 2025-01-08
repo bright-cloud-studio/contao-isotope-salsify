@@ -53,6 +53,7 @@ class Hooks
 
                         // Create Salsify Attributes for each loop
                         $attr = new SalsifyAttribute();
+                        $attr->pid = $request->id;
                         $attr->attribute_key = $key;
                         $attr->attribute_value = $val[0];
                         $attr->save();
