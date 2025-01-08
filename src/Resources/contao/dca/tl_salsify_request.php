@@ -91,7 +91,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
 			),
             'show' => array
             (
-                'label'               => &$GLOBALS['TL_LANG']['tl_assignment']['show'],
+                'label'               => &$GLOBALS['TL_LANG']['tl_salsify_request']['show'],
                 'href'                => 'act=show',
                 'icon'                => 'show.gif'
             )
@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     'palettes' => array
     (
         //'default'                     => '{assignment_legend}, date_created;'
-        'default'                     => '{assignment_legend}, date_created, date_30_day, date_45_day, psychologist, district, school, student, initial_reeval, type_of_testing, testing_date, meeting_required, meeting_date, contact_info_parent, contact_info_teacher, team_chair, email, report_submitted;{notes_legend},notes;{shared_legend},psychologists_shared;{internal_legend:hide}, lasid, sasid;{publish_legend},published;'
+        'default'                     => '{salsify_request_legend}, email;{publish_legend},published;'
     ),
  
     // Fields
