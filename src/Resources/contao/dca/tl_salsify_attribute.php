@@ -21,14 +21,10 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     'config' => array
     (
         'dataContainer'               => DC_Table::class,
-        'ptable'                      => 'tl_assignment',
+        'ptable'                      => 'tl_salsify_request',
         'switchToEdit'                => false,
-		    'enableVersioning'            => true,
-		    'markAsCopy'                  => 'title',
-        'onsubmit_callback' => array
-		    (
-			    array('Bcs\Backend\TransactionBackend', 'createTransaction')
-		    ),
+        'enableVersioning'            => true,
+        'markAsCopy'                  => 'title',
         'sql' => array
         (
             'keys' => array
@@ -56,8 +52,8 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         'label' => array
         (
             'fields'                  => array('date_submitted', 'psychologist'),
-			      'format'                  => '%s -  %s',
-			      'label_callback'          => array('tl_transaction', 'addIcon')
+			'format'                  => '%s -  %s',
+			'label_callback'          => array('tl_salsify_attribute', 'addIcon')
         ),
         'global_operations' => array
         (
@@ -73,27 +69,27 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         (
             'edit' => array
             (
-                'label'               => &$GLOBALS['TL_LANG']['tl_transaction']['edit'],
+                'label'               => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['edit'],
                 'href'                => 'act=edit',
                 'icon'                => 'edit.gif'
             ),
             'toggle' => array
-			      (
-				      'label'               => &$GLOBALS['TL_LANG']['tl_transaction']['toggle'],
-				      'icon'                => 'visible.gif',
-				      'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-				      'button_callback'     => array('Bcs\Backend\TransactionBackend', 'toggleIcon')
-			      ),
+            (
+                'label'               => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['toggle'],
+                'icon'                => 'visible.gif',
+                'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
+                'button_callback'     => array('Bcs\Backend\TransactionBackend', 'toggleIcon')
+            ),
             'delete' => array
             (
-                'label'               => &$GLOBALS['TL_LANG']['tl_transaction']['delete'],
+                'label'               => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['delete'],
                 'href'                => 'act=delete',
                 'icon'                => 'delete.svg',
                 'attributes'          => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null) . '\'))return false;Backend.getScrollOffset()"'
             ),
             'show' => array
             (
-                'label'               => &$GLOBALS['TL_LANG']['tl_transaction']['show'],
+                'label'               => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['show'],
                 'href'                => 'act=show',
                 'icon'                => 'show.gif'
             )
@@ -109,22 +105,21 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     // Fields
     'fields' => array
     (
-        /* ******************* */
+        
         // Contao Fields
-        /* ******************* */
         'id' => array
         (
-		      'sql'                     	=> "int(10) unsigned NOT NULL auto_increment"
+		    'sql'                   => "int(10) unsigned NOT NULL auto_increment"
         ),
         'pid' => array
         (
-		      'foreignKey'              => 'tl_assignment.id',
-			    'sql'                     => "int(10) unsigned NOT NULL default 0",
-			    'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
+		    'foreignKey'              => 'tl_assignment.id',
+		    'sql'                     => "int(10) unsigned NOT NULL default 0",
+		    'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
         ),
         'tstamp' => array
         (
-		      'sql'                     	=> "int(10) unsigned NOT NULL default '0'"
+		    'sql'                     	=> "int(10) unsigned NOT NULL default '0'"
         ),
         'sorting' => array
         (
@@ -139,167 +134,42 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'eval'                    => array('unique'=>true, 'rgxp'=>'alias', 'doNotCopy'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
             'save_callback' => array
             (
-                array('Bcs\Backend\TransactionBackend', 'generateAlias')
+                array('Bcs\Backend\SalsifyAttributeBackend', 'generateAlias')
             ),
             'sql'                     => "varchar(128) COLLATE utf8mb3_bin NOT NULL default ''"
-
         ),
         'published' => array
         (
             'exclude'                 => true,
-            'label'                   => &$GLOBALS['TL_LANG']['tl_transactions']['published'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['published'],
             'inputType'               => 'checkbox',
             'eval'                    => array('submitOnChange'=>false, 'doNotCopy'=>true),
             'sql'                     => "char(1) NOT NULL default ''"
         ),
 
 
-        /* ***************** */
-        // Assignment Details |
-        /* ***************** */
         
-        'assignment_details' => array
+        // Salsify Attribute Fields
+        'attribute_key' => array
         (
-            'input_field_callback'  => array('Bcs\Backend\TransactionBackend', 'getAssignmentDetails'),
-            'eval'                  => array('doNotShow'=>true),
-        ),
-
-        
-        
-        /* ******************* */
-        // Transaction Fields
-        /* ******************* */
-        
-        'date_submitted' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_transaction']['date_submitted'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['attribute_key'],
             'inputType'               => 'text',
             'default'                 => '',
+            'search'                  => false,
             'filter'                  => false,
-            'search'                  => false,
-            'eval'                    => array('rgxp'=>'date', 'datepicker'=>true, 'mandatory'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "int(10) unsigned NOT NULL default 0",
-            'default'                 => date("m/d/y")
-        ),
-        'psychologist' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_transaction']['psychologist'],
-            'inputType'               => 'select',
-            'filter'                  => true,
-            'search'                  => true,
-            'flag'                    => DataContainer::SORT_ASC,
-            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50', 'chosen'=>true),
-            'options_callback'	      => array('Bcs\Backend\TransactionBackend', 'getPsychologists'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
-        ),
-        'service' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_transactions']['service'],
-            'inputType'               => 'select',
-            'filter'                  => true,
-            'search'                  => false,
-            'flag'                    => DataContainer::SORT_ASC,
-            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50', 'chosen'=>true),
-            'options_callback'	      => array('Bcs\Backend\TransactionBackend', 'getServices'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
-        ),
-        'price' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_transactions']['price'],
-            'inputType'               => 'text',
-            'default'                 => '',
-            'filter'                  => false,
-            'search'                  => false,
-            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
-        ),
-        
-        'meeting_date' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_transactions']['meeting_date'],
-            'inputType'               => 'text',
-            'default'                 => '',
-            'filter'                  => false,
-            'search'                  => false,
-            'eval'                    => array('rgxp'=>'date', 'datepicker'=>true, 'mandatory'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(20) NOT NULL default ''",
-            'default'                 => date("m/d/y")
-        ),
-        'meeting_start' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_transactions']['meeting_start'],
-            'inputType'               => 'text',
-            'default'                 => '',
-            'filter'                  => true,
-            'search'                  => true,
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
             'sql'                     => "varchar(255) NOT NULL default ''"
         ),
-        'meeting_end' => array
+        'attribute_value' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_transactions']['meeting_end'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['attribute_value'],
             'inputType'               => 'text',
             'default'                 => '',
-            'filter'                  => true,
-            'search'                  => true,
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
-        ),
-        'meeting_duration' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_transactions']['meeting_duration'],
-            'inputType'               => 'text',
-            'default'                 => '',
-            'filter'                  => false,
             'search'                  => false,
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
-        ),
-        'notes' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_transactions']['notes'],
-            'inputType'               => 'text',
-            'default'                 => '',
-            'search'                  => true,
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'clr', 'allowHtml'=>false),
-            'sql'                     => "text NOT NULL default ''"
-        ),
-
-
-
-        // Hidden fields for search purposes
-        'lasid' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_transactions']['lasid'],
-            'inputType'               => 'text',
-            'default'                 => '',
-            'filter'                  => true,
-            'search'                  => true,
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
-        ),
-        'sasid' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_transactions']['sasid'],
-            'inputType'               => 'text',
-            'default'                 => '',
-            'filter'                  => true,
-            'search'                  => true,
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
-        ),
-        'originally_submitted' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_transaction']['originally_submitted'],
-            'inputType'               => 'text',
-            'default'                 => '',
             'filter'                  => false,
-            'search'                  => false,
-            'eval'                    => array('rgxp'=>'date', 'datepicker'=>true, 'mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'                     => "int(10) unsigned",
-            'default'                 => ''
-        ),
-        
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'                     => "varchar(255) NOT NULL default ''"
+        )
     )
 );
 
@@ -307,7 +177,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
 
 
 
-class tl_transaction extends Backend
+class tl_salsify_attribute extends Backend
 {
 
     /** @return string */
@@ -316,46 +186,12 @@ class tl_transaction extends Backend
         $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 		if($request && System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request))
 		{
-            $GLOBALS['TL_CSS'][] = 'bundles/bcspaymentdashboard/css/be_coloring.css';
+            //$GLOBALS['TL_CSS'][] = 'bundles/bcspaymentdashboard/css/be_coloring.css';
 		}
 	}
     
 	public function addIcon($row, $label)
 	{
-        // Clear out our current label
-        $label = '';
-
-        // Add our formatted date and a dash
-        $label .= date('m/d/Y', $row['date_submitted']) . " - ";
-
-        // Add the Psy's name
-        $psy = MemberModel::findBy('id', $row['psychologist']);
-        $label .= $psy->firstname . " " . $psy->lastname . " - ";
-
-        // Add Assignments District
-        $assignment = Assignment::findBy('id', $row['pid']);
-        $district = District::findBy('id', $assignment->district);
-        $label .= $district->district_name . " - ";
-
-        // Add Service
-        $service = Service::findBy('service_code', $row['service']);
-        $label .= $service->name . " - ";
-
-        // Add LASID / SASID
-        $student = Student::findBy('id', $assignment->student);
-        
-        $label .= $student->name . " - ";
-        
-        if($student->lasid != '' && $student->sasid != '') {
-            $label .= $student->lasid . " / " . $student->sasid;
-        } else {
-            if($student->lasid != '')
-                $label .= $student->lasid;
-            if($student->sasid != '')
-                $label .= $student->sasid;
-        }
-        
-        
 		$sub = 0;
 		$unpublished = ($row['start'] && $row['start'] > time()) || ($row['stop'] && $row['stop'] <= time());
 
