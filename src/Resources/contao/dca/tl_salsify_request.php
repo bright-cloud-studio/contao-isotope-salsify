@@ -68,9 +68,9 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         ),
         'operations' => array
         (
-            'transactions' => array
+            'salsify_request' => array
             (
-                'href'                => 'do=transaction',
+                'href'                => 'do=salsify_request',
                 'icon'                => 'articles.svg'
             ),
             'edit' => array
@@ -79,13 +79,6 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
                 'href'                => 'act=edit',
                 'icon'                => 'edit.gif'
             ),
-            'toggle' => array
-			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_salsify_request']['toggle'],
-				'icon'                => 'visible.gif',
-				'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-				'button_callback'     => array('Bcs\Backend\SalsifyRequestBackend', 'toggleIcon')
-			),
             'show' => array
             (
                 'label'               => &$GLOBALS['TL_LANG']['tl_salsify_request']['show'],
@@ -98,7 +91,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_request_legend}, product_sku, email;{publish_legend},published;'
+        'default'                     => '{salsify_request_legend}, product_sku, email;'
     ),
  
     // Fields
@@ -122,28 +115,6 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         'sorting' => array
         (
             'sql'                     => "int(10) unsigned NOT NULL default '0'"
-        ),
-        'alias' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['alias'],
-            'exclude'                 => true,
-            'inputType'               => 'text',
-            'search'                  => false,
-            'filter'                  => false,
-            'eval'                    => array('unique'=>true, 'rgxp'=>'alias', 'doNotCopy'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
-            'save_callback' => array
-            (
-                array('Bcs\Backend\SalsifyRequestBackend', 'generateAlias')
-            ),
-            'sql'                     => "varchar(128) COLLATE utf8mb3_bin NOT NULL default ''"
-        ),
-        'published' => array
-        (
-            'exclude'                 => true,
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['published'],
-            'inputType'               => 'checkbox',
-            'eval'                    => array('submitOnChange'=>false, 'doNotCopy'=>true),
-            'sql'                     => "char(1) NOT NULL default ''"
         ),
 
         
