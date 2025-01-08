@@ -25,71 +25,38 @@ class Hooks
             $reader = new JsonReader();
             $reader->open("../salsify/Salsify_product-feed_2025_01_02_18_31_17_UTC.json");
 
-            
-            /*************************/
-            /* Unzip our Assets file */
-            /*************************/
-
-            // Create a PHP ZIP variable
-            //$zip = new ZipArchive();
-            // Open our ZIP file
-            //$zip->open('../salsify/asset-feed-paper_2024_04_12_16_45_01_UTC.zip');
-            // Get today's date to be used as the folder's name
-            //$folder_date =  date('m_d_y');
-            // Extract the ZIP file into our date folder
-            //$zip->extractTo('../files/salsify_assets/' . $folder_date);
-            // Close the ZIP out
-            //$zip->close();
-
 
 
             /************************/
             /* Process "Attributes" */
             /************************/
-
-            // Read the "attributes" object
-            //$reader->read("attributes");
             // Store the initial depth so we know when to end
-            //$depth = $reader->depth();
+            $depth = $reader->depth();
             // Step to the first element within "attributes"
-            //$reader->read();
+            $reader->read();
 
             // Do while there is data to be read
-            /*
             do
             {
 
-                // Temporarly store our read values
-                $attr = $reader->value();
-
-                // Take the id, convert to lowercase, replace spaces with underscores, truncate to max length of 30 characters
-                $field_name = substr(str_replace(' ', '_', strtolower($attr["salsify:id"])), 0, 30);
+                // This is our overall displays
+                $array_parent = $reader->value();
                 
-                // Try and find an existing version of this Attribute
-                $existing_attr = Attribute::findOneBy(['tl_iso_attribute.field_name=?'],[$field_name])->id;
-                
-                // Create Attribute if it doesn't exist already
-                if(!$existing_attr)
-                {
-                    echo "New: " . $attr["salsify:id"] . "<br>";
-
-                    //$new_attr = new TextField();
-                    //$new_attr->tstamp = time();
-                    //$new_attr->name = $attr["salsify:id"];
-                    //$new_attr->field_name = $field_name;
-                    //$new_attr->type = 'textarea';
-                    //$new_attr->published = 1;
-                    //$new_attr->save();
+                foreach($array_parent as $array_child) {
                     
+                    foreach($array_child as $key => $val) {
+                        echo "KEY: " . $key . "<br>";
+                        echo "VAL: " . $val[0];
+                        echo "<br>";
+                    }
+                    
+                    echo "<hr>";
                     
                 }
-                // Update if this Attribute doesn't exist yet
-                else {
-                    echo "Old: " . $attr["salsify:id"] . "<br>";
-                }
+
 
             } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
-            */
+            
 
             /******************************/
             /* Process "Attribute Values" */
@@ -101,9 +68,9 @@ class Hooks
             /****************************/
 
             
-            //$reader->close();
+            $reader->close();
             
-            //die();
+            die();
             
         }
         
