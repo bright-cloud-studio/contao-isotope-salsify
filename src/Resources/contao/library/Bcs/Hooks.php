@@ -36,10 +36,11 @@ class Hooks
             $reader->read();
 
             // Do while there is data to be read
+            
             do
             {
 
-                // This is our overall displays
+                // Temporarly store our read values
                 $array_parent = $reader->value();
                 
                 foreach($array_parent as $array_child) {
