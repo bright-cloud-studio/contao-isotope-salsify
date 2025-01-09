@@ -18,6 +18,9 @@ class ModSalsifyImporter extends \Contao\Module
     /* Default Template */
     protected $strTemplate = 'mod_salsify_importer';
 
+    // Stores our messages, later displayed in the module's template
+    protected static $messages = array();
+
     /* Construct function */
     public function __construct($objModule, $strColumn='main')
     {
@@ -70,6 +73,8 @@ class ModSalsifyImporter extends \Contao\Module
                 $salsify_request->tstamp = time();
                 $salsify_request->product_sku = '123';
                 $salsify_request->save();
+
+                $messages[$salsify_request->id] = "Requesting: ID " . $salsify_request->id;
                 
                 foreach($array_child as $key => $val) {
                     
@@ -90,6 +95,8 @@ class ModSalsifyImporter extends \Contao\Module
         } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
         
         $reader->close();
+
+        $this->Template->salsify_messages = $messages;
         
     }
   
