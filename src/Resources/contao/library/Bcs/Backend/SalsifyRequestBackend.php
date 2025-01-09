@@ -8,7 +8,7 @@ use Contao\Input;
 use Contao\DataContainer;
 use Contao\StringUtil;
 
-class SalsifyRequestBackend extends Backend
+class SalsifyProductBackend extends Backend
 {
     
 	public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
@@ -50,7 +50,7 @@ class SalsifyRequestBackend extends Backend
 		}
 
 		// Update the database
-		$this->Database->prepare("UPDATE tl_salsify_request SET tstamp=". time() .", published='" . ($blnVisible ? 1 : '') . "' WHERE id=?")->execute($intId);
+		$this->Database->prepare("UPDATE tl_salsify_product SET tstamp=". time() .", published='" . ($blnVisible ? 1 : '') . "' WHERE id=?")->execute($intId);
 	}
 
     
@@ -65,7 +65,7 @@ class SalsifyRequestBackend extends Backend
 			$varValue = standardize(StringUtil::restoreBasicEntities($dc->activeRecord->name));
 		}
 
-		$objAlias = $this->Database->prepare("SELECT id FROM tl_salsify_request WHERE id=? OR alias=?")->execute($dc->id, $varValue);
+		$objAlias = $this->Database->prepare("SELECT id FROM tl_salsify_product WHERE id=? OR alias=?")->execute($dc->id, $varValue);
 
 		// Check whether the page alias exists
 		if ($objAlias->numRows > 1)
