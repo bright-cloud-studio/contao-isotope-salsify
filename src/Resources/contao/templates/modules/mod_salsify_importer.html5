@@ -3,12 +3,7 @@
 
 <div class="mod_review_transactions size100 no-pad">
 	<h2>Your Transactions From: <?= date('F Y') ?></h2>
-
-		<?php
-			foreach ($this->salsify_messages as $message) {
-				$buffer = '<p>' . $message . '</p>';
-				echo $buffer;
-			}
-		?>
-
+	<ul>
+		<li><?php foreach ($this->salsify_messages as $message) { echo $buffer; } ?></li>
+	</ul>
 </div>
