@@ -43,7 +43,7 @@ class Hooks
                 foreach($array_parent as $array_child) {
 
                     // Create a Salsify Request to hold everything
-                    $salsify_request = new SalsifyRequest();
+                    $salsify_request = new SalsifyAttribute();
                     $salsify_request->product_sku = '123';
                     $salsify_request->save();
                     
