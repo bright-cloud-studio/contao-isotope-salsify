@@ -52,8 +52,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         'label' => array
         (
             'fields'                  => array('id', 'attribute_key'),
-			'format'                  => 'ID: %s -  KEY: %s',
-			'label_callback'          => array('tl_salsify_attribute', 'addIcon')
+			'format'                  => 'ID: %s -  KEY: %s'
         ),
         'global_operations' => array
         (
