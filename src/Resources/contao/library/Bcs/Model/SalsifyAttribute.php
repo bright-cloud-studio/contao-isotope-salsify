@@ -6,5 +6,11 @@ use Contao\Model;
 
 class SalsifyAttribute extends Model
 {
-    protected static $strTable = 'tl_salsify_attribute';   
+	
+	/**
+	 * Table name
+	 * @var string
+	 */
+	protected static $strTable = 'tl_salsify_attribute';
+    
 }
