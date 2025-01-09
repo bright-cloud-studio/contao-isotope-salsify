@@ -1,6 +1,6 @@
 <?php
 
-/* Isotope Salsify - Parent to Salsify Attribute */
+/* Salsify Product - Parent to Salsify Attribute */
 
 use Contao\Backend;
 use Contao\Database;
@@ -12,7 +12,7 @@ use Contao\MemberModel;
 use Contao\System;
 
 /* Table tl_price_chart */
-$GLOBALS['TL_DCA']['tl_salsify_request'] = array
+$GLOBALS['TL_DCA']['tl_salsify_product'] = array
 (
  
     // Config
@@ -24,7 +24,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         'enableVersioning'            => true,
         'onload_callback' => array
 		(
-			array('tl_salsify_request', 'setRootType')
+			array('tl_salsify_product', 'setRootType')
 		),
         'sql' => array
         (
@@ -52,7 +52,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         (
             'fields'                  => array('id', 'product_sku'),
 			'format'                  => 'ID: %s | SKU: %s',
-			'label_callback'          => array('tl_salsify_request', 'addIcon')
+			'label_callback'          => array('tl_salsify_product', 'addIcon')
         ),
         'global_operations' => array
         (
@@ -68,13 +68,13 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         (
             'edit' => array
             (
-                'label'               => &$GLOBALS['TL_LANG']['tl_salsify_request']['edit'],
+                'label'               => &$GLOBALS['TL_LANG']['tl_salsify_product']['edit'],
                 'href'                => 'act=edit',
                 'icon'                => 'edit.gif'
             ),
             'show' => array
             (
-                'label'               => &$GLOBALS['TL_LANG']['tl_salsify_request']['show'],
+                'label'               => &$GLOBALS['TL_LANG']['tl_salsify_product']['show'],
                 'href'                => 'act=show',
                 'icon'                => 'show.gif'
             ),
@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_request_legend}, product_sku, email;'
+        'default'                     => '{salsify_product_legend}, product_sku, email;'
     ),
  
     // Fields
@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         ),
         'tstamp' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['date'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['date'],
             'inputType'               => 'text',
 		    'sql'                     => "int(10) unsigned NOT NULL default '0'"
         ),
@@ -115,7 +115,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         // Salsify Request Fields
         'product_sku' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['product_sku'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['product_sku'],
             'inputType'               => 'text',
             'default'                 => '',
             'search'                  => false,
@@ -125,7 +125,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         ),
         'email' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['email'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['email'],
             'inputType'               => 'text',
             'default'                 => '',
             'search'                  => false,
@@ -138,7 +138,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
 );
 
 
-class tl_salsify_request extends Backend
+class tl_salsify_product extends Backend
 {
   
 	public function setRootType(DataContainer $dc)
@@ -149,7 +149,7 @@ class tl_salsify_request extends Backend
 		}
 		if (Input::get('pid') == 0)
 		{
-			$GLOBALS['TL_DCA']['tl_salsify_request']['fields']['type']['default'] = 'root';
+			$GLOBALS['TL_DCA']['tl_salsify_product']['fields']['type']['default'] = 'root';
 		}
 		elseif (Input::get('mode') == 1)
 		{
@@ -160,7 +160,7 @@ class tl_salsify_request extends Backend
 
 			if ($objPage->pid == 0)
 			{
-				$GLOBALS['TL_DCA']['tl_salsify_request']['fields']['type']['default'] = 'root';
+				$GLOBALS['TL_DCA']['tl_salsify_product']['fields']['type']['default'] = 'root';
 			}
 		}
 	}
