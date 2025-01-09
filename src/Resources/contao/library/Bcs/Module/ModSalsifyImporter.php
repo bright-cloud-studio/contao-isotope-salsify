@@ -2,6 +2,11 @@
 
 namespace Bcs\Module;
 
+use Bcs\Model\SalsifyRequest;
+use Bcs\Model\SalsifyAttribute;
+
+use pcrov\JsonReader\JsonReader;
+
 use Contao\BackendTemplate;
 use Contao\System;
 use Contao\FrontendUser;
@@ -43,11 +48,49 @@ class ModSalsifyImporter extends \Contao\Module
 
     protected function compile()
     {
+        
+        // Open and process file
+        $reader = new JsonReader();
+        $reader->open("../salsify/Salsify_product-feed_2025_01_02_18_31_17_UTC.json");
+        $depth = $reader->depth();
+        $reader->read();
+
+        // Process loaded XML data
+        do
+        {
+        
+            // Load the first array, which is the overall wrapper of arrays
+            $array_parent = $reader->value();
             
-        // Include Datatables JS library and CSS stylesheets
-        //$GLOBALS['TL_JAVASCRIPT'][] = 'bundles/bcspaymentdashboard/js/datatables.min.js';
-        //$GLOBALS['TL_CSS'][]        = 'bundles/bcspaymentdashboard/css/datatables.min.css';
-      
+            // Loop through children arrays, these are what store the actual values here
+            foreach($array_parent as $array_child) {
+
+                // Create a Salsify Request to hold everything
+                $salsify_request = new SalsifyRequest();
+                $salsify_request->tstamp = time();
+                $salsify_request->product_sku = '123';
+                $salsify_request->save();
+                
+                foreach($array_child as $key => $val) {
+                    
+                    echo "<strong>" . $key . "</strong> - " . $val[0];
+                    echo "<br>";
+                    
+                    $salsify_attribute = new SalsifyAttribute();
+                    $salsify_attribute->pid = $salsify_request->id;
+                    $salsify_attribute->attribute_key = $key;
+                    $salsify_attribute->attribute_value = $val[0];
+                    $salsify_attribute->tstamp = time();
+                    $salsify_attribute->save();
+                    
+                }
+                echo "<hr>";
+            }
+
+        } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
+        
+        $reader->close();
+        
     }
   
 }
