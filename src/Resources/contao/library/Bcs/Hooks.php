@@ -44,6 +44,7 @@ class Hooks
 
                     // Create a Salsify Request to hold everything
                     $salsify_request = new SalsifyRequest();
+                    $salsify_request->tstamp = time();
                     $salsify_request->product_sku = '123';
                     $salsify_request->save();
                     
@@ -56,6 +57,7 @@ class Hooks
                         $salsify_attribute->pid = $salsify_request->id;
                         $salsify_attribute->attribute_key = $key;
                         $salsify_attribute->attribute_value = $val[0];
+                        $salsify_attribute->tstamp = time();
                         $salsify_attribute->save();
                         
                     }
