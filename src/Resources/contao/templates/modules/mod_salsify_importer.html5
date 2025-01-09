@@ -4,6 +4,6 @@
 <div class="mod_review_transactions size100 no-pad">
 	<h2>Your Transactions From: <?= date('F Y') ?></h2>
 	<ul>
-		<?php foreach ($this->salsify_messages as $message) { echo '<li>' . $message . '</li>; } ?>
+		<?php foreach ($this->salsify_messages as $message) { echo '<li>' . $message . '</li>'; } ?>
 	</ul>
 </div>
