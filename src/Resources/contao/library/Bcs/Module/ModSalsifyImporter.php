@@ -2,7 +2,7 @@
 
 namespace Bcs\Module;
 
-use Bcs\Model\SalsifyRequest;
+use Bcs\Model\SalsifyProduct;
 use Bcs\Model\SalsifyAttribute;
 
 use pcrov\JsonReader\JsonReader;
@@ -69,19 +69,19 @@ class ModSalsifyImporter extends \Contao\Module
             foreach($array_parent as $array_child) {
 
                 // Create a Salsify Request to hold everything
-                $salsify_request = new SalsifyRequest();
-                $salsify_request->tstamp = time();
-                $salsify_request->product_sku = '123';
-                $salsify_request->save();
+                $salsify_product = new SalsifyProduct();
+                $salsify_product->tstamp = time();
+                $salsify_product->product_sku = '123';
+                $salsify_product->save();
 
-                $log[$salsify_request->id]['id'] = $salsify_request->id;
+                $log[$salsify_product->id]['id'] = $salsify_product->id;
                 
                 $attributes = array();
                 
                 foreach($array_child as $key => $val) {
                     
                     $salsify_attribute = new SalsifyAttribute();
-                    $salsify_attribute->pid = $salsify_request->id;
+                    $salsify_attribute->pid = $salsify_product->id;
                     $salsify_attribute->attribute_key = $key;
                     $salsify_attribute->attribute_value = $val[0];
                     $salsify_attribute->tstamp = time();
@@ -90,7 +90,7 @@ class ModSalsifyImporter extends \Contao\Module
                     
                     $attributes[$salsify_attribute->id]['key'] = $key;
                     $attributes[$salsify_attribute->id]['value'] = $val[0];
-                    $log[$salsify_request->id]['attributes'] = $attributes;
+                    $log[$salsify_product->id]['attributes'] = $attributes;
                     
                 }
 
