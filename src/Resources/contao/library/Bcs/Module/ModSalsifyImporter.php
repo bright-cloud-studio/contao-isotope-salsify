@@ -78,8 +78,8 @@ class ModSalsifyImporter extends \Contao\Module
                 
                 foreach($array_child as $key => $val) {
                     
-                    echo "<strong>" . $key . "</strong> - " . $val[0];
-                    echo "<br>";
+                    //echo "<strong>" . $key . "</strong> - " . $val[0];
+                    //echo "<br>";
                     
                     $salsify_attribute = new SalsifyAttribute();
                     $salsify_attribute->pid = $salsify_request->id;
@@ -89,7 +89,7 @@ class ModSalsifyImporter extends \Contao\Module
                     $salsify_attribute->save();
                     
                 }
-                echo "<hr>";
+                //echo "<hr>";
             }
 
         } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
