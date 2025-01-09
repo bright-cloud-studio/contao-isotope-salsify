@@ -68,7 +68,7 @@ class ModSalsifyImporter extends \Contao\Module
             // Loop through children arrays, these are what store the actual values here
             foreach($array_parent as $array_child) {
 
-                // Create a Salsify Request to hold everything
+                // Create a Salsify Product to hold our Salsify Attributes
                 $salsify_product = new SalsifyProduct();
                 $salsify_product->tstamp = time();
                 $salsify_product->product_sku = '123';
