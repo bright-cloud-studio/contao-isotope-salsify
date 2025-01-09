@@ -121,7 +121,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'search'                  => false,
             'filter'                  => false,
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'sql'                     => "varchar(255) default ''"
         ),
         'attribute_value' => array
         (
@@ -131,7 +131,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'search'                  => false,
             'filter'                  => false,
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'sql'                     => "text default ''"
         )
     )
 );
