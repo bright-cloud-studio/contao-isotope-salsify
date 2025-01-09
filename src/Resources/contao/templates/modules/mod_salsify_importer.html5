@@ -1,4 +1,6 @@
+
 <!-- Include DataTables for better formatting -->
+
 
 <div class="mod_review_transactions size100 no-pad">
 	<h2>Your Transactions From: <?= date('F Y') ?></h2>
