@@ -112,7 +112,7 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
         ),
 
         
-        // Salsify Request Fields
+        // Salsify Product Fields
         'product_sku' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['product_sku'],
