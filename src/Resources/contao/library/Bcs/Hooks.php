@@ -21,7 +21,7 @@ class Hooks
 {
     public function generatePage(&$objPageModel, $objLayout, &$objPage)
     {
-
+        /*
         // TEMPORARY - IF OUR 'HIDDEN' TEST PAGE
         if($objPageModel->id == 58)
         {
@@ -72,6 +72,7 @@ class Hooks
             // TEMPORARY: Die so we can see the page with just our data on it
             die();
         }
+        */
         
     }
 }
