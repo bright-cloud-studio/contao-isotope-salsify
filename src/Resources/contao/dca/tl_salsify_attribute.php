@@ -1,6 +1,6 @@
 <?php
 
-/* Salsify Attribute - Child to Salsify Request */
+/* Salsify Attribute - Child to Salsify Product */
 
 use Contao\MemberModel;
 
@@ -21,7 +21,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     'config' => array
     (
         'dataContainer'               => DC_Table::class,
-        'ptable'                      => 'tl_salsify_request',
+        'ptable'                      => 'tl_salsify_product',
         'switchToEdit'                => false,
         'enableVersioning'            => true,
         'markAsCopy'                  => 'title',
