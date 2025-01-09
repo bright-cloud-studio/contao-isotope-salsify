@@ -98,7 +98,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         ),
         'pid' => array
         (
-		    'foreignKey'              => 'tl_salsify_request.id',
+		    'foreignKey'              => 'tl_salsify_product.id',
 		    'sql'                     => "int(10) unsigned NOT NULL default 0",
 		    'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
         ),
@@ -114,7 +114,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         // Salsify Attribute Fields
         'attribute_key' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['attribute_key'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['attribute_key'],
             'inputType'               => 'text',
             'default'                 => '',
             'search'                  => false,
@@ -124,7 +124,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         ),
         'attribute_value' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['attribute_value'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['attribute_value'],
             'inputType'               => 'text',
             'default'                 => '',
             'search'                  => false,
