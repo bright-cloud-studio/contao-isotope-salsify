@@ -4,6 +4,9 @@ namespace Bcs;
 
 use ZipArchive;
 
+use Bcs\Model\SalsifyRequest;
+use Bcs\Model\SalsifyAttribute;
+
 use pcrov\JsonReader\JsonReader; // Json streaming library
 use Contao\Database;
 use Isotope\Model\Attribute;
@@ -12,10 +15,6 @@ use Isotope\Model\AttributeOption;
 use Isotope\Interfaces\IsotopeProduct;
 use Isotope\Isotope;
 use Isotope\Model\Product;
-
-use Bcs\Model\SalsifyRequest;
-use Bcs\Model\SalsifyAttribute;
-
 
 
 class Hooks
@@ -44,19 +43,14 @@ class Hooks
                 foreach($array_parent as $array_child) {
 
                     // Create a Salsify Request to hold everything
-                    $request = new SalsifyRequest();
+                    $salsify_request = new SalsifyRequest();
+                    $salsify_request->product_sku = '123';
+                    $salsify_request->save();
                     
                     foreach($array_child as $key => $val) {
                         
                         echo "<strong>" . $key . "</strong> - " . $val[0];
                         echo "<br>";
-
-                        // Create Salsify Attributes for each loop
-                        $attr = new SalsifyAttribute();
-                        $attr->pid = $request->id;
-                        $attr->attribute_key = $key;
-                        $attr->attribute_value = $val[0];
-                        $attr->save();
                         
                     }
                     $request->save();
