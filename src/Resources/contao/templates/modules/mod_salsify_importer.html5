@@ -1,12 +1,20 @@
-
 <!-- Include DataTables for better formatting -->
 
 <div class="mod_review_transactions size100 no-pad">
 	<h2>Your Transactions From: <?= date('F Y') ?></h2>
 	<ul>
-		<?php foreach ($this->salsify_messages as $message)
+		<?php
+		foreach ($this->salsify_log as $log)
 		{ 
-			echo '<li>Request Created: ID' . $message->id . '</li>'; 
+			echo '<li>Request Created: ID# ' . $log['id'] . '</li>'; 
+			
+			echo '<ul>';
+			foreach ($log['attributes'] as $attr)
+			{ 
+				echo '<li>KEY:  ' . $attr['key'] . ' VAL: '. $attr['value'] .'</li>'; 
+			}
+			echo '</ul>';
+			
 		}
 		?>
 	</ul>
