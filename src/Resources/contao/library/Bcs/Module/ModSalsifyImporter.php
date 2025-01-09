@@ -76,10 +76,9 @@ class ModSalsifyImporter extends \Contao\Module
 
                 $log[$salsify_request->id]['id'] = $salsify_request->id;
                 
+                $attributes = array();
+                
                 foreach($array_child as $key => $val) {
-                    
-                    //echo "<strong>" . $key . "</strong> - " . $val[0];
-                    //echo "<br>";
                     
                     $salsify_attribute = new SalsifyAttribute();
                     $salsify_attribute->pid = $salsify_request->id;
@@ -88,20 +87,20 @@ class ModSalsifyImporter extends \Contao\Module
                     $salsify_attribute->tstamp = time();
                     $salsify_attribute->save();
 
-                    $attributes = array();
-                    $attributes['key'] = $key;
-                    $attributes['value'] = $val[0];
+                    
+                    $attributes[$salsify_attribute->id]['key'] = $key;
+                    $attributes[$salsify_attribute->id]['value'] = $val[0];
                     $log[$salsify_request->id]['attributes'] = $attributes;
                     
                 }
-                //echo "<hr>";
+
             }
 
         } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
         
         $reader->close();
 
-        $this->Template->salsify_messages = $messages;
+        $this->Template->salsify_log = $log;
         
     }
   
