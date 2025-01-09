@@ -1,3 +1,66 @@
-<div class="mod_salsify_importer">
-  <h1>Salsify - Importer</h1>
+
+<!-- Include DataTables for better formatting -->
+
+<div class="mod_review_transactions size100 no-pad">
+	<h2>Your Transactions From: <?= date('F Y') ?></h2>
+
+
+	<table id="review_transactions" class="display compact cell-border hover order-column row-borders stripe" style="width:100%">
+		<thead>
+			<tr>
+				<th></th>
+				<th class="dt-head-center">Reviewed</th>
+				<th style="min-width: 300px; max-width: 300px;" class="col_district">District</th>
+				<th style="min-width: 250px; max-width: 250px;" class="col_school">School</th>
+				<th style="min-width: 250px; max-width: 250px;" class="col_student">Student</th>
+				<th style="min-width: 100px; max-width: 100px;" class="col_lasid dt-head-center">LASID#</th>
+				<th style="min-width: 100px; max-width: 100px;" class="col_sasid dt-head-center">SASID#</th>
+				<th style="min-width: 245px; max-width: 245px;" class="col_service">Service</th>
+				<th>Price</th>
+
+			</tr>
+		</thead>
+		<tbody>
+			
+			<?php
+				foreach ($this->transactions as $transaction) {
+					$buffer = '';
+					$buffer .= "<tr data-id='". $transaction['id'] ."' data-date-created='". $transaction['date_submitted'] ."' data-transaction-type='". $transaction['transaction_type'] ."'>";
+					$buffer .= "<td></td>";
+					$buffer .= "<td class='dt-body-center ". strtolower($transaction['reviewed']) ."'>" . $transaction['reviewed'] . "</td>";
+					$buffer .= "<td class='col_district'>" . $transaction['district'] . "</td>";
+					$buffer .= "<td class='col_school'>" . $transaction['school'] . "</td>";
+					$buffer .= "<td class='col_student'>" . $transaction['student'] . "</td>";
+					$buffer .= "<td class='col_lasid dt-body-center'>" . $transaction['lasid'] . "</td>";
+					$buffer .= "<td class='col_sasid dt-body-center'>" . $transaction['sasid'] . "</td>";
+					$buffer .= "<td class='col_service'>" . $transaction['service'] . "</td>";
+					$buffer .= "<td class='col_price'>$" . $transaction['price'] . "</td>";
+					$buffer .= "</tr>";
+					echo $buffer;
+				}
+				
+				foreach ($this->transactions_misc as $transaction) {
+					$buffer = '';
+					$buffer .= "<tr data-id='m_". $transaction['id'] ."' data-date-created='". $transaction['date_submitted'] ."' data-transaction-type='". $transaction['transaction_type'] ."'>";
+					$buffer .= "<td></td>";
+					$buffer .= "<td class='dt-body-center ". strtolower($transaction['reviewed']) ."'>" . $transaction['reviewed'] . "</td>";
+					$buffer .= "<td class='col_district'>" . $transaction['district'] . "</td>";
+					$buffer .= "<td class='col_school'>" . $transaction['school'] . "</td>";
+					$buffer .= "<td class='col_student'>" . $transaction['student'] . "</td>";
+					$buffer .= "<td class='col_lasid dt-body-center'>" . $transaction['lasid'] . "</td>";
+					$buffer .= "<td class='col_sasid dt-body-center'>" . $transaction['sasid'] . "</td>";
+					$buffer .= "<td class='col_service'>" . $transaction['service'] . "</td>";
+					$buffer .= "<td class='col_price'>$" . $transaction['price'] . "</td>";
+					$buffer .= "</tr>";
+					echo $buffer;
+				}
+			?>
+
+		</tbody>
+	</table>
+	
+	<div class="size100 no-pad">
+		<p class="total align_right">Monthly Total: $<?= $this->transactions_total ?></p>
+	</div>
+
 </div>
