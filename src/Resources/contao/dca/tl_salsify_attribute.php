@@ -129,7 +129,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'default'                 => '',
             'search'                  => false,
             'filter'                  => false,
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50', 'rte'=>'tinyMCE'),
             'sql'                     => "text default ''"
         )
     )
