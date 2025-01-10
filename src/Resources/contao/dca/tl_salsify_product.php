@@ -151,6 +151,7 @@ class tl_salsify_product extends Backend
   
 	public function setRootType(DataContainer $dc)
 	{
+        /*
 		if (Input::get('act') != 'create')
 		{
 			return;
@@ -171,6 +172,7 @@ class tl_salsify_product extends Backend
 				$GLOBALS['TL_DCA']['tl_salsify_request']['fields']['type']['default'] = 'root';
 			}
 		}
+        */
 	}
 
     public function addIcon($row, $label)
