@@ -19,7 +19,6 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
     'config' => array
     (
         'dataContainer'               => DC_Table::class,
-        'ptable'                      => 'tl_salsify_request',
         'ctable'                      => array('tl_salsify_attribute'),
         'switchToEdit'                => false,
         'enableVersioning'            => true,
@@ -42,9 +41,9 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
     (
         'sorting' => array
         (
-            'mode'                    => DataContainer::MODE_TREE_EXTENDED,
-            'headerFields'            => array('name'),
+            'mode'                    => DataContainer::MODE_SORTED,
             'rootPaste'               => false,
+            'showRootTrails'          => false,
             'icon'                    => 'pagemounts.svg',
             'flag'                    => DataContainer::SORT_INITIAL_LETTER_ASC,
             'fields'                  => array('id DESC'),
@@ -104,9 +103,7 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
         ),
         'pid' => array
 		(
-			'foreignKey'              => 'tl_salsify_request.id',
-		    'sql'                     => "int(10) unsigned NOT NULL default 0",
-		    'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
+			'sql'                     => "int(10) unsigned NOT NULL default 0"
 		),
         'tstamp' => array
         (
@@ -151,7 +148,6 @@ class tl_salsify_product extends Backend
   
 	public function setRootType(DataContainer $dc)
 	{
-        /*
 		if (Input::get('act') != 'create')
 		{
 			return;
@@ -172,7 +168,6 @@ class tl_salsify_product extends Backend
 				$GLOBALS['TL_DCA']['tl_salsify_request']['fields']['type']['default'] = 'root';
 			}
 		}
-        */
 	}
 
     public function addIcon($row, $label)
