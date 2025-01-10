@@ -117,10 +117,10 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         ),
 
         
-        // Salsify Product Fields
+        // Salsify Request Fields
         'name' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['product_sku'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['name'],
             'inputType'               => 'text',
             'default'                 => '',
             'search'                  => false,
@@ -130,13 +130,10 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         ),
         'folder' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['email'],
-            'inputType'               => 'text',
-            'default'                 => '',
-            'search'                  => false,
-            'filter'                  => false,
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['folder'],
+            'inputType'               => 'fileTree',
+            'eval'                    => array('files'=>false, 'fieldType'=>'radio'),
+			'sql'                     => "binary(16) NULL"
         )
         
     )
