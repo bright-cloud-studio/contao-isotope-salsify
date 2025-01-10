@@ -2,8 +2,9 @@
 
 namespace Bcs\Module;
 
-use Bcs\Model\SalsifyProduct;
 use Bcs\Model\SalsifyAttribute;
+use Bcs\Model\SalsifyProduct;
+use Bcs\Model\SalsifyRequest;
 
 use pcrov\JsonReader\JsonReader;
 
@@ -68,10 +69,16 @@ class ModSalsifyImporter extends \Contao\Module
             // Loop through children arrays, these are what store the actual values here
             foreach($array_parent as $array_child) {
 
+                // Create a Salsify Request that holds our request to create products
+                $salsify_request = new SalsifyRequest();
+                $salsify_request->name = "New Request " . $salsify->request->id;
+                $salsify_request->save();
+                
                 // Create a Salsify Product to hold our Salsify Attributes
                 $salsify_product = new SalsifyProduct();
                 $salsify_product->tstamp = time();
                 $salsify_product->product_sku = '123';
+                $salsify_product->pid = $salsify->request->id;
                 $salsify_product->save();
 
                 $log[$salsify_product->id]['id'] = $salsify_product->id;
