@@ -78,7 +78,7 @@ class ModSalsifyImporter extends \Contao\Module
                 $salsify_product = new SalsifyProduct();
                 $salsify_product->tstamp = time();
                 $salsify_product->product_sku = '123';
-                $salsify_product->pid = $salsify->request->id;
+                $salsify_product->pid = $salsify_request->id;
                 $salsify_product->save();
 
                 $log[$salsify_product->id]['id'] = $salsify_product->id;
