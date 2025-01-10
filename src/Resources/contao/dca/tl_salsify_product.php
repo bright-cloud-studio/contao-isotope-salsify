@@ -100,11 +100,6 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
         (
 		    'sql'                     => "int(10) unsigned NOT NULL auto_increment"
         ),
-        'pid' => array
-        (
-		    'sql'                     => "int(10) unsigned NOT NULL default 0",
-		    'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
-        ),
         'tstamp' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['date'],
@@ -154,7 +149,7 @@ class tl_salsify_product extends Backend
 		}
 		if (Input::get('pid') == 0)
 		{
-			$GLOBALS['TL_DCA']['tl_salsify_product']['fields']['type']['default'] = 'root';
+			$GLOBALS['TL_DCA']['tl_salsify_request']['fields']['type']['default'] = 'root';
 		}
 		elseif (Input::get('mode') == 1)
 		{
@@ -165,7 +160,7 @@ class tl_salsify_product extends Backend
 
 			if ($objPage->pid == 0)
 			{
-				$GLOBALS['TL_DCA']['tl_salsify_product']['fields']['type']['default'] = 'root';
+				$GLOBALS['TL_DCA']['tl_salsify_request']['fields']['type']['default'] = 'root';
 			}
 		}
 	}
