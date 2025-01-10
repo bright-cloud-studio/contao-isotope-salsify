@@ -19,7 +19,6 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     'config' => array
     (
         'dataContainer'               => DC_Table::class,
-        'ctable'                      => array('tl_salsify_product'),
         'switchToEdit'                => false,
         'enableVersioning'            => true,
         'onload_callback' => array
