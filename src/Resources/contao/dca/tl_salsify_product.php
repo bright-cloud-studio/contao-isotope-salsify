@@ -19,6 +19,7 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
     'config' => array
     (
         'dataContainer'               => DC_Table::class,
+        'ptable'                      => 'tl_salsify_request',
         'ctable'                      => array('tl_salsify_attribute'),
         'switchToEdit'                => false,
         'enableVersioning'            => true,
@@ -103,7 +104,9 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
         ),
         'pid' => array
 		(
-			'sql'                     => "int(10) unsigned NOT NULL default 0"
+			'foreignKey'              => 'tl_salsify_request.id',
+		    'sql'                     => "int(10) unsigned NOT NULL default 0",
+		    'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
 		),
         'tstamp' => array
         (
