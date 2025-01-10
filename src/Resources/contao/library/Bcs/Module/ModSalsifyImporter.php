@@ -71,7 +71,7 @@ class ModSalsifyImporter extends \Contao\Module
 
                 // Create a Salsify Request that holds our request to create products
                 $salsify_request = new SalsifyRequest();
-                $salsify_request->name = "New Request " . $salsify->request->id;
+                $salsify_request->name = "New Request " . $salsify_request->id;
                 $salsify_request->save();
                 
                 // Create a Salsify Product to hold our Salsify Attributes
