@@ -30,7 +30,8 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
         (
             'keys' => array
             (
-                'id' 	=> 	'primary'
+                'id' 	=> 	'primary',
+                'pid'   => 'index'
             )
         )
     ),
@@ -100,6 +101,10 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
         (
 		    'sql'                     => "int(10) unsigned NOT NULL auto_increment"
         ),
+        'pid' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL default 0"
+		),
         'tstamp' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['date'],
