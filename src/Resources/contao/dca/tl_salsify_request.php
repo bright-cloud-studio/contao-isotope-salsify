@@ -116,17 +116,14 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['name'],
             'inputType'               => 'text',
-            'default'                 => '',
-            'search'                  => false,
-            'filter'                  => false,
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) NOT NULL default ''"
+            'sql'                     => "varchar(255) default ''"
         ),
         'folder' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['folder'],
             'inputType'               => 'fileTree',
-            'eval'                    => array('files'=>false, 'fieldType'=>'radio'),
+            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'tl_class'=>'clr'),
 			'sql'                     => "binary(16) NULL"
         )
         
