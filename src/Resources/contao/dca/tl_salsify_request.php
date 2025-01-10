@@ -77,11 +77,6 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
                 'label'               => &$GLOBALS['TL_LANG']['tl_salsify_request']['show'],
                 'href'                => 'act=show',
                 'icon'                => 'show.gif'
-            ),
-            'salsify_product' => array
-            (
-                'href'                => 'do=salsify_product',
-                'icon'                => 'articles.svg'
             )
         )
     ),
