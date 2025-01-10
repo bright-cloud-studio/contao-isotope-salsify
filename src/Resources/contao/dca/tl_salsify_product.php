@@ -103,7 +103,7 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
         'pid' => array
         (
 		    'sql'                     => "int(10) unsigned NOT NULL default 0",
-		    'relation'                => array('load'=>'lazy')
+		    'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
         ),
         'tstamp' => array
         (
