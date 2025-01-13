@@ -53,13 +53,15 @@ class ModSalsifyStatusUpdate extends \Contao\Module
     protected function compile()
     {
 
-        // Get the $_POST json
-        $vars = $_POST;
+        $postData = file_get_contents('php://input');
+        $salsify_json = json_decode($postData, true);
         
         // Write to file so we know its working
         $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_status_update_'.strtolower(date('m_d_y_H:m:s')).".txt", "w") or die("Unable to open file!");
-        foreach($vars as $key => $var) {
-            fwrite($myfile, "Key: " . $key . "  | Value: " . $var . "\n");
+        //fwrite($myfile, $publicationNotification['product_feed_export_url'] . "\n");
+        
+        foreach($salsify_json as $key => $salsify) {
+            fwrite($myfile, "Key: " . $key . "  | Value: " . $salsify . "\n");
         }
         
         // were done logging, close the file we just created
