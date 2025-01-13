@@ -53,18 +53,18 @@ class ModSalsifyStatusUpdate extends \Contao\Module
     protected function compile()
     {
 
+        // When Salsify updates, it will push a JSON notification file to a specific page.
+        // Grab that JSON file when this module is loaded
         $postData = file_get_contents('php://input');
         $salsify_json = json_decode($postData, true);
         
-        // Write to file so we know its working
+        // Create a LOG so we can tell if this is working or not
         $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_status_update_'.strtolower(date('m_d_y_H:m:s')).".txt", "w") or die("Unable to open file!");
-        //fwrite($myfile, $publicationNotification['product_feed_export_url'] . "\n");
-        
         foreach($salsify_json as $key => $salsify) {
+            // Write the JSON values to the log
             fwrite($myfile, "Key: " . $key . "  | Value: " . $salsify . "\n");
         }
-        
-        // were done logging, close the file we just created
+        // Close or LOG file
         fclose($myfile);
       
     }
