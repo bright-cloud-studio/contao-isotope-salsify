@@ -19,6 +19,7 @@ $GLOBALS['BE_MOD']['salsify']['salsify_attribute'] = array( 'tables' => array('t
 
 /* Front End modules */
 $GLOBALS['FE_MOD']['salsify']['mod_salsify_importer']         = 'Bcs\Module\ModSalsifyImporter';
+$GLOBALS['FE_MOD']['salsify']['mod_salsify_status_update']    = 'Bcs\Module\ModSalsifyStatusUpdate';
 
 /* Models */
 $GLOBALS['TL_MODELS']['tl_salsify_request']         = 'Bcs\Model\SalsifyRequest';
