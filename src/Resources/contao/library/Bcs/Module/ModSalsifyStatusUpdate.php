@@ -54,12 +54,12 @@ class ModSalsifyStatusUpdate extends \Contao\Module
     {
 
         // Get the $_POST json
+        $vars = $_POST;
         
         // Write to file so we know its working
         $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_status_update_'.strtolower(date('m_d_y_H:m:s')).".txt", "w") or die("Unable to open file!");
-        fwrite($myfile, "TEST WRITE" . "\n");
         foreach($vars as $key => $var) {
-            //fwrite($myfile, "Key: " . $key . "  | Value: " . $var . "\n");
+            fwrite($myfile, "Key: " . $key . "  | Value: " . $var . "\n");
         }
         
         // were done logging, close the file we just created
