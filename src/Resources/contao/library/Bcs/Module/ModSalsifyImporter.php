@@ -9,8 +9,16 @@ use Bcs\Model\SalsifyRequest;
 use pcrov\JsonReader\JsonReader;
 
 use Contao\BackendTemplate;
+use Contao\Database;
 use Contao\System;
 use Contao\FrontendUser;
+
+use Isotope\Interfaces\IsotopeProduct;
+use Isotope\Isotope;
+use Isotope\Model\Attribute;
+use Isotope\Model\AttributeOption;
+
+use Isotope\Model\Product;
 
 
 class ModSalsifyImporter extends \Contao\Module
@@ -55,7 +63,7 @@ class ModSalsifyImporter extends \Contao\Module
         
         // Open and process file
         $reader = new JsonReader();
-        $reader->open("../salsify/Salsify_product-feed_2025_01_02_18_31_17_UTC.json");
+        $reader->open("../files/salsify/salsify_product_feed_2025_01_14_15_24_21_964_UTC.json");
         $depth = $reader->depth();
         $reader->read();
 
@@ -79,7 +87,12 @@ class ModSalsifyImporter extends \Contao\Module
                 
                 $attributes = array();
                 
+                $prod_values = array();
+                
                 foreach($array_child as $key => $val) {
+                    
+                    $prod_values[$key] = $val[0];
+                    
                     
                     $salsify_attribute = new SalsifyAttribute();
                     $salsify_attribute->pid = $salsify_product->id;
@@ -87,13 +100,72 @@ class ModSalsifyImporter extends \Contao\Module
                     $salsify_attribute->attribute_value = $val[0];
                     $salsify_attribute->tstamp = time();
                     $salsify_attribute->save();
-
                     
                     $attributes[$salsify_attribute->id]['key'] = $key;
                     $attributes[$salsify_attribute->id]['value'] = $val[0];
                     $log[$salsify_product->id]['attributes'] = $attributes;
                     
+                    // Check if this attribute exists already
+                    $attr = Attribute::findOneBy(['tl_iso_attribute.field_name=?'],[$key]);
+                    // If we didn't find this attribute already
+                    if($attr == null) {
+                        // Create this attribute
+                        $new_attr = array();
+                        
+                        $new_attr['name'] = $key;
+                        $new_attr['field_name'] = $key;
+                        $new_attr['type'] = 'text';
+                        $new_attr['legend'] = 'options_legend';
+                        $new_attr['description'] = "SALSIFY IMPORTED ATTRIBUTE";
+                        $new_attr['optionsSource'] = 'attribute';
+                        $new_attr['size'] = 5;
+                        $new_attr['tstamp'] = time();
+                        $new_attr_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_attribute %s")
+                                                 ->set($new_attr)
+                                                 ->execute();
+                    }
+                    
                 }
+                
+                // Fill in the rest of the product's information then create the product
+                $prod_values['tstamp'] = time();
+                $prod_values['dateAdded'] = time();
+                $prod_values['type'] = 5;
+                $prod_values['orderPages'] = 'a:1:{i:0;s:3:"109";}';
+                $prod_values['alias'] = $prod_values['item_number'];
+                $prod_values['name'] = $prod_values['specific_product_title'];
+                $prod_values['sku'] = $prod_values['item_number'];
+                $prod_values['description'] = $prod_values['full_description'];
+                $prod_values['published'] = 1;
+                $prod_values['upc'] = $prod_values['package_upc'];
+                $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")
+                                                 ->set($prod_values)
+                                                 ->execute();
+                                                 
+                 // Second, create entry in the 'tl_product_price' table                    
+                $price = array();
+                $price['pid'] = $prod_values_result->insertId;
+                $price['tstamp'] = time();
+                $price['tax_class'] = 1;
+                $price['config_id'] = 0;
+                $price['member_group'] = 0;
+                $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")
+                                 ->set($price)
+                                 ->execute();                                           
+                                                         
+                
+                                                         
+                // First, create entry in the 'tl_product_pricetier" table
+                $priceTier = array();
+                $priceTier['pid'] = $priceResult->insertId;
+                $priceTier['tstamp'] = time();
+                $priceTier['min'] = 1;
+                $priceTier['price'] = '1.00';
+                $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")
+                                 ->set($priceTier)
+                                 ->execute();
+                
+                
 
             }
 
