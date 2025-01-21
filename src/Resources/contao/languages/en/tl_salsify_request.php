@@ -10,6 +10,6 @@ $GLOBALS['TL_LANG']['tl_salsify_request']['toggle']                     = array(
 
 
 /* Fields */
-$GLOBALS['TL_LANG']['tl_salsify_request']['salsify_attribute_legend']   = 'Salsify Request Details';
-$GLOBALS['TL_LANG']['tl_salsify_request']['attribute_key']              = array('Request Name', 'An internal-only name used to identify in the Backend');
-$GLOBALS['TL_LANG']['tl_salsify_request']['attribute_value']            = array('Salsify XML Folder', 'Select the folder where the Salsify XML files can be found.');
+$GLOBALS['TL_LANG']['tl_salsify_request']['salsify_request_legend']   = 'Salsify Request Details';
+$GLOBALS['TL_LANG']['tl_salsify_request']['name']                     = array('Request Name', 'An internal-only name used to identify in the Backend');
+$GLOBALS['TL_LANG']['tl_salsify_request']['folder']                   = array('Salsify XML Folder', 'Select the folder where the Salsify XML files can be found.');
