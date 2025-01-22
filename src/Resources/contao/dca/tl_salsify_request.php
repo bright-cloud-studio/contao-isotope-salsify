@@ -84,7 +84,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_request_legend}, name, folder;'
+        'default'                     => '{salsify_request_legend}, name, category_parent_page, salsify_category_field;'
     ),
  
     // Fields
@@ -119,13 +119,21 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
             'sql'                     => "varchar(255) default ''"
         ),
-        'folder' => array
+        'category_parent_page' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['folder'],
-            'inputType'               => 'fileTree',
-            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'tl_class'=>'clr'),
-			'sql'                     => "binary(16) NULL"
-        )
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['category_parent_page'],
+            'inputType'               => 'pageTree',
+            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'clr'),
+			'sql'                     => "int(10) unsigned NOT NULL default 0",
+            'relation'                => array('table'=>'tl_page', 'type'=>'hasMany', 'load'=>'lazy')
+        ),
+        'salsify_category_field' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['salsify_category_field'],
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'                     => "varchar(255) default ''"
+        ),
         
     )
 );
