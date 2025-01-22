@@ -2,7 +2,7 @@
 
 use Contao\Config;
 
-$GLOBALS['TL_DCA']['tl_settings']['palettes']['default'] = str_replace('{files_legend', '{salsify_legend}, ;{files_legend', $GLOBALS['TL_DCA']['tl_settings']['palettes']['default']);
+$GLOBALS['TL_DCA']['tl_settings']['palettes']['default'] = str_replace('{files_legend', '{salsify_legend}, name, category_parent_page, salsify_category_field;{files_legend', $GLOBALS['TL_DCA']['tl_settings']['palettes']['default']);
 
 
 $GLOBALS['TL_DCA']['tl_settings']['fields'] += [
