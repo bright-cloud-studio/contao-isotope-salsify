@@ -116,15 +116,15 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['name'],
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w100'),
             'sql'                     => "varchar(255) default ''"
         ),
         'category_parent_page' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['category_parent_page'],
             'inputType'               => 'pageTree',
-            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'clr'),
-			'sql'                     => "int(10) unsigned NOT NULL default 0",
+            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'w50'),
+			'sql'                     => "blob NULL",
             'relation'                => array('table'=>'tl_page', 'type'=>'hasMany', 'load'=>'lazy')
         ),
         'salsify_category_field' => array
