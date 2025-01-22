@@ -31,6 +31,5 @@ $GLOBALS['TL_DCA']['tl_settings']['fields'] += [
         'inputType'               => 'text',
         'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
         'sql'                     => "varchar(255) default ''"
-    ],
-    
+    ]
 ];
