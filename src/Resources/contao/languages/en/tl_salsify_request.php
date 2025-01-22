@@ -12,4 +12,5 @@ $GLOBALS['TL_LANG']['tl_salsify_request']['toggle']                     = array(
 /* Fields */
 $GLOBALS['TL_LANG']['tl_salsify_request']['salsify_request_legend']   = 'Salsify Request Details';
 $GLOBALS['TL_LANG']['tl_salsify_request']['name']                     = array('Request Name', 'An internal-only name used to identify in the Backend');
-$GLOBALS['TL_LANG']['tl_salsify_request']['folder']                   = array('Salsify XML Folder', 'Select the folder where the Salsify XML files can be found.');
+$GLOBALS['TL_LANG']['tl_salsify_request']['category_parent_page']     = array('Category Parent Page', 'Select the parent Page that the category pages will be added as children to.');
+$GLOBALS['TL_LANG']['tl_salsify_request']['salsify_category_field']   = array('Salsify Category Field', 'Enter in plain text the KEY value we will use to create product category pages.');
