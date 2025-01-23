@@ -27,7 +27,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         'markAsCopy'                  => 'title',
         'onsubmit_callback' => array
 		(
-			array('tl_salsify_attribute', 'linkSimilarAttributes')
+			array('Bcs\Backend\SalsifyAttributeBackend', 'linkSimilarAttributes')
 		),
         'sql' => array
         (
@@ -57,7 +57,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         (
             'fields'                  => array('id', 'attribute_key'),
 			'format'                  => 'ID: %s -  KEY: %s',
-            'label_callback' 		=> array('Bcs\Backend\SalsifyAttributeBackend', 'generateStatusLabel')
+            'label_callback' 		  => array('Bcs\Backend\SalsifyAttributeBackend', 'generateStatusLabel')
         ),
         'global_operations' => array
         (
@@ -175,11 +175,6 @@ class tl_salsify_attribute extends Backend
 		{
             //$GLOBALS['TL_CSS'][] = 'bundles/bcspaymentdashboard/css/be_coloring.css';
 		}
-	}
-
-    public function processState(DataContainer $dc)
-	{
-
 	}
     
 }
