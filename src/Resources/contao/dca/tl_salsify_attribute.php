@@ -25,6 +25,10 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         'switchToEdit'                => false,
         'enableVersioning'            => true,
         'markAsCopy'                  => 'title',
+        'onsubmit_callback' => array
+		(
+			array('tl_salsify_attribute', 'linkSimilarAttributes')
+		),
         'sql' => array
         (
             'keys' => array
@@ -52,7 +56,8 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         'label' => array
         (
             'fields'                  => array('id', 'attribute_key'),
-			'format'                  => 'ID: %s -  KEY: %s'
+			'format'                  => 'ID: %s -  KEY: %s',
+            'label_callback' 		=> array('Bcs\Backend\SalsifyAttributeBackend', 'generateStatusLabel')
         ),
         'global_operations' => array
         (
@@ -84,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value;'
+        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value, linked_isotope_attribute, error_log;'
     ),
  
     // Fields
@@ -119,7 +124,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'default'                 => '',
             'search'                  => false,
             'filter'                  => false,
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w100'),
             'sql'                     => "varchar(255) default ''"
         ),
         'attribute_value' => array
@@ -129,9 +134,31 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'default'                 => '',
             'search'                  => false,
             'filter'                  => false,
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50', 'rte'=>'tinyMCE'),
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w100', 'rte'=>'tinyMCE'),
             'sql'                     => "text default ''"
-        )
+        ),
+
+        // Salsify Attribute Fields
+        'linked_isotope_attribute' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['linked_isotope_attribute'],
+            'inputType'               => 'select',
+            'flag'                    => DataContainer::SORT_ASC,
+            'default'                 => '0',
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w100'),
+            'options_callback'	      => array('Bcs\Backend\SalsifyAttributeBackend', 'getIsotopeAttributes'),
+            'sql'                     => "int(10) unsigned default 0"
+        ),
+        // Salsify Attribute Fields
+        'error_log' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['error_log'],
+            'inputType'               => 'text',
+            'default'                 => '',
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w100', 'rte'=>'tinyMCE'),
+            'sql'                     => "text default ''"
+        ),
+        
     )
 );
 
@@ -148,6 +175,11 @@ class tl_salsify_attribute extends Backend
 		{
             //$GLOBALS['TL_CSS'][] = 'bundles/bcspaymentdashboard/css/be_coloring.css';
 		}
+	}
+
+    public function processState(DataContainer $dc)
+	{
+
 	}
     
 }
