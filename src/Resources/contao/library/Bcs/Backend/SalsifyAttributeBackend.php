@@ -85,4 +85,24 @@ class SalsifyAttributeBackend extends Backend
 		return $varValue;
 	}
 
+    public function linkSimilarAttributes()
+    {
+        
+    }
+
+    public function generateStatusLabel($row, $label, $dc, $args)
+    {
+        return $strLabel;
+    }
+
+    public function getIsotopeAttributes()
+    {
+        return array(
+            '1' => '1',
+            '2' => '2',
+            '3' => '3'
+        );
+        
+    }
+
 }
