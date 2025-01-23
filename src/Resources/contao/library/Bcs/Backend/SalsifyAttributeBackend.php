@@ -92,7 +92,7 @@ class SalsifyAttributeBackend extends Backend
 
     public function generateStatusLabel($row, $label, $dc, $args)
     {
-        return $strLabel;
+        return $label;
     }
 
     public function getIsotopeAttributes()
