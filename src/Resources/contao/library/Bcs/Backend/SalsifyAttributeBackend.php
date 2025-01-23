@@ -101,19 +101,25 @@ class SalsifyAttributeBackend extends Backend
 
         // Loop through all the collected Assignments
         foreach($salsify_attributes as $attr) {
-
             // If we have an isotope attribute assigned, save it
             if($attr->linked_isotope_attribute != null)
-                $linked[$attr->key] = $attr->linked_isotope_attribute;
-            
+                $linked[$attr->attribute_key] = $attr->linked_isotope_attribute;
         }
         
-        // Assign the same linked_isotope_attribute
+        // Loop through again, apply value to similar keys
+        foreach($salsify_attributes as $attr) {
+            // If we have an isotope attribute assigned, save it
+            if($attr->linked_isotope_attribute == null) {
 
-        echo "<pre>";
-        print_r($linked);
-        echo "</pre>";
-        die();
+                if($linked[$attr->attribute_key]) {
+
+                    $attr->linked_isotope_attribute = $linked[$attr->attribute_key];
+                    $attr->save();
+                    
+                }
+            }
+                
+        }
 
     
     }
