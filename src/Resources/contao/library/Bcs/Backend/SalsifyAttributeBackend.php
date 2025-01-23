@@ -111,17 +111,10 @@ class SalsifyAttributeBackend extends Backend
         while($attributes->next()) {
             $attr = $attributes->row();
 
-            echo "<pre>";
-            print_r($attr);
-            echo "</pre>";
-            die();
+            $options[] = [$attr['id'] => $attr['name']];
         }
         
-        return array(
-            '1' => '1',
-            '2' => '2',
-            '3' => '3'
-        );
+        return $options;
         
     }
 
