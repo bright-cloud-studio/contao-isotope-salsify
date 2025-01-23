@@ -145,7 +145,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'inputType'               => 'select',
             'flag'                    => DataContainer::SORT_ASC,
             'default'                 => NULL,
-            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w100'),
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w100', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
             'options_callback'	      => array('Bcs\Backend\SalsifyAttributeBackend', 'getIsotopeAttributes'),
             'sql'                     => "int(10) unsigned default NULL"
         ),
