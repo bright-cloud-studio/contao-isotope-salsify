@@ -173,7 +173,7 @@ class tl_salsify_attribute extends Backend
         $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 		if($request && System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request))
 		{
-            //$GLOBALS['TL_CSS'][] = 'bundles/bcspaymentdashboard/css/be_coloring.css';
+            $GLOBALS['TL_CSS'][]        = '/bundles/bcssalsify/css/salsify_attribute.css';
 		}
 	}
     
