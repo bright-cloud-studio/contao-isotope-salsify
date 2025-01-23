@@ -77,6 +77,12 @@ class ModSalsifyImporter extends \Contao\Module
         
             // Load the first array, which is the overall wrapper of arrays
             $array_parent = $reader->value();
+
+            // Kill things, see values
+            echo "<pre>";
+            print_r($array_parent);
+            echo "</pre>";
+            die();
             
             // Loop through children arrays, these are what store the actual values here
             foreach($array_parent as $array_child) {
