@@ -166,24 +166,5 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
 
 class tl_salsify_attribute extends Backend
 {
-
-    public function generate()
-	{
-        $request = System::getContainer()->get('request_stack')->getCurrentRequest();
-		if($request && System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request))
-		{
-            $GLOBALS['TL_CSS'][]        = '/bundles/bcssalsify/css/salsify_attribute.css';
-		}
-	}
-
-    /** @return string */
-	public function compile()
-	{
-        $request = System::getContainer()->get('request_stack')->getCurrentRequest();
-		if($request && System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request))
-		{
-            $GLOBALS['TL_CSS'][]        = '/bundles/bcssalsify/css/salsify_attribute.css';
-		}
-	}
     
 }
