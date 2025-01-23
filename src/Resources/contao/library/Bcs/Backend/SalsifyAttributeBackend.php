@@ -10,6 +10,8 @@ use Contao\DataContainer;
 use Contao\StringUtil;
 use Contao\System;
 
+use Isotope\Model\Attribute;
+
 class SalsifyAttributeBackend extends Backend
 {
   
@@ -102,6 +104,19 @@ class SalsifyAttributeBackend extends Backend
     // Build an array with the KEY being the ID of the Isotope Attribute and the VALUE is the text-readable name
     public function getIsotopeAttributes()
     {
+
+        $options = array();
+        
+        $attributes = Attribute::findAll();
+        while($attributes->next()) {
+            $attr = $attributes->row();
+
+            echo "<pre>";
+            print_r($attr);
+            echo "</pre>";
+            die();
+        }
+        
         return array(
             '1' => '1',
             '2' => '2',
