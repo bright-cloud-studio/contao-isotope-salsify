@@ -91,6 +91,9 @@ class SalsifyAttributeBackend extends Backend
     // Loop through all of our Attributes, find ones that are identical to this, and link them to the same Isotope Attribute
     public function linkSimilarAttributes()
     {
+        // Get all SalsifyAttributes with the same key
+        
+        // Assign the same linked_isotope_attribute
         
     }
 
@@ -99,10 +102,10 @@ class SalsifyAttributeBackend extends Backend
     public function generateStatusLabel($row, $label, $dc, $args)
     {
 
-        if($dc->salsify_isotope_attribute == '')
-            return "<span style='background-color: red;'>" . $label . "</span>";
+        if($row['linked_isotope_attribute'] == null)
+            return "Status: <span style='color: red;'>FAIL</span> - " . $label;
         else
-            return "<span style='background-color: green;'>" . $label . "</span>";
+            return "Status: <span style='color: green;'>PASS</span> - " . $label;
 
         
         
