@@ -98,7 +98,15 @@ class SalsifyAttributeBackend extends Backend
     // Display error until all 'flags' are 
     public function generateStatusLabel($row, $label, $dc, $args)
     {
-        return $label;
+        $class ='';
+        if($dc[''] == '') {
+            $class = 'status_error';
+        } else {
+            $class = 'status_continue';
+        }
+
+        return "<span class='". $class ."'>" . $label . "</span>";
+        
     }
 
     // Build an array with the KEY being the ID of the Isotope Attribute and the VALUE is the text-readable name
