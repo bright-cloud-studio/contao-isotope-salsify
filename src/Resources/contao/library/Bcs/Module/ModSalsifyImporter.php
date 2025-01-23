@@ -128,12 +128,8 @@ class ModSalsifyImporter extends \Contao\Module
                         $n_attr->tstamp = time();
                         $n_attr->save();
                         
-                        
-                        // This probably wont work until the cache is cleared
-                        // BUT, I cant figure out how to do that right now so moving on
-                        
-                        //$objUpdater = new DatabaseUpdater();
-                        //$objUpdater->autoUpdateTables(['tl_iso_attribute']);
+                        $objUpdater = new DatabaseUpdater();
+                        $objUpdater->autoUpdateTables(['tl_iso_attribute']);
                         
                         
                         /*
