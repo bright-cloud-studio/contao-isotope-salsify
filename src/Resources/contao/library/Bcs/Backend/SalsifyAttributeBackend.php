@@ -99,11 +99,10 @@ class SalsifyAttributeBackend extends Backend
     public function generateStatusLabel($row, $label, $dc, $args)
     {
         $class ='';
-        if($dc[''] == '') {
+        if($dc->salsify_isotope_attribute == '')
             $class = 'status_error';
-        } else {
+        else
             $class = 'status_continue';
-        }
 
         return "<span class='". $class ."'>" . $label . "</span>";
         
