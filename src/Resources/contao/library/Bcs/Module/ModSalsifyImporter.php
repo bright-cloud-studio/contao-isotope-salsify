@@ -78,11 +78,6 @@ class ModSalsifyImporter extends \Contao\Module
             // Load the first array, which is the overall wrapper of arrays
             $array_parent = $reader->value();
 
-            // Kill things, see values
-            echo "<pre>";
-            print_r($array_parent);
-            echo "</pre>";
-            die();
             
             // Loop through children arrays, these are what store the actual values here
             foreach($array_parent as $array_child) {
@@ -108,6 +103,7 @@ class ModSalsifyImporter extends \Contao\Module
                     $salsify_attribute->pid = $salsify_product->id;
                     $salsify_attribute->attribute_key = $key;
                     $salsify_attribute->attribute_value = $val[0];
+                    $salsify_attribute->isotope_linked_attribute = null;
                     $salsify_attribute->tstamp = time();
                     $salsify_attribute->save();
                     
@@ -120,7 +116,7 @@ class ModSalsifyImporter extends \Contao\Module
                     // If we didn't find this attribute already
                     if($attr == null) {
                         
-                        
+                        /*
                         // Replace this with Model, in hopes it will automatically add the attribute to the 'tl_iso_products' table
                         $n_attr = new TextField();
                         
@@ -138,7 +134,7 @@ class ModSalsifyImporter extends \Contao\Module
                         $objUpdater->autoUpdateTables(['tl_iso_attribute']);
                         
                         
-                        /*
+                        
                         // Create this attribute
                         $new_attr = array();
                         $new_attr['name'] = $key;
@@ -157,6 +153,7 @@ class ModSalsifyImporter extends \Contao\Module
                     
                 }
                 
+                /*
                 // Fill in the rest of the product's information then create the product
                 $prod_values['tstamp'] = time();
                 $prod_values['dateAdded'] = time();
@@ -195,7 +192,7 @@ class ModSalsifyImporter extends \Contao\Module
                                  ->set($priceTier)
                                  ->execute();
                 
-                
+                */
 
             }
 
