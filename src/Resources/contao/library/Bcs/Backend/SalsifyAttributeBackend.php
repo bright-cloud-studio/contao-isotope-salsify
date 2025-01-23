@@ -2,6 +2,8 @@
 
 namespace Bcs\Backend;
 
+use Bcs\Model\SalsifyAttribute;
+
 use Contao\Backend;
 use Contao\BackendTemplate;
 use Contao\Image;
@@ -91,10 +93,29 @@ class SalsifyAttributeBackend extends Backend
     // Loop through all of our Attributes, find ones that are identical to this, and link them to the same Isotope Attribute
     public function linkSimilarAttributes()
     {
+
+        $linked = array();
+        
         // Get all SalsifyAttributes with the same key
+        $salsify_attributes = SalsifyAttribute::findAll();
+
+        // Loop through all the collected Assignments
+        foreach($salsify_attributes as $attr) {
+
+            // If we have an isotope attribute assigned, save it
+            if($attr->linked_isotope_attribute != null)
+                $linked[$attr->key] = $attr->linked_isotope_attribute;
+            
+        }
         
         // Assign the same linked_isotope_attribute
-        
+
+        echo "<pre>";
+        print_r($linked);
+        echo "</pre>";
+        die();
+
+    
     }
 
     
