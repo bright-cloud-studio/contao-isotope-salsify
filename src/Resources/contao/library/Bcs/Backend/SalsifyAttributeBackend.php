@@ -98,13 +98,13 @@ class SalsifyAttributeBackend extends Backend
     // Display error until all 'flags' are 
     public function generateStatusLabel($row, $label, $dc, $args)
     {
-        $class ='';
-        if($dc->salsify_isotope_attribute == '')
-            $class = 'status_error';
-        else
-            $class = 'status_continue';
 
-        return "<span class='". $class ."'>" . $label . "</span>";
+        if($dc->salsify_isotope_attribute == '')
+            return "<span style='background-color: red;'>" . $label . "</span>";
+        else
+            return "<span style='background-color: green;'>" . $label . "</span>";
+
+        
         
     }
 
