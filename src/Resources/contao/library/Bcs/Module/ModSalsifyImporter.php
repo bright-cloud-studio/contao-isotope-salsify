@@ -9,17 +9,21 @@ use Bcs\Model\SalsifyRequest;
 use pcrov\JsonReader\JsonReader;
 
 use Contao\BackendTemplate;
+use Contao\Controller;
 use Contao\Database;
 use Contao\System;
 use Contao\FrontendUser;
 
 use Isotope\Interfaces\IsotopeProduct;
 use Isotope\Isotope;
+use Isotope\DatabaseUpdater;
+
 use Isotope\Model\Attribute;
 use Isotope\Model\AttributeOption;
-
+use Isotope\Model\Attribute\TextField;
 use Isotope\Model\Product;
 
+use Isotope\Backend\Attribute\DatabaseUpdate;
 
 class ModSalsifyImporter extends \Contao\Module
 {
@@ -63,7 +67,7 @@ class ModSalsifyImporter extends \Contao\Module
         
         // Open and process file
         $reader = new JsonReader();
-        $reader->open("../files/salsify/salsify_product_feed_2025_01_14_15_24_21_964_UTC.json");
+        $reader->open("../files/salsify/salsify_product_feed_2025_01_22_18_15_52_428_UTC.json");
         $depth = $reader->depth();
         $reader->read();
 
@@ -109,9 +113,32 @@ class ModSalsifyImporter extends \Contao\Module
                     $attr = Attribute::findOneBy(['tl_iso_attribute.field_name=?'],[$key]);
                     // If we didn't find this attribute already
                     if($attr == null) {
+                        
+                        
+                        // Replace this with Model, in hopes it will automatically add the attribute to the 'tl_iso_products' table
+                        $n_attr = new TextField();
+                        
+                        $n_attr->name = $key;
+                        $n_attr->field_name = $key;
+                        $n_attr->type = 'text';
+                        $n_attr->legend = 'options_legend';
+                        $n_attr->description = "SALSIFY IMPORTED ATTRIBUTE";
+                        $n_attr->optionsSource = 'attribute';
+                        $n_attr->size = 5;
+                        $n_attr->tstamp = time();
+                        $n_attr->save();
+                        
+                        
+                        // This probably wont work until the cache is cleared
+                        // BUT, I cant figure out how to do that right now so moving on
+                        
+                        //$objUpdater = new DatabaseUpdater();
+                        //$objUpdater->autoUpdateTables(['tl_iso_attribute']);
+                        
+                        
+                        /*
                         // Create this attribute
                         $new_attr = array();
-                        
                         $new_attr['name'] = $key;
                         $new_attr['field_name'] = $key;
                         $new_attr['type'] = 'text';
@@ -123,6 +150,7 @@ class ModSalsifyImporter extends \Contao\Module
                         $new_attr_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_attribute %s")
                                                  ->set($new_attr)
                                                  ->execute();
+                        */
                     }
                     
                 }
@@ -176,5 +204,6 @@ class ModSalsifyImporter extends \Contao\Module
         $this->Template->salsify_log = $log;
         
     }
+
   
 }
