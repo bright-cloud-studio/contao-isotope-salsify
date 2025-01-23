@@ -85,16 +85,21 @@ class SalsifyAttributeBackend extends Backend
 		return $varValue;
 	}
 
+
+    // Loop through all of our Attributes, find ones that are identical to this, and link them to the same Isotope Attribute
     public function linkSimilarAttributes()
     {
         
     }
 
+    
+    // Display error until all 'flags' are 
     public function generateStatusLabel($row, $label, $dc, $args)
     {
         return $label;
     }
 
+    // Build an array with the KEY being the ID of the Isotope Attribute and the VALUE is the text-readable name
     public function getIsotopeAttributes()
     {
         return array(
