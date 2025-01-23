@@ -144,10 +144,10 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['linked_isotope_attribute'],
             'inputType'               => 'select',
             'flag'                    => DataContainer::SORT_ASC,
-            'default'                 => '0',
+            'default'                 => '',
             'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w100'),
             'options_callback'	      => array('Bcs\Backend\SalsifyAttributeBackend', 'getIsotopeAttributes'),
-            'sql'                     => "int(10) unsigned default 0"
+            'sql'                     => "int(10) unsigned default ''"
         ),
         // Salsify Attribute Fields
         'error_log' => array
