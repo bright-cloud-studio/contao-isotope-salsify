@@ -8,6 +8,9 @@ use Contao\Input;
 use Contao\DataContainer;
 use Contao\StringUtil;
 
+use Isotope\Model\ProductType;
+
+
 class SalsifyProductBackend extends Backend
 {
     
@@ -85,7 +88,7 @@ class SalsifyProductBackend extends Backend
     public function getIsotopeProductTypes()
     {
         $options = array();
-        $attributes = Attribute::findAll();
+        $attributes = ProductType::findAll();
         while($attributes->next()) {
             $attr = $attributes->row();
             $options[$attr['id']] = $attr['name'];
