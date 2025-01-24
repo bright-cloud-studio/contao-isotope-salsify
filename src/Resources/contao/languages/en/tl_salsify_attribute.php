@@ -14,7 +14,7 @@ $GLOBALS['TL_LANG']['tl_salsify_attrbute']['salsify_attribute_legend']    = 'Sal
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['attribute_key']              = array('Attribute Key', 'The Attribute\'s KEY');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['attribute_value']            = array('Attribute Value', 'The Attribute\'s VALUE');
 
-$GLOBALS['TL_LANG']['tl_salsify_attrbute']['options_legend']              = 'Attribute Options';
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['options_legend']              = 'Attribute Options';
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['linked_isotope_attribute']   = array('Linked Isotope Attribute', 'Select the Isotope Attribute this will be filled into.');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['site_category_field']        = array('Site Category', 'Choose if this Attribute will be used for Page aliases.');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['is_sku']                     = array('Use as SKU', 'Choose if this Attribute is also used for the product\'s unique SKU');
