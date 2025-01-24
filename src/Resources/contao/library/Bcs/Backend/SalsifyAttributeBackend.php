@@ -118,10 +118,9 @@ class SalsifyAttributeBackend extends Backend
                     
                 }
             }
-                
+            
         }
 
-    
     }
 
     
@@ -133,9 +132,7 @@ class SalsifyAttributeBackend extends Backend
             return "Status: <span style='color: red;'>FAIL</span> - " . $label;
         else
             return "Status: <span style='color: green;'>PASS</span> - " . $label;
-
-        
-        
+            
     }
 
     // Build an array with the KEY being the ID of the Isotope Attribute and the VALUE is the text-readable name
