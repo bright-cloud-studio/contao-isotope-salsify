@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, site_category_field; {error_log_legend}, error_log;'
+        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, site_category_field, is_sku;{error_log_legend}, error_log;'
     ),
  
     // Fields
@@ -147,7 +147,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'inputType'               => 'select',
             'flag'                    => DataContainer::SORT_ASC,
             'default'                 => NULL,
-            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w100', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
             'options_callback'	      => array('Bcs\Backend\SalsifyAttributeBackend', 'getIsotopeAttributes'),
             'sql'                     => "int(10) unsigned default NULL"
         ),
@@ -155,6 +155,15 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         'site_category_field' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['site_category_field'],
+            'inputType'               => 'checkbox',
+            'default'				  => '',
+            'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "char(1) NOT NULL default ''"
+        ),
+        // Salsify Attribute Fields
+        'is_sku' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['is_sku'],
             'inputType'               => 'checkbox',
             'default'				  => '',
             'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
