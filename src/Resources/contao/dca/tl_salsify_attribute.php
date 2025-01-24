@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value, linked_isotope_attribute, error_log;'
+        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend} linked_isotope_attribute; {error_log} error_log;'
     ),
  
     // Fields
@@ -138,6 +138,8 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'sql'                     => "text default ''"
         ),
 
+
+        
         // Salsify Attribute Fields
         'linked_isotope_attribute' => array
         (
@@ -149,6 +151,18 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'options_callback'	      => array('Bcs\Backend\SalsifyAttributeBackend', 'getIsotopeAttributes'),
             'sql'                     => "int(10) unsigned default NULL"
         ),
+        // Salsify Attribute Fields
+        'site_category_field' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['site_category_field'],
+            'inputType'               => 'checkbox',
+            'default'				  => '',
+            'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'clr'),
+            'sql'                     => "char(1) NOT NULL default ''"
+        ),
+
+
+        
         // Salsify Attribute Fields
         'error_log' => array
         (
