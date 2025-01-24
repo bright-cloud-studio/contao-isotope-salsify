@@ -110,22 +110,29 @@ class SalsifyAttributeBackend extends Backend
             if($attr->site_category_field)
                     $cat_field_key = $attr->attribute_key;
         }
-
-        echo "Cat Field: " . $cat_field_key;
-        die();
         
         // Loop through again, apply value to similar keys
         foreach($salsify_attributes as $attr) {
+            
+            $save = false;
+            
             // If we have an isotope attribute assigned, save it
             if($attr->linked_isotope_attribute == null) {
 
                 if($linked[$attr->attribute_key]) {
-
                     $attr->linked_isotope_attribute = $linked[$attr->attribute_key];
-                    $attr->save();
-                    
+                    $save = true;
                 }
             }
+            
+            if($attr->attribute_key == $cat_field_key) {
+                $attr->site_category_field = 1;
+                $save = true;
+            }
+            
+            if($save)
+                $attr->save();
+            
             
         }
 
@@ -135,11 +142,16 @@ class SalsifyAttributeBackend extends Backend
     // Display error until all 'flags' are 
     public function generateStatusLabel($row, $label, $dc, $args)
     {
+        $site_category_field = '';
+        
+        if($row['site_category_field'] == 1) {
+            $site_category_field = "Alias: <span style='color: green;'>TRUE</span> - ";
+        }
 
         if($row['linked_isotope_attribute'] == null)
-            return "Status: <span style='color: red;'>FAIL</span> - " . $label;
+            return "Status: <span style='color: red;'>FAIL</span> - " . $site_category_field . $label;
         else
-            return "Status: <span style='color: green;'>PASS</span> - " . $label;
+            return "Status: <span style='color: green;'>PASS</span> - " . $site_category_field . $label;
             
     }
 
