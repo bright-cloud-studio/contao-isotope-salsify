@@ -95,6 +95,7 @@ class SalsifyAttributeBackend extends Backend
     {
 
         $linked = array();
+        $cat_field_key = '';
         
         // Get all SalsifyAttributes with the same key
         $salsify_attributes = SalsifyAttribute::findAll();
