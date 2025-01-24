@@ -97,6 +97,8 @@ class SalsifyAttributeBackend extends Backend
         $linked = array();
         // Stores the KEY of whatever attribute that is checked as a category field
         $cat_field_key = '';
+        // Stores the KEY of whatever attribute that is checked as being used for the SKU
+        $sku_field_key = '';
         
         // Get all SalsifyAttributes with the same key
         $salsify_attributes = SalsifyAttribute::findAll();
@@ -108,7 +110,10 @@ class SalsifyAttributeBackend extends Backend
                 $linked[$attr->attribute_key] = $attr->linked_isotope_attribute;
             // If this is checked as a category field, save it for the next full loop
             if($attr->site_category_field)
-                    $cat_field_key = $attr->attribute_key;
+                $cat_field_key = $attr->attribute_key;
+            // If this is checked as a category field, save it for the next full loop
+            if($attr->is_sku)
+                $sku_field_key = $attr->attribute_key;
         }
         
         // Loop through again, apply value to similar keys
@@ -124,9 +129,16 @@ class SalsifyAttributeBackend extends Backend
                     $save = true;
                 }
             }
-            
+
+            // Apply 'Site Category' value to similar SalsifyAttributes
             if($attr->attribute_key == $cat_field_key) {
                 $attr->site_category_field = 1;
+                $save = true;
+            }
+
+            // Apply "Use as SKU" value to similar SalsifyAttributes
+            if($attr->attribute_key == $sku_field_key) {
+                $attr->is_sku = 1;
                 $save = true;
             }
             
