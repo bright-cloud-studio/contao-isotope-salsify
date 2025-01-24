@@ -55,8 +55,8 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         ),
         'label' => array
         (
-            'fields'                  => array('attribute_key', 'attribute_value'),
-			'format'                  => '%s - %s',
+            'fields'                  => array('attribute_key'),
+			'format'                  => '%s',
             'label_callback' 		  => array('Bcs\Backend\SalsifyAttributeBackend', 'generateStatusLabel')
         ),
         'global_operations' => array
