@@ -105,7 +105,13 @@ class SalsifyAttributeBackend extends Backend
             // If we have an isotope attribute assigned, save it
             if($attr->linked_isotope_attribute != null)
                 $linked[$attr->attribute_key] = $attr->linked_isotope_attribute;
+
+            if($attr->site_category_field)
+                    $cat_field_key = $attr->attribute_key;
         }
+
+        echo "Cat Field: " . $cat_field_key;
+        die();
         
         // Loop through again, apply value to similar keys
         foreach($salsify_attributes as $attr) {
