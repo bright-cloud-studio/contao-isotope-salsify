@@ -155,9 +155,13 @@ class SalsifyAttributeBackend extends Backend
     public function generateStatusLabel($row, $label, $dc, $args)
     {
         $site_category_field = '';
-        
+        $is_sku = '';
+           
         if($row['site_category_field'] == 1) {
             $site_category_field = "Alias: <span style='color: green;'>TRUE</span> - ";
+        }
+        if($row['is_sku'] == 1) {
+            $site_category_field = "SKU: <span style='color: green;'>TRUE</span> - ";
         }
 
         if($row['linked_isotope_attribute'] == null)
