@@ -90,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_product_legend}, product_sku, email;'
+        'default'                     => '{salsify_product_legend}, product_sku, email, isotope_product_type, import_status;'
     ),
  
     // Fields
@@ -137,7 +137,31 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
             'filter'                  => false,
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
             'sql'                     => "varchar(255) NOT NULL default ''"
-        )
+        ),
+
+
+        'isotope_product_type' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['isotope_product_type'],
+            'inputType'               => 'select',
+            'flag'                    => DataContainer::SORT_ASC,
+            'default'                 => NULL,
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w100', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
+            'options_callback'	      => array('Bcs\Backend\SalsifyProductBackend', 'getIsotopeProductTypes'),
+            'sql'                     => "int(10) unsigned default NULL"
+        ),
+        'import_status' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['import_status'],
+            'inputType'               => 'select',
+            'default'                 => 'outstanding',
+            'filter'                  => true,
+            'search'                  => true,
+            'options'                  => array('incomplete' => 'Incompleted', 'completed' => 'Completed'),
+            'eval'                     => array('mandatory'=>true, 'tl_class'=>'w50'),
+            'sql'                      => "varchar(15) NOT NULL default ''"
+        ),
+        
         
     )
 );
