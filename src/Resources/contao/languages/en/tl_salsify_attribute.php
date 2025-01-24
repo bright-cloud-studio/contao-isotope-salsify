@@ -18,5 +18,5 @@ $GLOBALS['TL_LANG']['tl_salsify_attrbute']['options_legend']              = 'Att
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['linked_isotope_attribute']   = array('Linked Isotope Attribute', 'Select the Isotope Attribute this will be filled into.');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['site_category_field']        = array('Site Category', 'Choose if this Attribute is used for Page aliases.');
 
-$GLOBALS['TL_LANG']['tl_salsify_attrbute']['error_log_legend']            = 'INTERNAL DETAILS';
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['error_log_legend']           = 'INTERNAL DETAILS';
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['error_log']                  = array('Error Log', 'If something goes the error message will be plased here.');
