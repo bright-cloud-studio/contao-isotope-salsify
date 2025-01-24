@@ -93,8 +93,9 @@ class SalsifyAttributeBackend extends Backend
     // Loop through all of our Attributes, find ones that are identical to this, and link them to the same Isotope Attribute
     public function linkSimilarAttributes()
     {
-
+        // Stores our linked attribute values so we can apply them on the second loop
         $linked = array();
+        // Stores the KEY of whatever attribute that is checked as a category field
         $cat_field_key = '';
         
         // Get all SalsifyAttributes with the same key
@@ -105,7 +106,7 @@ class SalsifyAttributeBackend extends Backend
             // If we have an isotope attribute assigned, save it
             if($attr->linked_isotope_attribute != null)
                 $linked[$attr->attribute_key] = $attr->linked_isotope_attribute;
-
+            // If this is checked as a category field, save it for the next full loop
             if($attr->site_category_field)
                     $cat_field_key = $attr->attribute_key;
         }
