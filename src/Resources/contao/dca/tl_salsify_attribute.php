@@ -147,7 +147,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'inputType'               => 'select',
             'flag'                    => DataContainer::SORT_ASC,
             'default'                 => NULL,
-            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'clr w50', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
             'options_callback'	      => array('Bcs\Backend\SalsifyAttributeBackend', 'getIsotopeAttributes'),
             'sql'                     => "int(10) unsigned default NULL"
         ),
@@ -157,7 +157,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['site_category_field'],
             'inputType'               => 'checkbox',
             'default'				  => '',
-            'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'clr'),
+            'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
             'sql'                     => "char(1) NOT NULL default ''"
         ),
 
@@ -169,7 +169,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['error_log'],
             'inputType'               => 'text',
             'default'                 => '',
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50', 'rte'=>'tinyMCE'),
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w100', 'rte'=>'tinyMCE'),
             'sql'                     => "text default ''"
         ),
         
