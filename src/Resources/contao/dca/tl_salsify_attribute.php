@@ -130,11 +130,11 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         'attribute_value' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['attribute_value'],
-            'inputType'               => 'text',
+            'inputType'               => 'textarea',
             'default'                 => '',
             'search'                  => false,
             'filter'                  => false,
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w100', 'rte'=>'tinyMCE'),
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w100'),
             'sql'                     => "text default ''"
         ),
 
