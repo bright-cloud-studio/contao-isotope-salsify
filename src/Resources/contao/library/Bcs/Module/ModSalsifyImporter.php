@@ -78,14 +78,16 @@ class ModSalsifyImporter extends \Contao\Module
             // Load the first array, which is the overall wrapper of arrays
             $array_parent = $reader->value();
 
-            
+            $prod_count = 0;
             // Loop through children arrays, these are what store the actual values here
             foreach($array_parent as $array_child) {
+                $prod_count++;
                 
                 // Create a Salsify Product to hold our Salsify Attributes
                 $salsify_product = new SalsifyProduct();
                 $salsify_product->tstamp = time();
-                $salsify_product->product_sku = '123';
+                $salsify_product->product_sku = $prod_count;
+                $salsify_product->name = 'product_' . $prod_count;
                 $salsify_product->save();
 
                 $log[$salsify_product->id]['id'] = $salsify_product->id;
@@ -94,6 +96,7 @@ class ModSalsifyImporter extends \Contao\Module
                 
                 $prod_values = array();
                 
+                /*
                 foreach($array_child as $key => $val) {
                     
                     $prod_values[$key] = $val[0];
@@ -116,7 +119,7 @@ class ModSalsifyImporter extends \Contao\Module
                     // If we didn't find this attribute already
                     if($attr == null) {
                         
-                        /*
+                        
                         // Replace this with Model, in hopes it will automatically add the attribute to the 'tl_iso_products' table
                         $n_attr = new TextField();
                         
@@ -148,10 +151,11 @@ class ModSalsifyImporter extends \Contao\Module
                         $new_attr_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_attribute %s")
                                                  ->set($new_attr)
                                                  ->execute();
-                        */
+                        
                     }
                     
-                }
+                }*/
+                
                 
                 /*
                 // Fill in the rest of the product's information then create the product
