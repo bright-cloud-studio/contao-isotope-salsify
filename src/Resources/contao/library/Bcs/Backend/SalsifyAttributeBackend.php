@@ -105,6 +105,7 @@ class SalsifyAttributeBackend extends Backend
         $product_name_field_key = '';
 
         $isotope_product_type = '';
+        $isotope_product_type_key = '';
         $isotope_product_type_value = '';
         
         // Get all SalsifyAttributes with the same key
@@ -127,12 +128,8 @@ class SalsifyAttributeBackend extends Backend
 
             if($attr->isotope_product_type != null) {
                 $isotope_product_type = $attr->isotope_product_type;
+                $isotope_product_type_key = $attr->attribute_key;
                 $isotope_product_type_value = $attr->attribute_value;
-
-                echo "Product Type: " . $isotope_product_type . "<br>";
-                echo "Value: " . $isotope_product_type_value . "<br>";
-                die();
-                
             }
                 
         }
@@ -167,9 +164,7 @@ class SalsifyAttributeBackend extends Backend
                     $salsify_product->product_sku = $attr->attribute_value;
                     $salsify_product->save();
                 }
-                
                 $save = true;
-                
             }
 
             if($attr->attribute_key == $product_name_field_key) {
@@ -181,9 +176,21 @@ class SalsifyAttributeBackend extends Backend
                     $salsify_product->product_name = $attr->attribute_value;
                     $salsify_product->save();
                 }
-                
                 $save = true;
-                
+            }
+
+            // Product Type
+            if($attr->attribute_key == $isotope_product_type_key) {
+                if($attr->attribute_value == $isotope_product_type_value) {
+                    $attr->isotope_product_type = $isotope_product_type;
+                    $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attr->pid]);
+                    if($salsify_product != null) {
+                        $salsify_product->isotope_product_type = $isotope_product_type;
+                        $salsify_product->isotope_product_type_linked = 'linked';
+                        $salsify_product->save();
+                    }
+                    $save = true;
+                }
             }
             
             if($save)
