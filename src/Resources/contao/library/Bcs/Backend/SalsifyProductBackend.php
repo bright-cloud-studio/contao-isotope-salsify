@@ -83,17 +83,5 @@ class SalsifyProductBackend extends Backend
 
 		return $varValue;
 	}
-
-    // Build an array with the KEY being the ID of the Isotope Attribute and the VALUE is the text-readable name
-    public function getIsotopeProductTypes()
-    {
-        $options = array();
-        $attributes = ProductType::findAll();
-        while($attributes->next()) {
-            $attr = $attributes->row();
-            $options[$attr['id']] = $attr['name'];
-        }
-        return $options;
-    }
     
 }
