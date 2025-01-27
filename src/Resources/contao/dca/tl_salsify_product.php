@@ -90,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_product_legend}, product_sku, email, isotope_product_type, import_status;'
+        'default'                     => '{salsify_product_legend}, product_sku, email, isotope_product_type, import_status, last_update;'
     ),
  
     // Fields
@@ -160,6 +160,14 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
             'options'                  => array('incomplete' => 'Incompleted', 'completed' => 'Completed'),
             'eval'                     => array('mandatory'=>true, 'tl_class'=>'w50'),
             'sql'                      => "varchar(15) NOT NULL default ''"
+        ),
+        'last_update' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['last_update'],
+            'inputType'               => 'text',
+            'eval'                    => array('rgxp'=>'date', 'datepicker'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "varchar(20) NOT NULL default ''",
+            'default'                 => date("m/d/y")
         ),
         
         
