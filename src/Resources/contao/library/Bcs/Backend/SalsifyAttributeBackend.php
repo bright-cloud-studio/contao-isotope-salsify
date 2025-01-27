@@ -3,6 +3,7 @@
 namespace Bcs\Backend;
 
 use Bcs\Model\SalsifyAttribute;
+use Bcs\Model\SalsifyProduct;
 
 use Contao\Backend;
 use Contao\BackendTemplate;
