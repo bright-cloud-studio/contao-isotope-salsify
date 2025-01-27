@@ -21,58 +21,13 @@ class Hooks
 {
     public function generatePage(&$objPageModel, $objLayout, &$objPage)
     {
-        /*
-        // TEMPORARY - IF OUR 'HIDDEN' TEST PAGE
-        if($objPageModel->id == 58)
+        
+        if($objPageModel->id == 249)
         {
-            
-            // Open and process file
-            $reader = new JsonReader();
-            $reader->open("../salsify/Salsify_product-feed_2025_01_02_18_31_17_UTC.json");
-            $depth = $reader->depth();
-            $reader->read();
-            
-            // Process loaded XML data
-            do
-            {
-            
-                // Load the first array, which is the overall wrapper of arrays
-                $array_parent = $reader->value();
-                
-                // Loop through children arrays, these are what store the actual values here
-                foreach($array_parent as $array_child) {
 
-                    // Create a Salsify Request to hold everything
-                    $salsify_request = new SalsifyRequest();
-                    $salsify_request->tstamp = time();
-                    $salsify_request->product_sku = '123';
-                    $salsify_request->save();
-                    
-                    foreach($array_child as $key => $val) {
-                        
-                        echo "<strong>" . $key . "</strong> - " . $val[0];
-                        echo "<br>";
-                        
-                        $salsify_attribute = new SalsifyAttribute();
-                        $salsify_attribute->pid = $salsify_request->id;
-                        $salsify_attribute->attribute_key = $key;
-                        $salsify_attribute->attribute_value = $val[0];
-                        $salsify_attribute->tstamp = time();
-                        $salsify_attribute->save();
-                        
-                    }
-                    echo "<hr>";
-                }
-
-            } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
-
-
+            echo "generatePage CALLED <br>";
             
-            $reader->close();
-            // TEMPORARY: Die so we can see the page with just our data on it
-            die();
         }
-        */
         
     }
 }
