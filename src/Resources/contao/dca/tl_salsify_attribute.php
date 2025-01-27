@@ -158,7 +158,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'flag'                    => DataContainer::SORT_ASC,
             'default'                 => NULL,
             'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
-            'options_callback'	      => array('Bcs\Backend\SalsifyProductBackend', 'getIsotopeProductTypes'),
+            'options_callback'	      => array('Bcs\Backend\SalsifyAttributeBackend', 'getIsotopeProductTypes'),
             'sql'                     => "int(10) unsigned default NULL"
         ),
         // Salsify Attribute Fields
