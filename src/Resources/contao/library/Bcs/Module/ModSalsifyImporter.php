@@ -71,9 +71,11 @@ class ModSalsifyImporter extends \Contao\Module
         $depth = $reader->depth();
         $reader->read();
 
+        $do_loop = 0;
         // Process loaded XML data
         do
         {
+            $do_loop++;
         
             // Load the first array, which is the overall wrapper of arrays
             $array_parent = $reader->value();
@@ -86,8 +88,8 @@ class ModSalsifyImporter extends \Contao\Module
                 // Create a Salsify Product to hold our Salsify Attributes
                 $salsify_product = new SalsifyProduct();
                 $salsify_product->tstamp = time();
-                $salsify_product->product_sku = $prod_count;
-                $salsify_product->name = 'product_' . $prod_count;
+                $salsify_product->product_sku = $do_loop . '_' . $prod_count;
+                $salsify_product->name = 'product_' . $do_loop . '_' . $prod_count;
                 $salsify_product->save();
 
                 $log[$salsify_product->id]['id'] = $salsify_product->id;
