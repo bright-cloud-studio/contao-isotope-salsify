@@ -146,7 +146,7 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
             'inputType'               => 'select',
             'flag'                    => DataContainer::SORT_ASC,
             'default'                 => NULL,
-            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w100', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
             'options_callback'	      => array('Bcs\Backend\SalsifyProductBackend', 'getIsotopeProductTypes'),
             'sql'                     => "int(10) unsigned default NULL"
         ),
