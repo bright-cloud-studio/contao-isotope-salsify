@@ -139,7 +139,16 @@ class SalsifyAttributeBackend extends Backend
             // Apply "Use as SKU" value to similar SalsifyAttributes
             if($attr->attribute_key == $sku_field_key) {
                 $attr->is_sku = 1;
+                
+                // Find the parent SalsifyProduct and update the SKU to match this
+                $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attr->pid]);
+                if($salsify_product != null) {
+                    $salsify_product->product_sku = $attr->attribute_value;
+                    $salsify_product->save();
+                }
+
                 $save = true;
+                
             }
             
             if($save)
