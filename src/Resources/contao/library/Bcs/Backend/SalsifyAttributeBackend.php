@@ -14,6 +14,7 @@ use Contao\StringUtil;
 use Contao\System;
 
 use Isotope\Model\Attribute;
+use Isotope\Model\ProductType;
 
 class SalsifyAttributeBackend extends Backend
 {
