@@ -90,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_product_legend}, product_name, product_sku, email, isotope_product_type;{internal_details_legend}, import_status, last_update;'
+        'default'                     => '{salsify_product_legend}, product_name, product_sku, email;{internal_details_legend}, import_status, last_update;'
     ),
  
     // Fields
@@ -147,18 +147,6 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
             'filter'                  => false,
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
             'sql'                     => "varchar(255) NOT NULL default ''"
-        ),
-
-
-        'isotope_product_type' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['isotope_product_type'],
-            'inputType'               => 'select',
-            'flag'                    => DataContainer::SORT_ASC,
-            'default'                 => NULL,
-            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
-            'options_callback'	      => array('Bcs\Backend\SalsifyProductBackend', 'getIsotopeProductTypes'),
-            'sql'                     => "int(10) unsigned default NULL"
         ),
         'import_status' => array
         (
