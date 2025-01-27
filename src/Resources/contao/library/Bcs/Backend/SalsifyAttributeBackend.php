@@ -99,6 +99,8 @@ class SalsifyAttributeBackend extends Backend
         $cat_field_key = '';
         // Stores the KEY of whatever attribute that is checked as being used for the SKU
         $sku_field_key = '';
+        // Stores the KEY of whatever attribute that is checked is being used for the Product Name
+        $product_name_field_key = '';
         
         // Get all SalsifyAttributes with the same key
         $salsify_attributes = SalsifyAttribute::findAll();
@@ -114,6 +116,9 @@ class SalsifyAttributeBackend extends Backend
             // If this is checked as a category field, save it for the next full loop
             if($attr->is_sku)
                 $sku_field_key = $attr->attribute_key;
+
+            if($attr->is_name)
+                $product_name_field_key = $attr->attribute_key;
         }
         
         // Loop through again, apply value to similar keys
@@ -139,14 +144,28 @@ class SalsifyAttributeBackend extends Backend
             // Apply "Use as SKU" value to similar SalsifyAttributes
             if($attr->attribute_key == $sku_field_key) {
                 $attr->is_sku = 1;
-                
+
                 // Find the parent SalsifyProduct and update the SKU to match this
                 $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attr->pid]);
                 if($salsify_product != null) {
                     $salsify_product->product_sku = $attr->attribute_value;
                     $salsify_product->save();
                 }
+                
+                $save = true;
+                
+            }
 
+            if($attr->attribute_key == $product_name_field_key) {
+                $attr->is_name = 1;
+
+                // Find the parent SalsifyProduct and update the SKU to match this
+                $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attr->pid]);
+                if($salsify_product != null) {
+                    $salsify_product->product_name = $attr->attribute_value;
+                    $salsify_product->save();
+                }
+                
                 $save = true;
                 
             }
