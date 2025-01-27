@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, site_category_field, is_sku;{error_log_legend}, error_log;'
+        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, site_category_field, is_sku, is_name;{error_log_legend}, error_log;'
     ),
  
     // Fields
@@ -164,6 +164,15 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         'is_sku' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['is_sku'],
+            'inputType'               => 'checkbox',
+            'default'				  => '',
+            'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "char(1) NOT NULL default ''"
+        ),
+        // Salsify Attribute Fields
+        'is_name' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['is_name'],
             'inputType'               => 'checkbox',
             'default'				  => '',
             'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
