@@ -8,8 +8,6 @@ use Contao\Input;
 use Contao\DataContainer;
 use Contao\StringUtil;
 
-use Isotope\Model\ProductType;
-
 
 class SalsifyProductBackend extends Backend
 {
