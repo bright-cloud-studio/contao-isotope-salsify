@@ -103,6 +103,9 @@ class SalsifyAttributeBackend extends Backend
         $sku_field_key = '';
         // Stores the KEY of whatever attribute that is checked is being used for the Product Name
         $product_name_field_key = '';
+
+        $isotope_product_type = '';
+        $isotope_product_type_value = '';
         
         // Get all SalsifyAttributes with the same key
         $salsify_attributes = SalsifyAttribute::findAll();
@@ -121,6 +124,17 @@ class SalsifyAttributeBackend extends Backend
 
             if($attr->is_name)
                 $product_name_field_key = $attr->attribute_key;
+
+            if($attr->isotope_product_type != null) {
+                $isotope_product_type = $attr->isotope_product_type;
+                $isotope_product_type_value = $attr->attribute_value;
+
+                echo "Product Type: " . $isotope_product_type . "<br>";
+                echo "Value: " . $isotope_product_type_value . "<br>";
+                die();
+                
+            }
+                
         }
         
         // Loop through again, apply value to similar keys
