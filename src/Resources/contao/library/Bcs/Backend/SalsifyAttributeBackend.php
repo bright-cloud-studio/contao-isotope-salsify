@@ -107,6 +107,10 @@ class SalsifyAttributeBackend extends Backend
         $isotope_product_type = '';
         $isotope_product_type_key = '';
         $isotope_product_type_value = '';
+
+        $category_parent_page = '';
+        $category_parent_key = '';
+        $category_parent_value = '';
         
         // Get all SalsifyAttributes with the same key
         $salsify_attributes = SalsifyAttribute::findAll();
@@ -127,6 +131,16 @@ class SalsifyAttributeBackend extends Backend
                 $product_name_field_key = $attr->attribute_key;
 
             if($attr->isotope_product_type != null) {
+                $isotope_product_type = $attr->isotope_product_type;
+                $isotope_product_type_key = $attr->attribute_key;
+                $isotope_product_type_value = $attr->attribute_value;
+            }
+
+            if($attr->category_parent_page != null) {
+
+                echo $attr->category_parent_page;
+                die();
+                
                 $isotope_product_type = $attr->isotope_product_type;
                 $isotope_product_type_key = $attr->attribute_key;
                 $isotope_product_type_value = $attr->attribute_value;
