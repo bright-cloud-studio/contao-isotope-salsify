@@ -17,24 +17,18 @@
     if($prod_result) {
         while($prod = $prod_result->fetch_assoc()) {
             
-            
-            
-            
-            // Get the SalsifyAttributes
-            
-            
-            
-            
-            // Verify they all "PASS"
-            
-            
-            
-            
-            
-            
+            $attr_query =  "SELECT * FROM tl_salsify_attribute WHERE pid='".$prod['id']."' ORDER BY id ASC";
+            $attr_result = $dbh->query($attr_query);
+            if($attr_result) {
+                while($attr = $attr_result->fetch_assoc()) {
+                    
+                    print_r($attr);
+                    echo "<br><hr><br>";
+                }
+            }
             
 
-            
+            /*
             // Fill in the rest of the product's information then create the product
             $prod_values['tstamp'] = time();
             $prod_values['dateAdded'] = time();
@@ -70,6 +64,8 @@
             $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")
              ->set($priceTier)
              ->execute();
+             
+             */
              
             
  
