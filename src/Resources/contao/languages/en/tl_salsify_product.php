@@ -27,6 +27,7 @@ $GLOBALS['TL_LANG']['tl_salsify_product']['email']                      = array(
 
 
 $GLOBALS['TL_LANG']['tl_salsify_product']['internal_details_legend']        = 'INTERNAL DETAILS';
+$GLOBALS['TL_LANG']['tl_salsify_product']['isotope_product_type']           = array('Isotope Product Type', 'The Isotope Product Type this will turn into');
 $GLOBALS['TL_LANG']['tl_salsify_product']['isotope_product_type_linked']    = array('Isotope Product Type Linked', 'Tracks if we have the REQUIRED Product Type attribute applied');
 $GLOBALS['TL_LANG']['tl_salsify_product']['import_status']                  = array('Import Status', 'Tracks the Impot Status of this product');
 $GLOBALS['TL_LANG']['tl_salsify_product']['last_update']                    = array('Last Update', 'A timestamp of when the last update was processed');
