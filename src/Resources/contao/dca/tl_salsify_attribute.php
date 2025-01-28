@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, isotope_product_type, site_category_field, is_sku, is_name;{error_log_legend}, error_log;'
+        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, isotope_product_type, site_category_field, is_sku, is_name, category_parent_page;{error_log_legend}, error_log;'
     ),
  
     // Fields
@@ -157,7 +157,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'inputType'               => 'select',
             'flag'                    => DataContainer::SORT_ASC,
             'default'                 => NULL,
-            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w100 clr', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
             'options_callback'	      => array('Bcs\Backend\SalsifyAttributeBackend', 'getIsotopeProductTypes'),
             'sql'                     => "int(10) unsigned default NULL"
         ),
@@ -187,6 +187,14 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'default'				  => '',
             'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
             'sql'                     => "char(1) NOT NULL default ''"
+        ),
+        'category_parent_page' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['category_parent_page'],
+            'inputType'               => 'pageTree',
+            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'w50'),
+			'sql'                     => "blob NULL",
+            'relation'                => array('table'=>'tl_page', 'type'=>'hasMany', 'load'=>'lazy')
         ),
 
 
