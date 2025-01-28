@@ -21,11 +21,12 @@ $GLOBALS['TL_LANG']['tl_salsify_product']['toggle']                     = array(
 
 /* Fields */
 $GLOBALS['TL_LANG']['tl_salsify_product']['salsify_product_legend']     = 'Salsify Product Details';
-$GLOBALS['TL_LANG']['tl_salsify_product']['product_sku']                = array('Product SKU', 'The SKU of the product this Salsify Product is about');
+$GLOBALS['TL_LANG']['tl_salsify_product']['product_name']               = array('Product Name', 'The Name that the Isotope Product will use');
+$GLOBALS['TL_LANG']['tl_salsify_product']['product_sku']                = array('Product SKU', 'The unique SKU that the Isotope Product will use');
 $GLOBALS['TL_LANG']['tl_salsify_product']['email']                      = array('Email Address', 'The Email Address that will receive notifications in the event of an unresolvable issue');
 
 
-$GLOBALS['TL_LANG']['tl_salsify_product']['internal_details_legend']    = 'INTERNAL DETAILS';
-$GLOBALS['TL_LANG']['tl_salsify_product']['isotope_product_type']       = array('Isotope Product Type', 'Select the Isotope Product Type this Salsify Product will turn into');
-$GLOBALS['TL_LANG']['tl_salsify_product']['import_status']              = array('Import Status', 'Tracks the Impot Status of this product');
-$GLOBALS['TL_LANG']['tl_salsify_product']['last_update']                = array('Last Update', 'A timestamp of when the last update was processed');
+$GLOBALS['TL_LANG']['tl_salsify_product']['internal_details_legend']        = 'INTERNAL DETAILS';
+$GLOBALS['TL_LANG']['tl_salsify_product']['isotope_product_type_linked']    = array('Isotope Product Type Linked', 'Tracks if we have the REQUIRED Product Type attribute applied');
+$GLOBALS['TL_LANG']['tl_salsify_product']['import_status']                  = array('Import Status', 'Tracks the Impot Status of this product');
+$GLOBALS['TL_LANG']['tl_salsify_product']['last_update']                    = array('Last Update', 'A timestamp of when the last update was processed');
