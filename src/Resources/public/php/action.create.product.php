@@ -16,7 +16,25 @@
     $prod_result = $dbh->query($prod_query);
     if($prod_result) {
         while($prod = $prod_result->fetch_assoc()) {
+            
+            
+            
+            
+            // Get the SalsifyAttributes
+            
+            
+            
+            
+            // Verify they all "PASS"
+            
+            
+            
+            
+            
+            
+            
 
+            
             // Fill in the rest of the product's information then create the product
             $prod_values['tstamp'] = time();
             $prod_values['dateAdded'] = time();
@@ -52,6 +70,8 @@
             $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")
              ->set($priceTier)
              ->execute();
+             
+            
  
         }
     }
