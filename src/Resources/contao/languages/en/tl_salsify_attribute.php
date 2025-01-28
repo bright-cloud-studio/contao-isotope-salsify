@@ -20,6 +20,7 @@ $GLOBALS['TL_LANG']['tl_salsify_attribute']['isotope_product_type']        = arr
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['site_category_field']         = array('Site Category', 'Choose if this Attribute will be used for Page aliases.');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['is_sku']                      = array('Use as SKU', 'Choose if this Attribute is also used for the product\'s unique SKU');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['is_name']                     = array('Use as Name', 'Choose if this Attribute is also used for the product\'s name');
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['category_parent_page']        = array('Category Parent Page', 'Choose the Parent Page for this Attribute');
 
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['error_log_legend']            = 'INTERNAL DETAILS';
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['error_log']                   = array('Error Log', 'If something goes the error message will be plased here.');
