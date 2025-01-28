@@ -137,13 +137,10 @@ class SalsifyAttributeBackend extends Backend
             }
 
             if($attr->category_parent_page != null) {
-
-                echo $attr->category_parent_page;
-                die();
-                
-                $isotope_product_type = $attr->isotope_product_type;
-                $isotope_product_type_key = $attr->attribute_key;
-                $isotope_product_type_value = $attr->attribute_value;
+                $cat = unserialize($attr->category_parent_page);
+                $category_parent_page = $cat[0];
+                $category_parent_key = $attr->attribute_key;
+                $category_parent_value = $attr->attribute_value;
             }
                 
         }
@@ -203,6 +200,14 @@ class SalsifyAttributeBackend extends Backend
                         $salsify_product->isotope_product_type_linked = 'linked';
                         $salsify_product->save();
                     }
+                    $save = true;
+                }
+            }
+            
+            // Category Parent Page
+            if($attr->attribute_key == $category_parent_key) {
+                if($attr->attribute_value == $category_parent_value) {
+                    $attr->category_parent_page = $category_parent_page;
                     $save = true;
                 }
             }
