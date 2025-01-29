@@ -23,8 +23,9 @@
                 while($attr = $attr_result->fetch_assoc()) {
 
 
-                    $pass_1 = false;
-                    $pass_2 = false;
+                    $prod_values[$attr['attribute_key']] = $attr['attribute_value'];
+                }
+            }
 
 
                     
@@ -66,8 +67,7 @@
                      ->execute();
 
                     
-                }
-            }
+            
             
             
  
