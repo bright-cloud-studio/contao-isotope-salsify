@@ -52,9 +52,7 @@
                     $price['tax_class'] = 1;
                     $price['config_id'] = 0;
                     $price['member_group'] = 0;
-                    $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")
-                     ->set($price)
-                     ->execute();                                           
+                    $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();                                           
                                                              
                     // First, create entry in the 'tl_product_pricetier" table
                     $priceTier = array();
@@ -62,9 +60,7 @@
                     $priceTier['tstamp'] = time();
                     $priceTier['min'] = 1;
                     $priceTier['price'] = '1.00';
-                    $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")
-                     ->set($priceTier)
-                     ->execute();
+                    $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
 
                     
             
