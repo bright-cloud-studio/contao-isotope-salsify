@@ -67,7 +67,7 @@ class ModSalsifyImporter extends \Contao\Module
         
         // Open and process file
         $reader = new JsonReader();
-        $reader->open("../files/salsify/salsify_product_feed_2025_01_22_18_15_52_428_UTC.json");
+        $reader->open("../files/salsify/salsify_product_feed_2025_01_29_17_41_28_183_UTC.json");
         $depth = $reader->depth();
         $reader->read();
 
@@ -98,7 +98,7 @@ class ModSalsifyImporter extends \Contao\Module
                 
                 $prod_values = array();
                 
-                /*
+                
                 foreach($array_child as $key => $val) {
                     
                     $prod_values[$key] = $val[0];
@@ -116,47 +116,7 @@ class ModSalsifyImporter extends \Contao\Module
                     $attributes[$salsify_attribute->id]['value'] = $val[0];
                     $log[$salsify_product->id]['attributes'] = $attributes;
                     
-                    // Check if this attribute exists already
-                    $attr = Attribute::findOneBy(['tl_iso_attribute.field_name=?'],[$key]);
-                    // If we didn't find this attribute already
-                    if($attr == null) {
-                        
-                        
-                        // Replace this with Model, in hopes it will automatically add the attribute to the 'tl_iso_products' table
-                        $n_attr = new TextField();
-                        
-                        $n_attr->name = $key;
-                        $n_attr->field_name = $key;
-                        $n_attr->type = 'text';
-                        $n_attr->legend = 'options_legend';
-                        $n_attr->description = "SALSIFY IMPORTED ATTRIBUTE";
-                        $n_attr->optionsSource = 'attribute';
-                        $n_attr->size = 5;
-                        $n_attr->tstamp = time();
-                        $n_attr->save();
-                        
-                        $objUpdater = new DatabaseUpdater();
-                        $objUpdater->autoUpdateTables(['tl_iso_attribute']);
-                        
-                        
-                        
-                        // Create this attribute
-                        $new_attr = array();
-                        $new_attr['name'] = $key;
-                        $new_attr['field_name'] = $key;
-                        $new_attr['type'] = 'text';
-                        $new_attr['legend'] = 'options_legend';
-                        $new_attr['description'] = "SALSIFY IMPORTED ATTRIBUTE";
-                        $new_attr['optionsSource'] = 'attribute';
-                        $new_attr['size'] = 5;
-                        $new_attr['tstamp'] = time();
-                        $new_attr_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_attribute %s")
-                                                 ->set($new_attr)
-                                                 ->execute();
-                        
-                    }
-                    
-                }*/
+                }
                 
                 
                 /*
