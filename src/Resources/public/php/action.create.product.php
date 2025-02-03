@@ -44,6 +44,18 @@
                     $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")
                      ->set($prod_values)
                      ->execute();
+                     
+                     
+                     
+                     // First, create entry in the 'tl_product_pricetier" table
+                    $prod_cat = array();
+                    $prod_cat['pid'] = $prod_values_result->insertId;
+                    $prod_cat['tstamp'] = time();
+                    $prod_cat['page_id'] = '109';
+                    $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+
+                     
+                     
                                                      
                      // Second, create entry in the 'tl_product_price' table                    
                     $price = array();
