@@ -299,6 +299,18 @@ class SalsifyAttributeBackend extends Backend
         return $options;
     }
 
+    // Build an array with the KEY being the ID of the Isotope Attribute Option and the VALUE is the text-readable label
+    public function getIsotopeAttributeOptions()
+    {
+        $options = array();
+        $attributes = AttributeOption::findAll();
+        while($attributes->next()) {
+            $attr = $attributes->row();
+            $options[$attr['id']] = $attr['label'];
+        }
+        return $options;
+    }
+
     // Build an array with the KEY being the ID of the Isotope Attribute and the VALUE is the text-readable name
     public function getIsotopeProductTypes()
     {
