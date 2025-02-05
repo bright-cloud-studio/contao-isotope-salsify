@@ -67,7 +67,7 @@ class ModSalsifyImporter extends \Contao\Module
         
         // Open and process file
         $reader = new JsonReader();
-        $reader->open("../files/salsify/salsify_product_feed_2025_01_29_17_41_28_183_UTC.json");
+        $reader->open("../files/salsify/salsify_product_feed_2025_02_03_16_40_52_396_UTC.json");
         $depth = $reader->depth();
         $reader->read();
 
