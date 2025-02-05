@@ -14,6 +14,7 @@ use Contao\StringUtil;
 use Contao\System;
 
 use Isotope\Model\Attribute;
+use Isotope\Model\AttributeOption;
 use Isotope\Model\ProductType;
 
 class SalsifyAttributeBackend extends Backend
@@ -117,9 +118,50 @@ class SalsifyAttributeBackend extends Backend
 
         // Loop through all the collected Assignments
         foreach($salsify_attributes as $attr) {
+            
+            
             // If we have an isotope attribute assigned, save it
-            if($attr->linked_isotope_attribute != null)
-                $linked[$attr->attribute_key] = $attr->linked_isotope_attribute;
+            if($attr->linked_isotope_attribute != null) {
+                
+                // Get the Isotope Attribute
+                $iso_attr = Attribute::findBy(['id = ?'], [$attr->linked_isotope_attribute]);
+                
+                // Store universal settings
+                $linked[$attr->attribute_key]['isotope_attribute'] = $attr->linked_isotope_attribute;
+                $linked[$attr->attribute_key]['isotope_attribute_type'] = $iso_attr->type;
+                
+                
+                // Store 'Select' settings
+                if($iso_attr->type == 'select') {
+                    // Find all Options for this Attribute
+                    $iso_attr_opts = AttributeOption::findByPid($attr->linked_isotope_attribute);
+                    $opt_found = false;
+                    foreach($iso_attr_opts as $iso_attr_opt) {
+                        // If an Option's label matches our Attribute Value, it already exists
+                        if($iso_attr_opt->label == $attr->attribute_value) {
+                            $opt_found = true;
+                            $linked[$attr->attribute_key]['options'][$attr->attribute_value]['isotope_attribute_option'] = $iso_attr_opt->id;
+                        }
+                    }
+                    // If no Attribute Option is found, create it
+                    if($opt_found != true) {
+                        $new_attr_opt = new AttributeOption();
+                        $new_attr_opt->pid = $attr->linked_isotope_attribute;
+                        $new_attr_opt->label = $attr->attribute_value;
+                        $new_attr_opt->tstamp = time();
+                        $new_attr_opt->published = 1;
+                        $new_attr_opt->ptable = 'tl_iso_attribute';
+                        $new_attr_opt->type = 'option';
+                        $new_attr_opt->save();
+                        $linked[$attr->attribute_key]['options'][$attr->attribute_value]['isotope_attribute_option'] = $new_attr_opt->id;
+                    }
+                }
+                
+                
+                
+            }
+                
+                
             // If this is checked as a category field, save it for the next full loop
             if($attr->site_category_field)
                 $cat_field_key = $attr->attribute_key;
@@ -145,6 +187,8 @@ class SalsifyAttributeBackend extends Backend
                 
         }
         
+        
+        
         // Loop through again, apply value to similar keys
         foreach($salsify_attributes as $attr) {
             
@@ -154,6 +198,7 @@ class SalsifyAttributeBackend extends Backend
             if($attr->linked_isotope_attribute == null) {
 
                 if($linked[$attr->attribute_key]) {
+
                     $attr->linked_isotope_attribute = $linked[$attr->attribute_key];
                     $save = true;
                 }
@@ -217,6 +262,7 @@ class SalsifyAttributeBackend extends Backend
             
             
         }
+        die();
 
     }
 
