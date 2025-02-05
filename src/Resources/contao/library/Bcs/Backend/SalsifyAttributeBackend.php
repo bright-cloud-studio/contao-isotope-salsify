@@ -13,6 +13,8 @@ use Contao\DataContainer;
 use Contao\StringUtil;
 use Contao\System;
 
+use Contao\PageModel;
+
 use Isotope\Model\Attribute;
 use Isotope\Model\AttributeOption;
 use Isotope\Model\ProductType;
@@ -166,10 +168,47 @@ class SalsifyAttributeBackend extends Backend
                 
             }
                 
-                
+            
+            
+            /*    
             // If this is checked as a category field, save it for the next full loop
             if($attr->site_category_field)
                 $cat_field_key = $attr->attribute_key;
+            if($attr->category_parent_page != null) {
+                $cat = unserialize($attr->category_parent_page);
+                $category_parent_page = $cat[0];
+                $category_parent_key = $attr->attribute_key;
+                $category_parent_value = $attr->attribute_value;
+            }
+            */
+            
+            // If this is both a category attribute and we have a parent page selected
+            if($attr->site_category_field && $attr->category_parent_page != null) {
+                
+                
+                // Find Page or Create
+                $pid = unserialize($attr->category_parent_page);
+                
+                //$linked[$pid[0]][$attr->site_category_field] = $attr->category_parent_page;
+                
+                $page = PageModel::findBy(['pid = ?', 'title = ?'], [$pid[0], $attr->attribute_value]);
+                if($page != null) {
+                    $linked['category_page'][$pid[0]][$attr->attribute_value] = $page->id;
+                } else {
+                    $new_page = new PageModel();
+                    $new_page->pid = $pid[0];
+                    $new_page->title = $attr->attribute_value;
+                    $new_page->published = 1;
+                    $new_page->tstamp = time();
+                    $new_page->save();
+                    
+                    $linked['category_page'][$pid[0]][$attr->attribute_value] = $new_page->id;
+                }
+                
+            }
+            
+            
+                
             // If this is checked as a category field, save it for the next full loop
             if($attr->is_sku)
                 $sku_field_key = $attr->attribute_key;
@@ -191,13 +230,17 @@ class SalsifyAttributeBackend extends Backend
             }
                 
         }
-        
-        
+
+
+            
         
         // Loop through again, apply value to similar keys
         foreach($salsify_attributes as $attr) {
             
             $save = false;
+            
+            
+            
             
             // If we have an isotope attribute assigned, save it
             //if($attr->linked_isotope_attribute == null) {
@@ -255,6 +298,9 @@ class SalsifyAttributeBackend extends Backend
                 }
             }
             
+            
+            
+            /*
             // Category Parent Page
             if($attr->attribute_key == $category_parent_key) {
                 if($attr->attribute_value == $category_parent_value) {
@@ -262,6 +308,25 @@ class SalsifyAttributeBackend extends Backend
                     $save = true;
                 }
             }
+            
+            // If we have site category and parent page with a value, apply it
+            $pid = unserialize($attr->category_parent_page);
+            if($linked[$pid[0]][$attr->site_category_field] != '') {
+                $attr->category_page = $linked[$pid[0]][$attr->site_category_field];
+                $save = true;
+            }
+            */
+            
+            
+            $pid = unserialize($attr->category_parent_page);
+            if($linked['category_page'][$pid[0]][$attr->attribute_value] != '') {
+                $attr->category_page = $linked['category_page'][$pid[0]][$attr->attribute_value];
+                $save = true;
+            }
+            
+            
+            
+            
             
             if($save)
                 $attr->save();
