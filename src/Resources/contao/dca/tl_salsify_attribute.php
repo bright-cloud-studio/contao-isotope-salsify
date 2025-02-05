@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, linked_isotope_attribute_option, isotope_product_type, site_category_field, is_sku, is_name, category_parent_page;{error_log_legend}, error_log;'
+        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, linked_isotope_attribute_option, isotope_product_type, is_sku, is_name; {options_legend}, site_category_field, category_parent_page, category_page;{error_log_legend}, error_log;'
     ),
  
     // Fields
@@ -201,6 +201,14 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         'category_parent_page' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['category_parent_page'],
+            'inputType'               => 'pageTree',
+            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'w50'),
+			'sql'                     => "blob NULL",
+            'relation'                => array('table'=>'tl_page', 'type'=>'hasMany', 'load'=>'lazy')
+        ),
+        'category_page' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['category_page'],
             'inputType'               => 'pageTree',
             'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'w50'),
 			'sql'                     => "blob NULL",
