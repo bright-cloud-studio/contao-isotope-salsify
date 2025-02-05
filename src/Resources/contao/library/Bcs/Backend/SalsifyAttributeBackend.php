@@ -141,6 +141,8 @@ class SalsifyAttributeBackend extends Backend
                         if($iso_attr_opt->label == $attr->attribute_value) {
                             $opt_found = true;
                             $linked[$attr->attribute_key]['options'][$attr->attribute_value]['isotope_attribute_option'] = $iso_attr_opt->id;
+                            $attr->linked_isotope_attribute_option = $iso_addr_opt->id;
+                            $attr->save();
                         }
                     }
                     // If no Attribute Option is found, create it
@@ -154,6 +156,9 @@ class SalsifyAttributeBackend extends Backend
                         $new_attr_opt->type = 'option';
                         $new_attr_opt->save();
                         $linked[$attr->attribute_key]['options'][$attr->attribute_value]['isotope_attribute_option'] = $new_attr_opt->id;
+                        
+                        $attr->linked_isotope_attribute_option = $new_attr_opt->id;
+                        $attr->save();
                     }
                 }
                 
@@ -195,14 +200,15 @@ class SalsifyAttributeBackend extends Backend
             $save = false;
             
             // If we have an isotope attribute assigned, save it
-            if($attr->linked_isotope_attribute == null) {
+            //if($attr->linked_isotope_attribute == null) {
 
                 if($linked[$attr->attribute_key]) {
-
-                    $attr->linked_isotope_attribute = $linked[$attr->attribute_key];
+                    
+                    $attr->linked_isotope_attribute = $linked[$attr->attribute_key]['isotope_attribute'];
+                    $attr->linked_isotope_attribute_option = $linked[$attr->attribute_key]['options'][$attr->attribute_value]['isotope_attribute_option'];
                     $save = true;
                 }
-            }
+            //}
 
             // Apply 'Site Category' value to similar SalsifyAttributes
             if($attr->attribute_key == $cat_field_key) {
@@ -262,8 +268,6 @@ class SalsifyAttributeBackend extends Backend
             
             
         }
-        die();
-
     }
 
     
