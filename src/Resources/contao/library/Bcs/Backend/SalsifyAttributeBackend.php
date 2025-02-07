@@ -167,23 +167,10 @@ class SalsifyAttributeBackend extends Backend
                 
                 
             }
-                
             
-            
-            /*    
-            // If this is checked as a category field, save it for the next full loop
-            if($attr->site_category_field)
-                $cat_field_key = $attr->attribute_key;
-            if($attr->category_parent_page != null) {
-                $cat = unserialize($attr->category_parent_page);
-                $category_parent_page = $cat[0];
-                $category_parent_key = $attr->attribute_key;
-                $category_parent_value = $attr->attribute_value;
-            }
-            */
             
             // If this is both a category attribute and we have a parent page selected
-            if($attr->site_category_field && $attr->category_parent_page != null) {
+            if($attr->category_parent_page != null && $attr->category_reader_page != null) {
                 
                 
                 // Find Page or Create
@@ -195,10 +182,17 @@ class SalsifyAttributeBackend extends Backend
                 if($page != null) {
                     $linked['category_page'][$pid[0]][$attr->attribute_value] = $page->id;
                 } else {
+                    
+                    // Generate Page
                     $new_page = new PageModel();
                     $new_page->pid = $pid[0];
                     $new_page->title = $attr->attribute_value;
                     $new_page->alias = strtolower($attr->attribute_value);
+                    
+                    $new_page->robots = "noindex,nofollow";
+                    $new_page->enableCanonical = 1;
+                    $new_page->sitemap = "map_default";
+                    
                     $new_page->published = 1;
                     $new_page->tstamp = time();
                     $new_page->save();
@@ -299,24 +293,6 @@ class SalsifyAttributeBackend extends Backend
                 }
             }
             
-            
-            
-            /*
-            // Category Parent Page
-            if($attr->attribute_key == $category_parent_key) {
-                if($attr->attribute_value == $category_parent_value) {
-                    $attr->category_parent_page = $category_parent_page;
-                    $save = true;
-                }
-            }
-            
-            // If we have site category and parent page with a value, apply it
-            $pid = unserialize($attr->category_parent_page);
-            if($linked[$pid[0]][$attr->site_category_field] != '') {
-                $attr->category_page = $linked[$pid[0]][$attr->site_category_field];
-                $save = true;
-            }
-            */
             
             
             $pid = unserialize($attr->category_parent_page);
