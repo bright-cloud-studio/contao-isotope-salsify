@@ -31,7 +31,10 @@
             $prod_values['tstamp'] = time();
             $prod_values['dateAdded'] = time();
             $prod_values['type'] = 5;
-            $prod_values['orderPages'] = 'a:1:{i:0;s:3:"109";}';
+            
+            $prod_values['orderPages'] = $prod['category_page'];
+            $prod_values['sku'] = $prod['product_sku'];
+            
             $prod_values['alias'] = $prod_values['item_number'];
             $prod_values['name'] = $prod_values['specific_product_title'];
             $prod_values['sku'] = $prod_values['item_number'];
