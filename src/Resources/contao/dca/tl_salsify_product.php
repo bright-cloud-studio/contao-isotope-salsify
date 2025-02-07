@@ -90,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_product_legend}, product_name, product_sku, isotope_product_type, email, variant_group;{internal_details_legend}, isotope_product_type_linked, import_status, last_update;'
+        'default'                     => '{salsify_product_legend}, product_name, product_sku, isotope_product_type, email, variant_group, category_page;{internal_details_legend}, isotope_product_type_linked, import_status, last_update;'
     ),
  
     // Fields
@@ -167,6 +167,14 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
             'filter'                  => false,
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
             'sql'                     => "varchar(255) NOT NULL default ''"
+        ),
+        'category_page' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['category_page'],
+            'inputType'               => 'pageTree',
+            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'w50'),
+			'sql'                     => "blob NULL",
+            'relation'                => array('table'=>'tl_page', 'type'=>'hasMany', 'load'=>'lazy')
         ),
         'import_status' => array
         (
