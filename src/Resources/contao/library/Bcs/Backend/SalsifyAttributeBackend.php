@@ -169,18 +169,18 @@ class SalsifyAttributeBackend extends Backend
             }
             
             
-            // If this is both a category attribute and we have a parent page selected
+            // If we have a parent page and a reader page set
             if($attr->category_parent_page != null && $attr->category_reader_page != null) {
                 
-                
-                // Find Page or Create
+                // Try to find page, if not create it
                 $pid = unserialize($attr->category_parent_page);
-                
-                //$linked[$pid[0]][$attr->site_category_field] = $attr->category_parent_page;
-                
                 $page = PageModel::findBy(['pid = ?', 'title = ?'], [$pid[0], $attr->attribute_value]);
                 if($page != null) {
+                    
                     $linked['category_page'][$pid[0]][$attr->attribute_value] = $page->id;
+                    
+                    $linked[][][] = $page->id;
+                    
                 } else {
                     
                     // Generate Page
