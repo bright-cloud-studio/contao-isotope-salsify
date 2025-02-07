@@ -243,7 +243,7 @@ class SalsifyAttributeBackend extends Backend
 
 
         
-        // Loop through again, apply value to similar keys
+        // SECOND LOOP
         foreach($salsify_attributes as $attr) {
             
             // Tracks if a change was made, and if we need to save() or not at the end
@@ -266,7 +266,7 @@ class SalsifyAttributeBackend extends Backend
                 $save = true;
             }
 
-            // Apply "Use as SKU" value to similar SalsifyAttributes
+            // Product SKU
             if($attr->attribute_key == $sku_field_key) {
                 $attr->is_sku = 1;
 
@@ -279,6 +279,7 @@ class SalsifyAttributeBackend extends Backend
                 $save = true;
             }
 
+            // Product Name
             if($attr->attribute_key == $product_name_field_key) {
                 $attr->is_name = 1;
 
@@ -290,6 +291,21 @@ class SalsifyAttributeBackend extends Backend
                 }
                 $save = true;
             }
+            
+            // Variant Grouping
+            if($attr->attribute_key == $grouping_field_key) {
+                $attr->is_grouping = 1;
+
+                // Find the parent SalsifyProduct and update the 'variant_group' to match this
+                $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attr->pid]);
+                if($salsify_product != null) {
+                    $salsify_product->variant_group = $attr->attribute_value;
+                    $salsify_product->save();
+                }
+                $save = true;
+            }
+            
+            
 
             // Product Type
             if($attr->attribute_key == $isotope_product_type_key) {
