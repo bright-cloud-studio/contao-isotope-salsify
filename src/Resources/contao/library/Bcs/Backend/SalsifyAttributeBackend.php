@@ -174,12 +174,14 @@ class SalsifyAttributeBackend extends Backend
                 
                 // Try to find page, if not create it
                 $pid = unserialize($attr->category_parent_page);
+                $pid_r = unserialize($attr->category_reader_page);
                 $page = PageModel::findBy(['pid = ?', 'title = ?'], [$pid[0], $attr->attribute_value]);
+                
                 if($page != null) {
                     
-                    $linked['category_page'][$pid[0]][$attr->attribute_value] = $page->id;
-                    
-                    $linked[][][] = $page->id;
+                    $linked[$attr->attribute_key][$attr->attribute_value]['category_parent_page'] = $pid;
+                    $linked[$attr->attribute_key][$attr->attribute_value]['category_reader_page'] = $pid_r;
+                    $linked[$attr->attribute_key][$attr->attribute_value]['category_page'] = $page->id;
                     
                 } else {
                     
@@ -193,11 +195,21 @@ class SalsifyAttributeBackend extends Backend
                     $new_page->enableCanonical = 1;
                     $new_page->sitemap = "map_default";
                     
+                    
+                    $new_page->iso_readerJumpTo = $pid_r[0];
+                    $new_page->iso_readerMode = "page";
+                    
+                    // Get Page Layout from parent page
+                    $new_page->includeLayout = 1;
+                    $new_page->layout = 29;
+                    
                     $new_page->published = 1;
                     $new_page->tstamp = time();
                     $new_page->save();
-                    
-                    $linked['category_page'][$pid[0]][$attr->attribute_value] = $new_page->id;
+
+                    $linked[$attr->attribute_key][$attr->attribute_value]['category_parent_page'] = $pid;
+                    $linked[$attr->attribute_key][$attr->attribute_value]['category_reader_page'] = $pid_r;
+                    $linked[$attr->attribute_key][$attr->attribute_value]['category_page'] = $new_page->id;
                 }
                 
             }
@@ -227,7 +239,12 @@ class SalsifyAttributeBackend extends Backend
         }
 
 
-            
+        
+        echo "<pre>";
+        print_r($linked);
+        echo "</pre>";
+        die();
+        
         
         // Loop through again, apply value to similar keys
         foreach($salsify_attributes as $attr) {
@@ -295,11 +312,11 @@ class SalsifyAttributeBackend extends Backend
             
             
             
-            $pid = unserialize($attr->category_parent_page);
-            if($linked['category_page'][$pid[0]][$attr->attribute_value] != '') {
-                $attr->category_page = $linked['category_page'][$pid[0]][$attr->attribute_value];
-                $save = true;
-            }
+            //$pid = unserialize($attr->category_parent_page);
+            //if($linked['category_page'][$pid[0]][$attr->attribute_value] != '') {
+            //    $attr->category_page = $linked['category_page'][$pid[0]][$attr->attribute_value];
+            //    $save = true;
+            //}
             
             
             
