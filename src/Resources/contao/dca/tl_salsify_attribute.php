@@ -189,11 +189,14 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
             'sql'                     => "char(1) NOT NULL default ''"
         ),
+
+
+        // PAGE GENERATION STUFFS
         'category_parent_page' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['category_parent_page'],
             'inputType'               => 'pageTree',
-            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'w50'),
+            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'clr w50'),
 			'sql'                     => "blob NULL",
             'relation'                => array('table'=>'tl_page', 'type'=>'hasMany', 'load'=>'lazy')
         ),
@@ -201,7 +204,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['category_reader_page'],
             'inputType'               => 'pageTree',
-            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'w50'),
+            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'clr w50'),
 			'sql'                     => "blob NULL",
             'relation'                => array('table'=>'tl_page', 'type'=>'hasMany', 'load'=>'lazy')
         ),
@@ -209,7 +212,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['category_page'],
             'inputType'               => 'pageTree',
-            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'w50'),
+            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'clr w50'),
 			'sql'                     => "blob NULL",
             'relation'                => array('table'=>'tl_page', 'type'=>'hasMany', 'load'=>'lazy')
         ),
