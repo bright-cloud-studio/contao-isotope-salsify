@@ -240,20 +240,12 @@ class SalsifyAttributeBackend extends Backend
 
 
         
-        echo "<pre>";
-        print_r($linked);
-        echo "</pre>";
-        die();
-        
-        
         // Loop through again, apply value to similar keys
         foreach($salsify_attributes as $attr) {
             
+            // Tracks if a change was made, and if we need to save() or not at the end
             $save = false;
-            
-            
-            
-            
+
             // If we have an isotope attribute assigned, save it
             //if($attr->linked_isotope_attribute == null) {
 
@@ -310,23 +302,21 @@ class SalsifyAttributeBackend extends Backend
                 }
             }
             
+            // Check if our attribute_key/attribute_value has stored info in $linked
+            if($linked[$attr->attribute_key][$attr->attribute_value] != null) {
+                
+                $attr->category_parent_page = $linked[$attr->attribute_key][$attr->attribute_value]['category_parent_page'];
+                $attr->category_reader_page = $linked[$attr->attribute_key][$attr->attribute_value]['category_reader_page'];
+                $attr->category_page = $linked[$attr->attribute_key][$attr->attribute_value]['category_page'];
+                $save = true;
+            }
             
-            
-            //$pid = unserialize($attr->category_parent_page);
-            //if($linked['category_page'][$pid[0]][$attr->attribute_value] != '') {
-            //    $attr->category_page = $linked['category_page'][$pid[0]][$attr->attribute_value];
-            //    $save = true;
-            //}
-            
-            
-            
-            
-            
+            // If $save has been flagged anywhere, save this bad boy
             if($save)
                 $attr->save();
-            
-            
+                
         }
+        
     }
 
     
