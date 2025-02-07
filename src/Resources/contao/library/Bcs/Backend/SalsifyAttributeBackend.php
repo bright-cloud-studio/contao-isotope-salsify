@@ -104,6 +104,8 @@ class SalsifyAttributeBackend extends Backend
         $cat_field_key = '';
         // Stores the KEY of whatever attribute that is checked as being used for the SKU
         $sku_field_key = '';
+        // Stores the KEY of whatever attribute that is checked as being use for grouping
+        $grouping_field_key = '';
         // Stores the KEY of whatever attribute that is checked is being used for the Product Name
         $product_name_field_key = '';
 
@@ -164,8 +166,6 @@ class SalsifyAttributeBackend extends Backend
                     }
                 }
                 
-                
-                
             }
             
             
@@ -222,6 +222,9 @@ class SalsifyAttributeBackend extends Backend
 
             if($attr->is_name)
                 $product_name_field_key = $attr->attribute_key;
+                
+            if($attr->is_grouping)
+                $grouping_field_key = $attr->attribute_key;
 
             if($attr->isotope_product_type != null) {
                 $isotope_product_type = $attr->isotope_product_type;
