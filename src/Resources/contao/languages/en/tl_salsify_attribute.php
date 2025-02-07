@@ -20,6 +20,7 @@ $GLOBALS['TL_LANG']['tl_salsify_attribute']['linked_isotope_attribute_option']  
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['isotope_product_type']        = array('Isotope Product Type', 'Select the Isotope Product Type this will be turned into');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['is_sku']                      = array('Use as SKU', 'Choose if this Attribute is also used for the product\'s unique SKU');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['is_name']                     = array('Use as Name', 'Choose if this Attribute is also used for the product\'s name');
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['is_grouping']                 = array('Use as Grouping', 'Select if this attribute is used to \'link\' products together as Variants');
 
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['category_parent_page']        = array('Category Parent Page', 'Select the Parent Page this will live inside');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['category_reader_page']        = array('Category Reader Page', 'Select the Reader page for this product');
