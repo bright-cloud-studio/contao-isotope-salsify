@@ -25,6 +25,7 @@ $GLOBALS['TL_LANG']['tl_salsify_product']['product_name']               = array(
 $GLOBALS['TL_LANG']['tl_salsify_product']['product_sku']                = array('Product SKU', 'The unique SKU that the Isotope Product will use');
 $GLOBALS['TL_LANG']['tl_salsify_product']['email']                      = array('Email Address', 'The Email Address that will receive notifications in the event of an unresolvable issue');
 $GLOBALS['TL_LANG']['tl_salsify_product']['variant_group']              = array('Variant Group', 'If a Saislify Attribute is selected as grouping, this will store which group this product belongs to');
+$GLOBALS['TL_LANG']['tl_salsify_product']['category_page']              = array('Category Page', 'This is the page this product will live on');
 
 
 $GLOBALS['TL_LANG']['tl_salsify_product']['internal_details_legend']        = 'INTERNAL DETAILS';
