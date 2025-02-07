@@ -322,11 +322,16 @@ class SalsifyAttributeBackend extends Backend
             }
             
             // Check if our attribute_key/attribute_value has stored info in $linked
-            if($linked[$attr->attribute_key][$attr->attribute_value] != null) {
+            if($linked[$attr->attribute_key][$attr->attribute_value]['category_page'] != null) {
                 
                 $attr->category_parent_page = $linked[$attr->attribute_key][$attr->attribute_value]['category_parent_page'];
                 $attr->category_reader_page = $linked[$attr->attribute_key][$attr->attribute_value]['category_reader_page'];
                 $attr->category_page = $linked[$attr->attribute_key][$attr->attribute_value]['category_page'];
+                $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attr->pid]);
+                if($salsify_product != null) {
+                    $salsify_product->category_page = $linked[$attr->attribute_key][$attr->attribute_value]['category_page'];
+                    $salsify_product->save();
+                }
                 $save = true;
             }
             
