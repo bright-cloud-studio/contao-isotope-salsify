@@ -198,6 +198,7 @@ class SalsifyAttributeBackend extends Backend
                     $new_page = new PageModel();
                     $new_page->pid = $pid[0];
                     $new_page->title = $attr->attribute_value;
+                    $new_page->alias = strtolower($attr->attribute_value);
                     $new_page->published = 1;
                     $new_page->tstamp = time();
                     $new_page->save();
