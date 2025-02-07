@@ -35,13 +35,9 @@ class Hooks
         
         if($objPageModel->id == 249)
         {
-
-            echo "generatePage CALLED <br>";
-
-
             // Open and process file
             $reader = new JsonReader();
-            $reader->open("../files/salsify/salsify_product_feed_2025_01_22_18_15_52_428_UTC.json");
+            $reader->open("../files/salsify/salsify_product_feed_2025_02_07_18_04_34_532_UTC.json");
             $depth = $reader->depth();
             $reader->read();
             
