@@ -163,8 +163,8 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['variant_group'],
             'inputType'               => 'text',
             'default'                 => '',
-            'search'                  => false,
-            'filter'                  => false,
+            'search'                  => true,
+            'filter'                  => true,
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
             'sql'                     => "varchar(255) NOT NULL default ''"
         ),
