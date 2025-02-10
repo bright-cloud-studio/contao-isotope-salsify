@@ -30,7 +30,19 @@
                 while($attr = $attr_result->fetch_assoc()) {
 
                     $prod_values[$attr['attribute_key']] = $attr['attribute_value'];
-                    $products[$prod['variant_group']][$prod['product_sku']][$attr['attribute_key']] = $attr['attribute_value'];
+
+                    
+                    
+                    $iso_attr_query =  "SELECT * FROM tl_iso_attribute WHERE id='".$attr['linked_isotope_attribute']."' ORDER BY id ASC";
+                    $iso_attr_result = $dbh->query($iso_attr_query);
+                    if($iso_attr_result) {
+                        while($iso_attr = $iso_attr_result->fetch_assoc()) {
+                            $products[$prod['variant_group']][$prod['product_sku']][$iso_attr['field_name']] = $attr['attribute_value'];
+                        }
+                    }
+                    
+                    
+                    
                     
                 }
             }
@@ -38,13 +50,13 @@
             $products[$prod['variant_group']][$prod['product_sku']]['tstamp'] = time();
             $products[$prod['variant_group']][$prod['product_sku']]['dateAdded'] = time();
             $products[$prod['variant_group']][$prod['product_sku']]['type'] = 5;
-            $products[$prod['variant_group']][$prod['product_sku']]['orderPages'] = 'a:1:{i:0;s:3:"109";}';
+            $products[$prod['variant_group']][$prod['product_sku']]['orderPages'] = serialize([$prod['category_page']]);
             $products[$prod['variant_group']][$prod['product_sku']]['alias'] = $prod_values['item_number'];
             $products[$prod['variant_group']][$prod['product_sku']]['name'] = $prod_values['specific_product_title'];
             $products[$prod['variant_group']][$prod['product_sku']]['sku'] = $prod_values['item_number'];
             $products[$prod['variant_group']][$prod['product_sku']]['description'] = $prod_values['full_description'];
             $products[$prod['variant_group']][$prod['product_sku']]['published'] = 1;
-            $products[$prod['variant_group']][$prod['product_sku']]['upc'] = $prod_values['package_upc'];
+            //$products[$prod['variant_group']][$prod['product_sku']]['upc'] = $prod_values['package_upc'];
 
         }
     }
@@ -54,18 +66,66 @@
     // INSERT PRODUCTS INTO DATABASE
     
     // Loop through our groups
-    foreach($products as $group) {
+    $count_single = 0;
+    $count_variant = 0;
+    foreach($products as $key => $group) {
         
         // Build either a single product, or a variant
         if(count($group) == 1) {
-            echo "SINGLE PRODUCT<br>";
+            
+            $count_single++;
+            
+            foreach($group as $key2 => $prod) {
+                
+                $cat_id = unserialize($prod['orderPages']);
+                //
+                
+                $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($prod)->execute();
+                
+                 // First, create entry in the 'tl_product_pricetier" table
+                $prod_cat = array();
+                $prod_cat['pid'] = $prod_values_result->insertId;
+                $prod_cat['tstamp'] = time();
+                $prod_cat['page_id'] = $cat_id[0];
+                $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                
+                // Second, create entry in the 'tl_product_price' table                    
+                $price = array();
+                $price['pid'] = $prod_values_result->insertId;
+                $price['tstamp'] = time();
+                $price['tax_class'] = 1;
+                $price['config_id'] = 0;
+                $price['member_group'] = 0;
+                $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();
+                
+                // First, create entry in the 'tl_product_pricetier" table
+                $priceTier = array();
+                $priceTier['pid'] = $priceResult->insertId;
+                $priceTier['tstamp'] = time();
+                $priceTier['min'] = 1;
+                $priceTier['price'] = '1.00';
+                $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
+
+                
+
+            }
+            
+            
         } else {
-            echo "VARIANT<br>";
+            
+            $count_variant++;
+
+            foreach($group as $prod) {
+
+            }
+            
         }
         
         
     }
     
+    echo "SINGLE: $count_single<br>";
+    echo "VARIANT: $count_variant<br>";
     
     
     //echo "<pre>";
