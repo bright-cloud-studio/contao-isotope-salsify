@@ -27,9 +27,11 @@ $GLOBALS['TL_LANG']['tl_salsify_product']['email']                      = array(
 $GLOBALS['TL_LANG']['tl_salsify_product']['variant_group']              = array('Variant Group', 'If a Saislify Attribute is selected as grouping, this will store which group this product belongs to');
 $GLOBALS['TL_LANG']['tl_salsify_product']['category_page']              = array('Category Page', 'This is the page this product will live on');
 
+$GLOBALS['TL_LANG']['tl_salsify_product']['grouping_legend']        = 'Grouping Details';
+$GLOBALS['TL_LANG']['tl_salsify_product']['isotope_product_type']           = array('Isotope Product Type', 'The Isotope Product Type this will turn into');
+$GLOBALS['TL_LANG']['tl_salsify_product']['isotope_product_variant_type']   = array('Isotope Product Variant Type', 'Tracks if this is a Product or a Variant Product');
+$GLOBALS['TL_LANG']['tl_salsify_product']['isotope_product_type_linked']    = array('Isotope Product Type Linked', 'Tracks if we have the REQUIRED Product Type attribute applied');
 
 $GLOBALS['TL_LANG']['tl_salsify_product']['internal_details_legend']        = 'INTERNAL DETAILS';
-$GLOBALS['TL_LANG']['tl_salsify_product']['isotope_product_type']           = array('Isotope Product Type', 'The Isotope Product Type this will turn into');
-$GLOBALS['TL_LANG']['tl_salsify_product']['isotope_product_type_linked']    = array('Isotope Product Type Linked', 'Tracks if we have the REQUIRED Product Type attribute applied');
 $GLOBALS['TL_LANG']['tl_salsify_product']['import_status']                  = array('Import Status', 'Tracks the Impot Status of this product');
 $GLOBALS['TL_LANG']['tl_salsify_product']['last_update']                    = array('Last Update', 'A timestamp of when the last update was processed');
