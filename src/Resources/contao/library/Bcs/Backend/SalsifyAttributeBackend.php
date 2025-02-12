@@ -21,80 +21,7 @@ use Isotope\Model\ProductType;
 
 class SalsifyAttributeBackend extends Backend
 {
-  
-	public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-	{
-        if (strlen(Input::get('tid')))
-		{
-			$this->toggleVisibility(Input::get('tid'), (Input::get('state') == 1), (@func_get_arg(12) ?: null));
-			$this->redirect($this->getReferer());
-		}
-
-		$href .= '&amp;tid='.$row['id'].'&amp;state='.($row['published'] ? '' : 1);
-
-		if (!$row['published'])
-		{
-			$icon = 'invisible.gif';
-		}
-
-		return '<a href="'.$this->addToUrl($href).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
-	}	
-	
-
-	public function toggleVisibility($intId, $blnVisible, DataContainer $dc=null)
-	{
-		// Trigger the save_callback
-		if (is_array($GLOBALS['TL_DCA']['tl_salsify_attribute']['fields']['published']['save_callback']))
-		{
-			foreach ($GLOBALS['TL_DCA']['tl_salsify_attribute']['fields']['published']['save_callback'] as $callback)
-			{
-				if (is_array($callback))
-				{
-					$this->import($callback[0]);
-					$blnVisible = $this->$callback[0]->$callback[1]($blnVisible, ($dc ?: $this));
-				}
-				elseif (is_callable($callback))
-				{
-					$blnVisible = $callback($blnVisible, ($dc ?: $this));
-				}
-			}
-		}
-
-		// Update the database
-		$this->Database->prepare("UPDATE tl_salsify_attribute SET tstamp=". time() .", published='" . ($blnVisible ? 1 : '') . "' WHERE id=?")->execute($intId);
-		System::getContainer()->get('monolog.logger.contao.cron')->info('A new version of record "tl_transactions.id='.$intId.'" has been created'.$this->getParentEntries('tl_listing', $intId));
-	}
-	
-	
-	
-	public function generateAlias($varValue, DataContainer $dc)
-	{
-		$autoAlias = false;
-		
-		// Generate an alias if there is none
-		if ($varValue == '')
-		{
-			$autoAlias = true;
-			$varValue = standardize(StringUtil::restoreBasicEntities($dc->activeRecord->name));
-		}
-
-		$objAlias = $this->Database->prepare("SELECT id FROM tl_salsify_attribute WHERE id=? OR alias=?")->execute($dc->id, $varValue);
-
-		// Check whether the page alias exists
-		if ($objAlias->numRows > 1)
-		{
-			if (!$autoAlias)
-			{
-				throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-			}
-
-			$varValue .= '-' . $dc->id;
-		}
-
-		return $varValue;
-	}
-
-
+    
     // Loop through all of our Attributes, find ones that are identical to this, and link them to the same Isotope Attribute
     public function linkSimilarAttributes()
     {
@@ -104,14 +31,19 @@ class SalsifyAttributeBackend extends Backend
         $cat_field_key = '';
         // Stores the KEY of whatever attribute that is checked as being used for the SKU
         $sku_field_key = '';
-        // Stores the KEY of whatever attribute that is checked as being use for grouping
-        $grouping_field_key = '';
         // Stores the KEY of whatever attribute that is checked is being used for the Product Name
         $product_name_field_key = '';
 
+
+        // Stores the KEY of whatever attribute that is checked as being use for grouping
+        $grouping_field_key = '';
         $isotope_product_type = '';
-        $isotope_product_type_key = '';
-        $isotope_product_type_value = '';
+        $isotope_product_type_variant = '';
+        
+        $group_counter = array();
+        
+        //$isotope_product_type_key = '';
+        //$isotope_product_type_value = '';
 
         $category_parent_page = '';
         $category_parent_key = '';
@@ -136,7 +68,7 @@ class SalsifyAttributeBackend extends Backend
                 
                 
                 // Store 'Select' settings
-                if($iso_attr->type == 'select') {
+                if($iso_attr->type == 'select' || $iso_attr->type == 'radio') {
                     // Find all Options for this Attribute
                     $iso_attr_opts = AttributeOption::findByPid($attr->linked_isotope_attribute);
                     $opt_found = false;
@@ -222,15 +154,6 @@ class SalsifyAttributeBackend extends Backend
 
             if($attr->is_name)
                 $product_name_field_key = $attr->attribute_key;
-                
-            if($attr->is_grouping)
-                $grouping_field_key = $attr->attribute_key;
-
-            if($attr->isotope_product_type != null) {
-                $isotope_product_type = $attr->isotope_product_type;
-                $isotope_product_type_key = $attr->attribute_key;
-                $isotope_product_type_value = $attr->attribute_value;
-            }
 
             if($attr->category_parent_page != null) {
                 $cat = unserialize($attr->category_parent_page);
@@ -238,7 +161,19 @@ class SalsifyAttributeBackend extends Backend
                 $category_parent_key = $attr->attribute_key;
                 $category_parent_value = $attr->attribute_value;
             }
+            
+            
+            // If all thee grouping settings are filled in
+            if($attr->is_grouping && $attr->isotope_product_type != null && $attr->isotope_product_type_variant != null) {
                 
+                $grouping_field_key = $attr->attribute_key;
+                $isotope_product_type = $attr->isotope_product_type;
+                $isotope_product_type_variant = $attr->isotope_product_type_variant;
+
+                //$isotope_product_type_key = $attr->attribute_key;
+                //$isotope_product_type_value = $attr->attribute_value;
+            }
+            
         }
 
 
@@ -294,7 +229,13 @@ class SalsifyAttributeBackend extends Backend
             
             // Variant Grouping
             if($attr->attribute_key == $grouping_field_key) {
+                
                 $attr->is_grouping = 1;
+                $attr->isotope_product_type = $isotope_product_type;
+                $attr->isotope_product_type_variant = $isotope_product_type_variant;
+                
+                $group_counter[$attr->attribute_value] = $group_counter[$attr->attribute_value] + 1;
+                
 
                 // Find the parent SalsifyProduct and update the 'variant_group' to match this
                 $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attr->pid]);
@@ -302,12 +243,12 @@ class SalsifyAttributeBackend extends Backend
                     $salsify_product->variant_group = $attr->attribute_value;
                     $salsify_product->save();
                 }
+                
                 $save = true;
             }
-            
-            
 
             // Product Type
+            /*
             if($attr->attribute_key == $isotope_product_type_key) {
                 if($attr->attribute_value == $isotope_product_type_value) {
                     $attr->isotope_product_type = $isotope_product_type;
@@ -320,6 +261,9 @@ class SalsifyAttributeBackend extends Backend
                     $save = true;
                 }
             }
+            */
+            
+            
             
             // Check if our attribute_key/attribute_value has stored info in $linked
             if($linked[$attr->attribute_key][$attr->attribute_value]['category_page'] != null) {
@@ -340,6 +284,32 @@ class SalsifyAttributeBackend extends Backend
                 $attr->save();
                 
         }
+        
+        
+        // Third Grouping Loop
+        if($group_counter != null) {
+            
+            // Get all SalsifyAttributes with the same key
+            $salsify_products = SalsifyProduct::findAll();
+            foreach($salsify_products as $prod) {
+                
+                if($group_counter[$prod->variant_group] == 1) {
+                    
+                    $prod->isotope_product_variant_type = 'single';
+                    $prod->isotope_product_type = $isotope_product_type;
+                    
+                    
+                } else {
+                    $prod->isotope_product_variant_type = 'variant';
+                    $prod->isotope_product_type = $isotope_product_type_variant;
+                }
+                
+                $prod->isotope_product_type_linked = 'linked';
+                $prod->save();
+            }
+            
+        }
+        
         
     }
 
@@ -399,5 +369,78 @@ class SalsifyAttributeBackend extends Backend
         }
         return $options;
     }
+    
+    
+    
+    
+    
+    public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
+	{
+        if (strlen(Input::get('tid')))
+		{
+			$this->toggleVisibility(Input::get('tid'), (Input::get('state') == 1), (@func_get_arg(12) ?: null));
+			$this->redirect($this->getReferer());
+		}
 
+		$href .= '&amp;tid='.$row['id'].'&amp;state='.($row['published'] ? '' : 1);
+
+		if (!$row['published'])
+		{
+			$icon = 'invisible.gif';
+		}
+
+		return '<a href="'.$this->addToUrl($href).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+	}	
+	
+	public function toggleVisibility($intId, $blnVisible, DataContainer $dc=null)
+	{
+		// Trigger the save_callback
+		if (is_array($GLOBALS['TL_DCA']['tl_salsify_attribute']['fields']['published']['save_callback']))
+		{
+			foreach ($GLOBALS['TL_DCA']['tl_salsify_attribute']['fields']['published']['save_callback'] as $callback)
+			{
+				if (is_array($callback))
+				{
+					$this->import($callback[0]);
+					$blnVisible = $this->$callback[0]->$callback[1]($blnVisible, ($dc ?: $this));
+				}
+				elseif (is_callable($callback))
+				{
+					$blnVisible = $callback($blnVisible, ($dc ?: $this));
+				}
+			}
+		}
+
+		// Update the database
+		$this->Database->prepare("UPDATE tl_salsify_attribute SET tstamp=". time() .", published='" . ($blnVisible ? 1 : '') . "' WHERE id=?")->execute($intId);
+		System::getContainer()->get('monolog.logger.contao.cron')->info('A new version of record "tl_transactions.id='.$intId.'" has been created'.$this->getParentEntries('tl_listing', $intId));
+	}
+	
+	public function generateAlias($varValue, DataContainer $dc)
+	{
+		$autoAlias = false;
+		
+		// Generate an alias if there is none
+		if ($varValue == '')
+		{
+			$autoAlias = true;
+			$varValue = standardize(StringUtil::restoreBasicEntities($dc->activeRecord->name));
+		}
+
+		$objAlias = $this->Database->prepare("SELECT id FROM tl_salsify_attribute WHERE id=? OR alias=?")->execute($dc->id, $varValue);
+
+		// Check whether the page alias exists
+		if ($objAlias->numRows > 1)
+		{
+			if (!$autoAlias)
+			{
+				throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+			}
+
+			$varValue .= '-' . $dc->id;
+		}
+
+		return $varValue;
+	}
+	
 }
