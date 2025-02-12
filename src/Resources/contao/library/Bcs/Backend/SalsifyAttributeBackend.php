@@ -62,42 +62,47 @@ class SalsifyAttributeBackend extends Backend
                 // Get the Isotope Attribute
                 $iso_attr = Attribute::findBy(['id = ?'], [$attr->linked_isotope_attribute]);
                 
-                // Store universal settings
-                $linked[$attr->attribute_key]['isotope_attribute'] = $attr->linked_isotope_attribute;
-                $linked[$attr->attribute_key]['isotope_attribute_type'] = $iso_attr->type;
-                
-                
-                // Store 'Select' settings
-                if($iso_attr->type == 'select' || $iso_attr->type == 'radio') {
-                    // Find all Options for this Attribute
-                    $iso_attr_opts = AttributeOption::findByPid($attr->linked_isotope_attribute);
-                    $opt_found = false;
-                    foreach($iso_attr_opts as $iso_attr_opt) {
-                        // If an Option's label matches our Attribute Value, it already exists
-                        if($iso_attr_opt->label == $attr->attribute_value) {
-                            $opt_found = true;
-                            $linked[$attr->attribute_key]['options'][$attr->attribute_value]['isotope_attribute_option'] = $iso_attr_opt->id;
-                            $attr->linked_isotope_attribute_option = $iso_addr_opt->id;
+                // Get our parents variant type
+                $parent = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attr->pid]);
+                if($parent != null) {
+
+                    // Store universal settings
+                    $linked[$attr->attribute_key][$parent->isotope_product_variant_type]['isotope_attribute'] = $attr->linked_isotope_attribute;
+                    $linked[$attr->attribute_key][$parent->isotope_product_variant_type]['isotope_attribute_type'] = $iso_attr->type;
+                    
+                    // Store 'Select' settings
+                    if($iso_attr->type == 'select' || $iso_attr->type == 'radio') {
+                        // Find all Options for this Attribute
+                        $iso_attr_opts = AttributeOption::findByPid($attr->linked_isotope_attribute);
+                        $opt_found = false;
+                        foreach($iso_attr_opts as $iso_attr_opt) {
+                            // If an Option's label matches our Attribute Value, it already exists
+                            if($iso_attr_opt->label == $attr->attribute_value) {
+                                $opt_found = true;
+                                $linked[$attr->attribute_key][$parent->isotope_product_variant_type]['options'][$attr->attribute_value]['isotope_attribute_option'] = $iso_attr_opt->id;
+                                $attr->linked_isotope_attribute_option = $iso_addr_opt->id;
+                                $attr->save();
+                            }
+                        }
+                        // If no Attribute Option is found, create it
+                        if($opt_found != true) {
+                            $new_attr_opt = new AttributeOption();
+                            $new_attr_opt->pid = $attr->linked_isotope_attribute;
+                            $new_attr_opt->label = $attr->attribute_value;
+                            $new_attr_opt->tstamp = time();
+                            $new_attr_opt->published = 1;
+                            $new_attr_opt->ptable = 'tl_iso_attribute';
+                            $new_attr_opt->type = 'option';
+                            $new_attr_opt->save();
+                            $linked[$attr->attribute_key][$parent->isotope_product_variant_type]['options'][$attr->attribute_value]['isotope_attribute_option'] = $new_attr_opt->id;
+                            
+                            $attr->linked_isotope_attribute_option = $new_attr_opt->id;
                             $attr->save();
                         }
                     }
-                    // If no Attribute Option is found, create it
-                    if($opt_found != true) {
-                        $new_attr_opt = new AttributeOption();
-                        $new_attr_opt->pid = $attr->linked_isotope_attribute;
-                        $new_attr_opt->label = $attr->attribute_value;
-                        $new_attr_opt->tstamp = time();
-                        $new_attr_opt->published = 1;
-                        $new_attr_opt->ptable = 'tl_iso_attribute';
-                        $new_attr_opt->type = 'option';
-                        $new_attr_opt->save();
-                        $linked[$attr->attribute_key]['options'][$attr->attribute_value]['isotope_attribute_option'] = $new_attr_opt->id;
-                        
-                        $attr->linked_isotope_attribute_option = $new_attr_opt->id;
-                        $attr->save();
-                    }
+                    
                 }
-                
+ 
             }
             
             
@@ -176,7 +181,12 @@ class SalsifyAttributeBackend extends Backend
             
         }
 
-
+        
+        
+        //echo "<pre>";
+        //print_r($linked);
+        //die();
+        
         
         // SECOND LOOP
         foreach($salsify_attributes as $attr) {
@@ -184,16 +194,18 @@ class SalsifyAttributeBackend extends Backend
             // Tracks if a change was made, and if we need to save() or not at the end
             $save = false;
 
-            // If we have an isotope attribute assigned, save it
-            //if($attr->linked_isotope_attribute == null) {
+            $parent = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attr->pid]);
+            if($parent != null) {
+                
+                if($linked[$attr->attribute_key][$parent->isotope_product_variant_type]) {
 
-                if($linked[$attr->attribute_key]) {
-                    
-                    $attr->linked_isotope_attribute = $linked[$attr->attribute_key]['isotope_attribute'];
-                    $attr->linked_isotope_attribute_option = $linked[$attr->attribute_key]['options'][$attr->attribute_value]['isotope_attribute_option'];
+                    $attr->linked_isotope_attribute = $linked[$attr->attribute_key][$parent->isotope_product_variant_type]['isotope_attribute'];
+                    $attr->linked_isotope_attribute_option = $linked[$attr->attribute_key][$parent->isotope_product_variant_type]['options'][$attr->attribute_value]['isotope_attribute_option'];
                     $save = true;
                 }
-            //}
+                
+            }
+
 
             // Apply 'Site Category' value to similar SalsifyAttributes
             if($attr->attribute_key == $cat_field_key) {
@@ -339,13 +351,49 @@ class SalsifyAttributeBackend extends Backend
     }
 
     // Build an array with the KEY being the ID of the Isotope Attribute and the VALUE is the text-readable name
-    public function getIsotopeAttributes()
+    public function getIsotopeAttributes(DataContainer $dc)
     {
+        
+        $linked_attributes = array();
+        
+        // first check if salsify product has product type selected
+        $sp = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$dc->activeRecord->pid]);
+        if($sp != null) {
+            
+            if($sp->isotope_product_type != null) {
+
+                $pt = ProductType::findOneBy(['tl_iso_producttype.id=?'],[$sp->isotope_product_type]);
+                if($pt != null) {
+                    
+                    
+                    if($pt->variant_attributes != null) {
+                        foreach($pt->variant_attributes as $key => $attr) {
+                            
+                            if($attr['enabled'] == '1') {
+                                $linked_attributes[] = $key;
+                            }
+                        }
+                    } else {
+                        foreach($pt->attributes as $key => $attr) {
+                            if($attr['enabled'] == '1') {
+                                $linked_attributes[] = $key;
+                            }
+                        }
+                    }
+                    
+                    
+                }
+                
+            }
+            
+        }
         $options = array();
         $attributes = Attribute::findAll();
         while($attributes->next()) {
             $attr = $attributes->row();
-            $options[$attr['id']] = $attr['name'];
+            if(in_array($attr['field_name'], $linked_attributes)) {
+                $options[$attr['id']] = $attr['name'];
+            }
         }
         return $options;
     }
@@ -355,9 +403,11 @@ class SalsifyAttributeBackend extends Backend
     {
         $options = array();
         $attributes = AttributeOption::findAll();
-        while($attributes->next()) {
-            $attr = $attributes->row();
-            $options[$attr['id']] = $attr['label'];
+        if($attributes) {
+            while($attributes->next()) {
+                $attr = $attributes->row();
+                $options[$attr['id']] = $attr['label'];
+            }
         }
         return $options;
     }
