@@ -14,10 +14,14 @@ $GLOBALS['TL_LANG']['tl_salsify_attrbute']['salsify_attribute_legend']    = 'Sal
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['attribute_key']              = array('Attribute Key', 'The Attribute\'s KEY');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['attribute_value']            = array('Attribute Value', 'The Attribute\'s VALUE');
 
-$GLOBALS['TL_LANG']['tl_salsify_attribute']['options_legend']              = 'Attribute Options';
-$GLOBALS['TL_LANG']['tl_salsify_attribute']['linked_isotope_attribute']    = array('Linked Isotope Attribute', 'Select the Isotope Attribute this will be filled into.');
-$GLOBALS['TL_LANG']['tl_salsify_attribute']['linked_isotope_attribute_option']    = array('Linked Isotope Attribute Option', 'If the Isotope Attribute uses Options, the option will be linked here during setup');
-$GLOBALS['TL_LANG']['tl_salsify_attribute']['isotope_product_type']        = array('Isotope Product Type', 'Select the Isotope Product Type this will be turned into');
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['options_legend']                  = 'Attribute Options';
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['linked_isotope_attribute']        = array('Linked Isotope Attribute', 'Select the Isotope Attribute this will be filled into.');
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['linked_isotope_attribute_option'] = array('Linked Isotope Attribute Option', 'If the Isotope Attribute uses Options, the option will be linked here during setup');
+
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['grouping_legend']              = 'Grouping Options';
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['isotope_product_type']         = array('Isotope Product Type', 'Select the Isotope Product Type for singular Products');
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['isotope_product_type_variant'] = array('Isotope Product Type Variant', 'Select the Isotope Product Type for Variant Products');
+
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['is_sku']                      = array('Use as SKU', 'Choose if this Attribute is also used for the product\'s unique SKU');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['is_name']                     = array('Use as Name', 'Choose if this Attribute is also used for the product\'s name');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['is_grouping']                 = array('Use as Grouping', 'Select if this attribute is used to \'link\' products together as Variants');
