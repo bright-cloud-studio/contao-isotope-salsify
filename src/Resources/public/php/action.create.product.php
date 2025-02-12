@@ -81,11 +81,13 @@
             
             foreach($group as $key2 => $prod) {
                 
-                /*
+                
                 
                 // If we have a Product Page selected
                 $cat_id = unserialize($prod['orderPages']);
                 if($cat_id[0]) {
+                    
+                    echo "PAGE: " . $cat_id[0] . "<br>";
 
                     $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($prod)->execute();
                     
@@ -114,7 +116,7 @@
                     $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
                     
                 }
-                */
+                
                 
             }
             
@@ -123,43 +125,95 @@
             
             $count_variant++;
             
-            // Create parent using $key as name
-            $parent['tstamp'] = time();
-            $parent['dateAdded'] = time();
-            $parent['type'] = 5;
-            $parent['orderPages'] = 'a:1:{i:0;s:3:"109";}';
-            $parent['alias'] = str_replace(' ', '_', strtolower($key));
-            $parent['name'] = $key;
-            $parent['sku'] = $prod_values['item_number'];
-            $parent['description'] = $prod_values['full_description'];
-            $parent['published'] = 1;
-            $parent_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
-            
-            // First, create entry in the 'tl_product_pricetier" table
-            $parent_cat = array();
-            $parent_cat['pid'] = $parent_result->insertId;
-            $parent_cat['tstamp'] = time();
-            $parent_cat['page_id'] = '109';
-            $parent_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($parent_cat)->execute();
-
-             // Second, create entry in the 'tl_product_price' table                    
-            $price = array();
-            $price['pid'] = $parent_result->insertId;
-            $price['tstamp'] = time();
-            $price['tax_class'] = 1;
-            $price['config_id'] = 0;
-            $price['member_group'] = 0;
-            $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();                                           
-                                                     
-            // First, create entry in the 'tl_product_pricetier" table
-            $priceTier = array();
-            $priceTier['pid'] = $priceResult->insertId;
-            $priceTier['tstamp'] = time();
-            $priceTier['min'] = 1;
-            $priceTier['price'] = '1.00';
-            $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
+            // For now, we need to use the first loop to create the parent, track if it is that loop
+            $create_parent = true;
+            $parent_id = 0;
             
             foreach($group as $key2 => $prod) {
+                
+                /*
+                if($create_parent) {
+                    $create_parent = false;
+                    
+                    // CREATE PARENT PRODUCT
+                    $parent['tstamp'] = time();
+                    $parent['dateAdded'] = time();
+                    $parent['type'] = 5;
+                    $parent['orderPages'] = 'a:1:{i:0;s:3:"109";}';
+                    $parent['alias'] = str_replace(' ', '_', strtolower($key));
+                    $parent['name'] = $key;
+                    $parent['sku'] = $prod_values['item_number'];
+                    $parent['description'] = $prod_values['full_description'];
+                    $parent['published'] = 1;
+                    //$parent_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
+                    
+                    $parent_id = $parent_result->insertId;
+                    
+                    // First, create entry in the 'tl_product_pricetier" table
+                    $parent_cat = array();
+                    $parent_cat['pid'] = $parent_result->insertId;
+                    $parent_cat['tstamp'] = time();
+                    $parent_cat['page_id'] = '109';
+                    //$parent_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($parent_cat)->execute();
+        
+                     // Second, create entry in the 'tl_product_price' table                    
+                    $price = array();
+                    $price['pid'] = $parent_result->insertId;
+                    $price['tstamp'] = time();
+                    $price['tax_class'] = 1;
+                    $price['config_id'] = 0;
+                    $price['member_group'] = 0;
+                    //$priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();                                           
+                                                             
+                    // First, create entry in the 'tl_product_pricetier" table
+                    $priceTier = array();
+                    $priceTier['pid'] = $priceResult->insertId;
+                    $priceTier['tstamp'] = time();
+                    $priceTier['min'] = 1;
+                    $priceTier['price'] = '1.00';
+                    //$priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
+                    
+                } else {
+                    
+                    // CREATE CHILD
+                    $parent['tstamp'] = time();
+                    $parent['dateAdded'] = time();
+                    $parent['pid'] = $parent_id;
+                    $parent['type'] = 5;
+                    $parent['orderPages'] = 'a:1:{i:0;s:3:"109";}';
+                    $parent['alias'] = str_replace(' ', '_', strtolower($key));
+                    $parent['name'] = $key;
+                    $parent['sku'] = $prod_values['item_number'];
+                    $parent['description'] = $prod_values['full_description'];
+                    $parent['published'] = 1;
+                    //$parent_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
+                    
+                    // First, create entry in the 'tl_product_pricetier" table
+                    $parent_cat = array();
+                    $parent_cat['pid'] = $parent_result->insertId;
+                    $parent_cat['tstamp'] = time();
+                    $parent_cat['page_id'] = '109';
+                    //$parent_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($parent_cat)->execute();
+        
+                     // Second, create entry in the 'tl_product_price' table                    
+                    $price = array();
+                    $price['pid'] = $parent_result->insertId;
+                    $price['tstamp'] = time();
+                    $price['tax_class'] = 1;
+                    $price['config_id'] = 0;
+                    $price['member_group'] = 0;
+                    //$priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();                                           
+                                                             
+                    // First, create entry in the 'tl_product_pricetier" table
+                    $priceTier = array();
+                    $priceTier['pid'] = $priceResult->insertId;
+                    $priceTier['tstamp'] = time();
+                    $priceTier['min'] = 1;
+                    $priceTier['price'] = '1.00';
+                    //$priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
+                }
+                
+                */
 
             }
             
