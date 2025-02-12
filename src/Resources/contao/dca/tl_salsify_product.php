@@ -202,12 +202,12 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['isotope_product_variant_type'],
             'inputType'               => 'select',
-            'default'                 => NULL,
+            'default'                 => 'single',
             'filter'                  => true,
             'search'                  => true,
             'options'                  => array('single' => 'Single Product', 'variant' => 'Variant Product'),
-            'eval'                     => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
-            'sql'                     => "int(10) unsigned default NULL"
+            'eval'                     => array('mandatory'=>true, 'multiple'=>false, 'tl_class'=>'w50'),
+            'sql'                      => "varchar(15) NOT NULL default ''"
         ),
         'last_update' => array
         (
