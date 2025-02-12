@@ -90,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_product_legend}, product_name, product_sku, isotope_product_type, email, variant_group, category_page;{internal_details_legend}, isotope_product_type_linked, import_status, last_update;'
+        'default'                     => '{salsify_product_legend}, product_name, product_sku, isotope_product_type, email, variant_group, isotope_product_variant_type, category_page;{internal_details_legend}, isotope_product_type_linked, import_status, last_update;'
     ),
  
     // Fields
@@ -197,6 +197,17 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
             'options'                  => array('unlinked' => 'Unlinked', 'linked' => 'Linked'),
             'eval'                     => array('mandatory'=>true, 'tl_class'=>'w50'),
             'sql'                      => "varchar(15) NOT NULL default ''"
+        ),
+        'isotope_product_variant_type' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['isotope_product_variant_type'],
+            'inputType'               => 'select',
+            'default'                 => NULL,
+            'filter'                  => true,
+            'search'                  => true,
+            'options'                  => array('single' => 'Single Product', 'variant' => 'Variant Product'),
+            'eval'                     => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
+            'sql'                     => "int(10) unsigned default NULL"
         ),
         'last_update' => array
         (
