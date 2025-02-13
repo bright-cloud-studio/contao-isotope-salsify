@@ -25,6 +25,7 @@ class SalsifyAttributeBackend extends Backend
     // Loop through all of our Attributes, find ones that are identical to this, and link them to the same Isotope Attribute
     public function linkSimilarAttributes()
     {
+        
         // Stores our linked attribute values so we can apply them on the second loop
         $linked = array();
         // Stores the KEY of whatever attribute that is checked as a category field
@@ -46,8 +47,6 @@ class SalsifyAttributeBackend extends Backend
         
         // Get all SalsifyAttributes with the same key
         $salsify_attributes = SalsifyAttribute::findAll();
-
-
 
         // LOOP ONE - STAGE DATA
         foreach($salsify_attributes as $attr) {
@@ -109,6 +108,12 @@ class SalsifyAttributeBackend extends Backend
                 // Try to find page, if not create it
                 $pid = unserialize($attr->category_parent_page);
                 $pid_r = unserialize($attr->category_reader_page);
+                
+                
+                // Create array of categories
+                $cats = $this->csvStringToArray($attr->attribute_value);
+            
+                
                 $page = PageModel::findBy(['pid = ?', 'title = ?'], [$pid[0], $attr->attribute_value]);
                 
                 if($page != null) {
@@ -147,7 +152,6 @@ class SalsifyAttributeBackend extends Backend
                 
             }
             
-            
                 
             // If this is checked as a category field, save it for the next full loop
             if($attr->is_sku)
@@ -163,21 +167,17 @@ class SalsifyAttributeBackend extends Backend
                 $category_parent_value = $attr->attribute_value;
             }
             
-            
             // If all thee grouping settings are filled in
             if($attr->is_grouping && $attr->isotope_product_type != null && $attr->isotope_product_type_variant != null) {
                 
                 $grouping_field_key = $attr->attribute_key;
                 $isotope_product_type = $attr->isotope_product_type;
                 $isotope_product_type_variant = $attr->isotope_product_type_variant;
-
-                //$isotope_product_type_key = $attr->attribute_key;
-                //$isotope_product_type_value = $attr->attribute_value;
+                
             }
             
         }
-        
-        
+
         
         // LOOP TWO: Link matching SalsifyAttributes
         foreach($salsify_attributes as $attr) {
@@ -196,7 +196,7 @@ class SalsifyAttributeBackend extends Backend
                 }
                 
             }
-
+            
 
             // Apply 'Site Category' value to similar SalsifyAttributes
             if($attr->attribute_key == $cat_field_key) {
@@ -488,5 +488,14 @@ class SalsifyAttributeBackend extends Backend
 
 		return $varValue;
 	}
+	
+	public function csvStringToArray(string $csvString): array {
+        if (empty($csvString)) { return []; }
+
+        $result = str_getcsv($csvString);
+
+        return array_filter($result, function($value) { return $value !== ""; });
+    }
+	
 	
 }
