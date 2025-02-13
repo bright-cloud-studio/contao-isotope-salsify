@@ -31,8 +31,6 @@
 
                     $prod_values[$attr['attribute_key']] = $attr['attribute_value'];
 
-                    
-                    
                     $iso_attr_query =  "SELECT * FROM tl_iso_attribute WHERE id='".$attr['linked_isotope_attribute']."' ORDER BY id ASC";
                     $iso_attr_result = $dbh->query($iso_attr_query);
                     if($iso_attr_result) {
@@ -53,7 +51,7 @@
 
             $products[$prod['variant_group']][$prod['product_sku']]['tstamp'] = time();
             $products[$prod['variant_group']][$prod['product_sku']]['dateAdded'] = time();
-            $products[$prod['variant_group']][$prod['product_sku']]['type'] = 5;
+            $products[$prod['variant_group']][$prod['product_sku']]['type'] = $prod['isotope_product_type'];
             $products[$prod['variant_group']][$prod['product_sku']]['orderPages'] = serialize([$prod['category_page']]);
             $products[$prod['variant_group']][$prod['product_sku']]['alias'] = $prod_values['item_number'];
             $products[$prod['variant_group']][$prod['product_sku']]['name'] = $prod_values['specific_product_title'];
@@ -72,6 +70,11 @@
     // Loop through our groups
     $count_single = 0;
     $count_variant = 0;
+    
+    //echo "<pre>";
+    //print_r($products);
+    //die();
+    
     foreach($products as $key => $group) {
         
         // Build either a single product, or a variant
@@ -86,8 +89,6 @@
                 // If we have a Product Page selected
                 $cat_id = unserialize($prod['orderPages']);
                 if($cat_id[0]) {
-                    
-                    echo "PAGE: " . $cat_id[0] . "<br>";
 
                     $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($prod)->execute();
                     
@@ -123,98 +124,73 @@
             
         } else {
             
-            $count_variant++;
+            
             
             // For now, we need to use the first loop to create the parent, track if it is that loop
             $create_parent = true;
             $parent_id = 0;
-            
             foreach($group as $key2 => $prod) {
-                
-                /*
+                $count_variant++;
+
+                // CREATE PARENT PRODUCT
                 if($create_parent) {
                     $create_parent = false;
                     
-                    // CREATE PARENT PRODUCT
-                    $parent['tstamp'] = time();
-                    $parent['dateAdded'] = time();
-                    $parent['type'] = 5;
-                    $parent['orderPages'] = 'a:1:{i:0;s:3:"109";}';
-                    $parent['alias'] = str_replace(' ', '_', strtolower($key));
-                    $parent['name'] = $key;
-                    $parent['sku'] = $prod_values['item_number'];
-                    $parent['description'] = $prod_values['full_description'];
-                    $parent['published'] = 1;
-                    //$parent_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
-                    
-                    $parent_id = $parent_result->insertId;
-                    
-                    // First, create entry in the 'tl_product_pricetier" table
-                    $parent_cat = array();
-                    $parent_cat['pid'] = $parent_result->insertId;
-                    $parent_cat['tstamp'] = time();
-                    $parent_cat['page_id'] = '109';
-                    //$parent_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($parent_cat)->execute();
-        
-                     // Second, create entry in the 'tl_product_price' table                    
-                    $price = array();
-                    $price['pid'] = $parent_result->insertId;
-                    $price['tstamp'] = time();
-                    $price['tax_class'] = 1;
-                    $price['config_id'] = 0;
-                    $price['member_group'] = 0;
-                    //$priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();                                           
-                                                             
-                    // First, create entry in the 'tl_product_pricetier" table
-                    $priceTier = array();
-                    $priceTier['pid'] = $priceResult->insertId;
-                    $priceTier['tstamp'] = time();
-                    $priceTier['min'] = 1;
-                    $priceTier['price'] = '1.00';
-                    //$priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
-                    
-                } else {
-                    
-                    // CREATE CHILD
-                    $parent['tstamp'] = time();
-                    $parent['dateAdded'] = time();
-                    $parent['pid'] = $parent_id;
-                    $parent['type'] = 5;
-                    $parent['orderPages'] = 'a:1:{i:0;s:3:"109";}';
-                    $parent['alias'] = str_replace(' ', '_', strtolower($key));
-                    $parent['name'] = $key;
-                    $parent['sku'] = $prod_values['item_number'];
-                    $parent['description'] = $prod_values['full_description'];
-                    $parent['published'] = 1;
-                    //$parent_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
-                    
-                    // First, create entry in the 'tl_product_pricetier" table
-                    $parent_cat = array();
-                    $parent_cat['pid'] = $parent_result->insertId;
-                    $parent_cat['tstamp'] = time();
-                    $parent_cat['page_id'] = '109';
-                    //$parent_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($parent_cat)->execute();
-        
-                     // Second, create entry in the 'tl_product_price' table                    
-                    $price = array();
-                    $price['pid'] = $parent_result->insertId;
-                    $price['tstamp'] = time();
-                    $price['tax_class'] = 1;
-                    $price['config_id'] = 0;
-                    $price['member_group'] = 0;
-                    //$priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();                                           
-                                                             
-                    // First, create entry in the 'tl_product_pricetier" table
-                    $priceTier = array();
-                    $priceTier['pid'] = $priceResult->insertId;
-                    $priceTier['tstamp'] = time();
-                    $priceTier['min'] = 1;
-                    $priceTier['price'] = '1.00';
-                    //$priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
+                    $cat_id = unserialize($prod['orderPages']);
+                    if($cat_id[0]) {
+                        
+                        $parent = $prod;
+                        $parent['name'] = $key2;
+                        $parent['alias'] = generateAlias($key2);
+                        $parent['sku'] = $parent['sku'] . "_parent";
+ 
+                        $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
+                        
+                        $parent_id = $prod_values_result->insertId;
+                        
+                         // First, create entry in the 'tl_product_pricetier" table
+                        $prod_cat = array();
+                        $prod_cat['pid'] = $prod_values_result->insertId;
+                        $prod_cat['tstamp'] = time();
+                        $prod_cat['page_id'] = $cat_id[0];
+                        $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                        
+                        // Second, create entry in the 'tl_product_price' table                    
+                        $price = array();
+                        $price['pid'] = $prod_values_result->insertId;
+                        $price['tstamp'] = time();
+                        $price['tax_class'] = 1;
+                        $price['config_id'] = 0;
+                        $price['member_group'] = 0;
+                        $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();
+                        
+                        // First, create entry in the 'tl_product_pricetier" table
+                        $priceTier = array();
+                        $priceTier['pid'] = $priceResult->insertId;
+                        $priceTier['tstamp'] = time();
+                        $priceTier['min'] = 1;
+                        $priceTier['price'] = '1.00';
+                        $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
+                    }
                 }
                 
-                */
+                // CREATE VARIANTS
+                $cat_id = unserialize($prod['orderPages']);
+                if($cat_id[0]) {
+                    
+                    $variant = $prod;
+                    $variant['pid'] = $parent_id;
+                    $variant['type'] = 0;
+                    $variant['orderPages'] = NULL;
+                    
+                    //echo "<pre>";
+                    //print_r($variant);
+                    //die();
+                    
+                    $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($variant)->execute();
+                }
 
+                
             }
             
         }
@@ -222,4 +198,23 @@
         
     }
 
-    echo "success";
+    echo "Counts:<br>";
+    echo "Single Product: " . $count_single . "<br>";
+    echo "Variant Product: " . $count_variant . "<br>";
+    
+    function generateAlias($string) {
+        // 1. Replace spaces with underscores
+        $string = str_replace(" ", "_", $string);
+        
+        // 2. Remove special characters (using a regular expression)
+        // This regex keeps alphanumeric characters, underscores, hyphens, and periods.
+        // You can customize this regex to keep or remove other characters as needed.
+        $string = preg_replace('/[^a-zA-Z0-9_\-\.]/', '', $string);
+        
+        
+        //  More restrictive option (only allows alphanumeric and underscores):
+        //  $string = preg_replace('/[^a-zA-Z0-9_]/', '', $string);
+        
+        
+        return $string;
+    }
