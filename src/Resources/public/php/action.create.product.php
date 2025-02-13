@@ -22,8 +22,6 @@
     if($prod_result) {
         while($prod = $prod_result->fetch_assoc()) {
             
-            //$products[$prod->variant_group][$prod->product_sku];
-            
             $attr_query =  "SELECT * FROM tl_salsify_attribute WHERE pid='".$prod['id']."' ORDER BY id ASC";
             $attr_result = $dbh->query($attr_query);
             if($attr_result) {
@@ -42,10 +40,7 @@
                                 $products[$prod['variant_group']][$prod['product_sku']][$iso_attr['field_name']] = $attr['attribute_value'];
                         }
                     }
-                    
-                    
-                    
-                    
+
                 }
             }
 
@@ -58,7 +53,6 @@
             $products[$prod['variant_group']][$prod['product_sku']]['sku'] = $prod_values['item_number'];
             $products[$prod['variant_group']][$prod['product_sku']]['description'] = $prod_values['full_description'];
             $products[$prod['variant_group']][$prod['product_sku']]['published'] = 1;
-            //$products[$prod['variant_group']][$prod['product_sku']]['upc'] = $prod_values['package_upc'];
 
         }
     }
@@ -83,7 +77,6 @@
             $count_single++;
             
             foreach($group as $key2 => $prod) {
-                
                 
                 
                 // If we have a Product Page selected
@@ -183,38 +176,17 @@
                     $variant['type'] = 0;
                     $variant['orderPages'] = NULL;
                     
-                    //echo "<pre>";
-                    //print_r($variant);
-                    //die();
-                    
                     $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($variant)->execute();
                 }
 
-                
             }
             
         }
         
-        
     }
-
-    echo "Counts:<br>";
-    echo "Single Product: " . $count_single . "<br>";
-    echo "Variant Product: " . $count_variant . "<br>";
     
     function generateAlias($string) {
-        // 1. Replace spaces with underscores
         $string = str_replace(" ", "_", $string);
-        
-        // 2. Remove special characters (using a regular expression)
-        // This regex keeps alphanumeric characters, underscores, hyphens, and periods.
-        // You can customize this regex to keep or remove other characters as needed.
         $string = preg_replace('/[^a-zA-Z0-9_\-\.]/', '', $string);
-        
-        
-        //  More restrictive option (only allows alphanumeric and underscores):
-        //  $string = preg_replace('/[^a-zA-Z0-9_]/', '', $string);
-        
-        
         return $string;
     }
