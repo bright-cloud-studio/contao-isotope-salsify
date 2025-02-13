@@ -34,16 +34,11 @@ class SalsifyAttributeBackend extends Backend
         // Stores the KEY of whatever attribute that is checked is being used for the Product Name
         $product_name_field_key = '';
 
-
         // Stores the KEY of whatever attribute that is checked as being use for grouping
         $grouping_field_key = '';
         $isotope_product_type = '';
         $isotope_product_type_variant = '';
-        
         $group_counter = array();
-        
-        //$isotope_product_type_key = '';
-        //$isotope_product_type_value = '';
 
         $category_parent_page = '';
         $category_parent_key = '';
@@ -52,7 +47,9 @@ class SalsifyAttributeBackend extends Backend
         // Get all SalsifyAttributes with the same key
         $salsify_attributes = SalsifyAttribute::findAll();
 
-        // Loop through all the collected Assignments
+
+
+        // LOOP ONE - STAGE DATA
         foreach($salsify_attributes as $attr) {
             
             
@@ -132,7 +129,6 @@ class SalsifyAttributeBackend extends Backend
                     $new_page->enableCanonical = 1;
                     $new_page->sitemap = "map_default";
                     
-                    
                     $new_page->iso_readerJumpTo = $pid_r[0];
                     $new_page->iso_readerMode = "page";
                     
@@ -180,15 +176,10 @@ class SalsifyAttributeBackend extends Backend
             }
             
         }
-
         
         
-        //echo "<pre>";
-        //print_r($linked);
-        //die();
         
-        
-        // SECOND LOOP
+        // LOOP TWO: Link matching SalsifyAttributes
         foreach($salsify_attributes as $attr) {
             
             // Tracks if a change was made, and if we need to save() or not at the end
@@ -296,6 +287,7 @@ class SalsifyAttributeBackend extends Backend
                 $attr->save();
                 
         }
+        
         
         
         // Third Grouping Loop
