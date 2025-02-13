@@ -90,7 +90,7 @@ class Hooks
                         // If we didn't find this attribute already
                         if($attr == null) {
                             
-                            
+                            /*
                             // Replace this with Model, in hopes it will automatically add the attribute to the 'tl_iso_products' table
                             $n_attr = new TextField();
                             
@@ -121,7 +121,8 @@ class Hooks
                             $new_attr['tstamp'] = time();
                             $new_attr_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_attribute %s")
                                                      ->set($new_attr)
-                                                     ->execute();
+                                
+                            */                     ->execute();
                             
                         }
                         
