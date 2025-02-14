@@ -30,8 +30,8 @@
             $related_result = $dbh->query($related_query);
             if($related_result) {
                 while($related = $prod_result->fetch_assoc()) {
-                    echo "PROD: " . $prod->id . "<br>";
-                    echo "RELATED: " . $related->id . "<br>";
+                    echo "PROD: " . $prod['id'] . "<br>";
+                    echo "RELATED: " . $related['id'] . "<br>";
                     
                 }
             }
