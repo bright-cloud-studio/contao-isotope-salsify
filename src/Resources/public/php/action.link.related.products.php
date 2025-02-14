@@ -19,15 +19,23 @@
 
 
 
-// Loop through all Isotope Products
+    // Loop through all products
+    // Loop through the Salsify Products
+    $prod_query =  "SELECT * FROM tl_salsify_product ORDER BY id ASC";
+    $prod_result = $dbh->query($prod_query);
+    if($prod_result) {
+        while($prod = $prod_result->fetch_assoc()) {
+            
+            
+            // See if it has an entry in tl_iso_related_products
+    
+            //If not, make one,
+            
+            //If so, pass
+                
+            
+        }
+    }
+    
 
-
-    // Convert 'related_products to array of SKUs
-
-
-        // Find ID using SKU
-
-
-            // tl_iso_related_product.products
-            // tl_iso_related_product.productsOrder
     
