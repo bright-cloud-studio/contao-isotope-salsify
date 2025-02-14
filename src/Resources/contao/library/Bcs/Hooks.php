@@ -37,7 +37,7 @@ class Hooks
         {
             // Open and process file
             $reader = new JsonReader();
-            $reader->open("../files/salsify/salsify_product_feed_2025_02_11_21_26_48_531_UTC.json");
+            $reader->open("../files/salsify/salsify_product_feed_2025_02_13_20_22_00_752_UTC.json");
             $depth = $reader->depth();
             $reader->read();
             
@@ -122,8 +122,8 @@ class Hooks
                             $new_attr_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_attribute %s")
                                                      ->set($new_attr)
                                 
-                            */                     ->execute();
-                            
+                                                 ->execute();
+                            */
                         }
                         
                     }
