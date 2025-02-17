@@ -51,7 +51,6 @@ class SalsifyAttributeBackend extends Backend
         // LOOP ONE - STAGE DATA
         foreach($salsify_attributes as $attr) {
             
-            
             // If we have an isotope attribute assigned, save it
             if($attr->linked_isotope_attribute != null) {
                 
@@ -112,43 +111,44 @@ class SalsifyAttributeBackend extends Backend
                 
                 // Create array of categories
                 $cats = $this->csvStringToArray($attr->attribute_value);
-            
                 
-                $page = PageModel::findBy(['pid = ?', 'title = ?'], [$pid[0], $attr->attribute_value]);
-                
-                if($page != null) {
-                    
-                    $linked[$attr->attribute_key][$attr->attribute_value]['category_parent_page'] = $pid;
-                    $linked[$attr->attribute_key][$attr->attribute_value]['category_reader_page'] = $pid_r;
-                    $linked[$attr->attribute_key][$attr->attribute_value]['category_page'] = $page->id;
-                    
-                } else {
-                    
-                    // Generate Page
-                    $new_page = new PageModel();
-                    $new_page->pid = $pid[0];
-                    $new_page->title = $attr->attribute_value;
-                    $new_page->alias = strtolower($attr->attribute_value);
-                    
-                    $new_page->robots = "noindex,nofollow";
-                    $new_page->enableCanonical = 1;
-                    $new_page->sitemap = "map_default";
-                    
-                    $new_page->iso_readerJumpTo = $pid_r[0];
-                    $new_page->iso_readerMode = "page";
-                    
-                    // Get Page Layout from parent page
-                    $new_page->includeLayout = 1;
-                    $new_page->layout = 29;
-                    
-                    $new_page->published = 1;
-                    $new_page->tstamp = time();
-                    $new_page->save();
+                $category_pages = array();
 
-                    $linked[$attr->attribute_key][$attr->attribute_value]['category_parent_page'] = $pid;
-                    $linked[$attr->attribute_key][$attr->attribute_value]['category_reader_page'] = $pid_r;
-                    $linked[$attr->attribute_key][$attr->attribute_value]['category_page'] = $new_page->id;
+                foreach($cats as $cat) {
+                    
+                    $page = PageModel::findBy(['pid = ?', 'title = ?'], [$pid[0], $cat]);
+                    if($page != null) {
+                        $linked[$attr->attribute_key][$attr->attribute_value]['category_parent_page'] = $pid;
+                        $linked[$attr->attribute_key][$attr->attribute_value]['category_reader_page'] = $pid_r;
+                        //$linked[$attr->attribute_key][$attr->attribute_value]['category_page'] = $page->id;
+                        $category_pages[] = $page->id;
+                    } else {
+                        $new_page = new PageModel();
+                        $new_page->pid = $pid[0];
+                        $new_page->title = $attr->attribute_value;
+                        $new_page->alias = strtolower($attr->attribute_value);
+                        $new_page->robots = "noindex,nofollow";
+                        $new_page->enableCanonical = 1;
+                        $new_page->sitemap = "map_default";
+                        $new_page->iso_readerJumpTo = $pid_r[0];
+                        $new_page->iso_readerMode = "page";
+                        $new_page->includeLayout = 1;
+                        $new_page->layout = 29;
+                        $new_page->published = 1;
+                        $new_page->tstamp = time();
+                        $new_page->save();
+    
+                        $linked[$attr->attribute_key][$attr->attribute_value]['category_parent_page'] = $pid;
+                        $linked[$attr->attribute_key][$attr->attribute_value]['category_reader_page'] = $pid_r;
+                        //$linked[$attr->attribute_key][$attr->attribute_value]['category_page'] = $new_page->id;
+                        $category_pages[] = $new_page->id;
+                    }
                 }
+                $linked[$attr->attribute_key][$attr->attribute_value]['category_page'] = implode(',', $category_pages);
+                
+                //echo "<pre>";
+                //print_r($linked[$attr->attribute_key][$attr->attribute_value]);
+                //echo "<pre><br><hr><br>";
                 
             }
             
@@ -273,13 +273,17 @@ class SalsifyAttributeBackend extends Backend
                 
                 $attr->category_parent_page = $linked[$attr->attribute_key][$attr->attribute_value]['category_parent_page'];
                 $attr->category_reader_page = $linked[$attr->attribute_key][$attr->attribute_value]['category_reader_page'];
+                
                 $attr->category_page = $linked[$attr->attribute_key][$attr->attribute_value]['category_page'];
                 $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attr->pid]);
                 if($salsify_product != null) {
                     $salsify_product->category_page = $linked[$attr->attribute_key][$attr->attribute_value]['category_page'];
                     $salsify_product->save();
                 }
+                
+                
                 $save = true;
+                
             }
             
             // If $save has been flagged anywhere, save this bad boy
@@ -287,7 +291,6 @@ class SalsifyAttributeBackend extends Backend
                 $attr->save();
                 
         }
-        
         
         
         // Third Grouping Loop
@@ -492,6 +495,7 @@ class SalsifyAttributeBackend extends Backend
 	public function csvStringToArray(string $csvString): array {
         if (empty($csvString)) { return []; }
 
+        $csvString = str_replace(' ', '', $csvString);
         $result = str_getcsv($csvString);
 
         return array_filter($result, function($value) { return $value !== ""; });
