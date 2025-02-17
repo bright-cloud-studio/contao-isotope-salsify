@@ -52,10 +52,13 @@
             $products[$prod['variant_group']][$prod['product_sku']]['tstamp'] = time();
             $products[$prod['variant_group']][$prod['product_sku']]['dateAdded'] = time();
             $products[$prod['variant_group']][$prod['product_sku']]['type'] = $prod['isotope_product_type'];
-            $products[$prod['variant_group']][$prod['product_sku']]['orderPages'] = serialize([$prod['category_page']]);
-            $products[$prod['variant_group']][$prod['product_sku']]['alias'] = $prod_values['item_number'];
-            $products[$prod['variant_group']][$prod['product_sku']]['name'] = $prod_values['specific_product_title'];
-            $products[$prod['variant_group']][$prod['product_sku']]['sku'] = $prod_values['item_number'];
+            
+            $cat_array = explode(", ", $prod['category_page']);
+            $products[$prod['variant_group']][$prod['product_sku']]['orderPages'] = serialize($cat_array);
+            
+            $products[$prod['variant_group']][$prod['product_sku']]['name'] = $prod['product_name'];
+            $products[$prod['variant_group']][$prod['product_sku']]['alias'] = generateAlias($prod['product_name']);
+            $products[$prod['variant_group']][$prod['product_sku']]['sku'] = $prod['product_sku'];
             $products[$prod['variant_group']][$prod['product_sku']]['description'] = $prod_values['full_description'];
             $products[$prod['variant_group']][$prod['product_sku']]['published'] = 1;
             //$products[$prod['variant_group']][$prod['product_sku']]['upc'] = $prod_values['package_upc'];
@@ -88,19 +91,17 @@
                 
                 // If we have a Product Page selected
                 $cat_id = unserialize($prod['orderPages']);
-                
-                echo "CAT: " . $prod['orderPages']. "<br>";
-                
                 if($cat_id[0]) {
 
                     $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($prod)->execute();
                     
-                     // First, create entry in the 'tl_product_pricetier" table
                     $prod_cat = array();
                     $prod_cat['pid'] = $prod_values_result->insertId;
                     $prod_cat['tstamp'] = time();
-                    $prod_cat['page_id'] = $cat_id[0];
-                    $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                    foreach($cat_id as $cat) {
+                        $prod_cat['page_id'] = $cat;
+                        $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                    }
                     
                     // Second, create entry in the 'tl_product_price' table                    
                     $price = array();
@@ -143,20 +144,23 @@
                     if($cat_id[0]) {
                         
                         $parent = $prod;
-                        $parent['name'] = $key2;
-                        $parent['alias'] = generateAlias($key2);
+                        $parent['name'] = $key;
+                        $parent['alias'] = generateAlias($key);
                         $parent['sku'] = $parent['sku'] . "_parent";
  
                         $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
                         
                         $parent_id = $prod_values_result->insertId;
+
                         
                          // First, create entry in the 'tl_product_pricetier" table
                         $prod_cat = array();
                         $prod_cat['pid'] = $prod_values_result->insertId;
                         $prod_cat['tstamp'] = time();
-                        $prod_cat['page_id'] = $cat_id[0];
-                        $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                        foreach($cat_id as $cat) {
+                            $prod_cat['page_id'] = $cat;
+                            $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                        }
                         
                         // Second, create entry in the 'tl_product_price' table                    
                         $price = array();
@@ -205,19 +209,23 @@
     echo "Single Product: " . $count_single . "<br>";
     echo "Variant Product: " . $count_variant . "<br>";
     
-    function generateAlias($string) {
-        // 1. Replace spaces with underscores
-        $string = str_replace(" ", "_", $string);
-        
-        // 2. Remove special characters (using a regular expression)
-        // This regex keeps alphanumeric characters, underscores, hyphens, and periods.
-        // You can customize this regex to keep or remove other characters as needed.
-        $string = preg_replace('/[^a-zA-Z0-9_\-\.]/', '', $string);
-        
-        
-        //  More restrictive option (only allows alphanumeric and underscores):
-        //  $string = preg_replace('/[^a-zA-Z0-9_]/', '', $string);
-        
-        
-        return $string;
+    function generateAlias($text) {
+        // 1. Convert to lowercase:
+        $text = strtolower($text);
+    
+        // 2. Replace all non-alphanumeric characters with underscores:
+        $text = preg_replace('/[^a-z0-9_]/', '_', $text);
+    
+        // 3. Remove multiple consecutive underscores:
+        $text = preg_replace('/_+/', '_', $text);
+    
+        // 4. Remove leading and trailing underscores:
+        $text = trim($text, '_');
+    
+        // 5.  Handle empty strings:
+        if (empty($text)) {
+            $text = 'default_alias'; // Or any other default you prefer
+        }
+    
+        return $text;
     }
