@@ -88,6 +88,9 @@
                 
                 // If we have a Product Page selected
                 $cat_id = unserialize($prod['orderPages']);
+                
+                echo "CAT: " . $prod['orderPages']. "<br>";
+                
                 if($cat_id[0]) {
 
                     $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($prod)->execute();
