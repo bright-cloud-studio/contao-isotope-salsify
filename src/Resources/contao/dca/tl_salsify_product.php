@@ -171,10 +171,9 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
         'category_page' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['category_page'],
-            'inputType'               => 'pageTree',
-            'eval'                    => array('files'=>false, 'fieldType'=>'checkbox', 'multiple'=>true, 'tl_class'=>'w50'),
-			'sql'                     => "blob NULL",
-            'relation'                => array('table'=>'tl_page', 'type'=>'hasMany', 'load'=>'lazy')
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
+			'sql'                     => "varchar(255) default ''"
         ),
         'import_status' => array
         (
