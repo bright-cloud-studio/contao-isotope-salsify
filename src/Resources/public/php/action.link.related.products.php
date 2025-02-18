@@ -9,14 +9,7 @@
     die("Connection failed: " . $dbh->connect_error);
     }
 
-    $prod_query =  "SELECT * FROM tl_salsify_product ORDER BY id ASC";
-    $prod_result = $dbh->query($prod_query);
-    if($prod_result) {
-        while($prod = $prod_result->fetch_assoc()) {
-            
-        }
-    }
-
+    $linked = array();
 
     // Loop through all products
     $prod_query =  "SELECT * FROM tl_iso_product ORDER BY id ASC";
@@ -24,25 +17,84 @@
     if($prod_result) {
         while($prod = $prod_result->fetch_assoc()) {
             
+            $found = false;
             
-            // See if it has an entry in tl_iso_related_products
+            // Loop through all related product entries
             $related_query =  "SELECT * FROM tl_iso_related_product ORDER BY id ASC";
             $related_result = $dbh->query($related_query);
             if($related_result) {
-                while($related = $prod_result->fetch_assoc()) {
-                    echo "PROD: " . $prod['id'] . "<br>";
-                    echo "RELATED: " . $related['id'] . "<br>";
+                while($related = $related_result->fetch_assoc()) {
                     
+                    // If one of our entries matches 
+                    if($prod['id'] == $related['pid'])
+                        $found = true;
+
                 }
             }
-    
-            //If not, make one,
             
-            //If so, pass
+                // If we didnt find a related products entry yet, make one
+                if(!$found) {
+                    
+                    // Get our SKUs as an array
+                    
+                    $cleaned = str_replace(' ', '', $prod['related_products']);
+                    $cleaned = explode(",",$cleaned);
+                    
+                    //echo "<pre>";
+                    //print_r($cleaned);
+                    //echo "</pre><br><hr><br>";
                 
+                    
+                    $linked[$prod['id']] = $cleaned;
+                    
+                    
+                }
             
+            
+
         }
     }
     
-
     
+    // Loop through $linked
+    
+    foreach($linked as $key => $skus) {
+        
+        foreach($skus as $sku) {
+            
+            $ids = array();
+            
+            $prod_query =  "SELECT * FROM tl_iso_product where item_number='".$sku."' ORDER BY id ASC";
+            $prod_result = $dbh->query($prod_query);
+            if($prod_result) {
+                while($prod = $prod_result->fetch_assoc()) {
+                    array_push($ids, $prod['id']);
+                }
+            }
+        }
+        
+        $rp = array();
+            $rp['pid'] = $key;
+            $rp['tstamp'] = time();
+            $rp['category'] = 1;
+            
+            $first = true;
+            foreach($ids as $id) {
+                if($first) {
+                    $first = false;
+                    $rp['products'] = strval($id);
+                } else {
+                    $rp['products'] =  $rp['products'] . ", " . strval($id);
+                }
+            }
+            
+            
+            
+            $rp['productsOrder'] = serialize($ids);
+            
+            $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_related_product %s")
+                             ->set($rp)
+                             ->execute();
+        
+        
+    }
