@@ -53,7 +53,7 @@
             $products[$prod['variant_group']][$prod['product_sku']]['dateAdded'] = time();
             $products[$prod['variant_group']][$prod['product_sku']]['type'] = $prod['isotope_product_type'];
             
-            $cat_array = explode(", ", $prod['category_page']);
+            $cat_array = explode(",", $prod['category_page']);
             $products[$prod['variant_group']][$prod['product_sku']]['orderPages'] = serialize($cat_array);
             
             $products[$prod['variant_group']][$prod['product_sku']]['name'] = $prod['product_name'];
