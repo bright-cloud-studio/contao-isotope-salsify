@@ -326,6 +326,7 @@ class SalsifyAttributeBackend extends Backend
     {
         $site_category_field = '';
         $is_sku = '';
+        $cat = '';
            
         if($row['site_category_field'] == 1) {
             $site_category_field = "Alias: <span style='color: green;'>TRUE</span> - ";
@@ -337,11 +338,13 @@ class SalsifyAttributeBackend extends Backend
         if($row['is_grouping'] == 1) {
             $site_category_field = "GROUP: <span style='color: green;'>TRUE</span> - ";
         }
+        if($row['category_page'] != '') {
+            $cat = "CAT: <span style='color: green;'>".$row['category_page']."</span> - ";
+        }
+        
 
-        if($row['linked_isotope_attribute'] == null)
-            return "Status: <span style='color: red;'>FAIL</span> - " . $site_category_field . $label;
-        else
-            return "Status: <span style='color: green;'>PASS</span> - " . $site_category_field . $label;
+        if($row['linked_isotope_attribute'] != null)
+            return "Status: <span style='color: green;'>PASS</span> - " . $site_category_field . $cat .  $label;
             
     }
 
