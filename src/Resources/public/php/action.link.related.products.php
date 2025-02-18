@@ -11,7 +11,9 @@
 
     $linked = array();
 
-    // Loop through all products
+
+
+    // LOOP THROUGH PRODUCTS
     $prod_query =  "SELECT * FROM tl_iso_product ORDER BY id ASC";
     $prod_result = $dbh->query($prod_query);
     if($prod_result) {
@@ -24,34 +26,19 @@
             $related_result = $dbh->query($related_query);
             if($related_result) {
                 while($related = $related_result->fetch_assoc()) {
-                    
                     // If one of our entries matches 
                     if($prod['id'] == $related['pid'])
                         $found = true;
-
                 }
             }
             
-                // If we didnt find a related products entry yet, make one
-                if(!$found) {
-                    
-                    // Get our SKUs as an array
-                    
-                    $cleaned = str_replace(' ', '', $prod['related_products']);
-                    $cleaned = explode(",",$cleaned);
-                    
-                    //echo "<pre>";
-                    //print_r($cleaned);
-                    //echo "</pre><br><hr><br>";
-                
-                    
-                    $linked[$prod['id']] = $cleaned;
-                    
-                    
-                }
-            
-            
+            // If we didnt find a related products entry yet, make one
+            if(!$found) {
+                $cleaned = str_replace(' ', '', $prod['related_products']);
+                $cleaned = explode(",",$cleaned);
 
+                $linked[$prod['id']] = $cleaned;
+            }
         }
     }
     
