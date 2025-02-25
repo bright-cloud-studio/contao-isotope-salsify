@@ -30,6 +30,14 @@
                 while($attr = $attr_result->fetch_assoc()) {
 
                     $prod_values[$attr['attribute_key']] = $attr['attribute_value'];
+                    
+                    // If this product has a 'default_product_variant' attribute and it's set to 'true', set the fallback to 1 for this variant
+                    if($attr['attribute_key'] == 'default_product_variant') {
+                        if($attr['attribute_value'] == 'true') {
+                            $products[$prod['variant_group']][$prod['product_sku']]['fallback'] = 1;
+                        }
+                    }
+                    
 
                     $iso_attr_query =  "SELECT * FROM tl_iso_attribute WHERE id='".$attr['linked_isotope_attribute']."' ORDER BY id ASC";
                     $iso_attr_result = $dbh->query($iso_attr_query);
@@ -48,6 +56,8 @@
                     
                 }
             }
+
+            
 
             $products[$prod['variant_group']][$prod['product_sku']]['tstamp'] = time();
             $products[$prod['variant_group']][$prod['product_sku']]['dateAdded'] = time();
