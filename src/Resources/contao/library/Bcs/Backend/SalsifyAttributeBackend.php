@@ -99,6 +99,7 @@ class SalsifyAttributeBackend extends Backend
                                 $alphabet = range('A', 'Z');
                                 $only_letter = substr($attr->attribute_value, 0);
                                 $new_attr_opt->sorting = $alphabet[$only_letter];
+                                // Apply
                             }
                             
                             $new_attr_opt->save();
