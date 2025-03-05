@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, linked_isotope_attribute_option, is_sku, is_name;{grouping_legend}, is_grouping, isotope_product_type, isotope_product_type_variant; {options_legend}, category_parent_page, category_reader_page, category_page;{error_log_legend}, error_log;'
+        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, linked_isotope_attribute_option, attribute_option_sorting;{isotope_config_legend},is_sku, is_name;{grouping_legend}, is_grouping, isotope_product_type, isotope_product_type_variant; {options_legend}, category_parent_page, category_reader_page, category_page;{error_log_legend}, error_log;'
     ),
  
     // Fields
@@ -161,6 +161,19 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'options_callback'	      => array('Bcs\Backend\SalsifyAttributeBackend', 'getIsotopeAttributeOptions'),
             'sql'                     => "int(10) unsigned default NULL"
         ),
+        'attribute_option_sorting' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['attribute_option_sorting'],
+            'inputType'               => 'select',
+            'default'                 => NULL,
+            'filter'                  => true,
+            'search'                  => true,
+            'options'                  => array('sort_alphabetical' => 'Sort Alphabetical', 'sort_numerical' => 'Sort Numerical'),
+            'eval'                     => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
+            'sql'                      => "varchar(15) default NULL"
+        ),
+
+
         
         'is_grouping' => array
         (
@@ -190,8 +203,9 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'options_callback'	      => array('Bcs\Backend\SalsifyAttributeBackend', 'getIsotopeProductTypes'),
             'sql'                     => "int(10) unsigned default NULL"
         ),
+
         
-        // Salsify Attribute Fields
+        // Isotope Configuration - Use as SKU
         'is_sku' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['is_sku'],
@@ -200,7 +214,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
             'sql'                     => "char(1) NOT NULL default ''"
         ),
-        // Salsify Attribute Fields
+        // Isotope Configuration - Use as Name
         'is_name' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['is_name'],
