@@ -89,9 +89,17 @@ class SalsifyAttributeBackend extends Backend
                             $new_attr_opt->ptable = 'tl_iso_attribute';
                             $new_attr_opt->type = 'option';
                             
-                            // Sorting - strip everything but numbers and use that as the sorting value to easily sort out options
-                            //preg_replace("/[^0-9]/","",'604-619-5135');
-                            //$new_attr_opt->sorting = THAT_VALUE;
+                            // Sorting
+                            if($iso_attr->attribute_option_sorting = 'sort_numerical') {
+                                // Strip everything but numbers from label, use that as sorting number
+                                $only_number = preg_replace("/[^0-9]/","",'604-619-5135');
+                                $new_attr_opt->sorting = $only_number;
+                            } else if($iso_attr->attribute_option_sorting = 'sort_alphabetical') {
+                                // Get just the first letter of the label, convert to number in alphabet, use as sorting number
+                                $alphabet = range('A', 'Z');
+                                $only_letter = substr($attr->attribute_value, 0);
+                                $new_attr_opt->sorting = $alphabet[$only_letter];
+                            }
                             
                             $new_attr_opt->save();
                             $linked[$attr->attribute_key][$parent->isotope_product_variant_type]['options'][$attr->attribute_value]['isotope_attribute_option'] = $new_attr_opt->id;
