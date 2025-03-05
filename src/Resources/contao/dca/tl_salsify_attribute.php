@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, linked_isotope_attribute_option, attribute_option_sorting;{isotope_config_legend},is_sku, is_name;{grouping_legend}, is_grouping, isotope_product_type, isotope_product_type_variant; {options_legend}, category_parent_page, category_reader_page, category_page;{error_log_legend}, error_log;'
+        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, linked_isotope_attribute_option, attribute_option_sorting;{grouping_legend}, is_grouping, isotope_product_type, isotope_product_type_variant;{isotope_config_legend},is_sku, is_name;{options_legend}, category_parent_page, category_reader_page, category_page;{error_log_legend}, error_log;'
     ),
  
     // Fields
