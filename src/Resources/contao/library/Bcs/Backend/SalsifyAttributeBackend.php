@@ -88,6 +88,11 @@ class SalsifyAttributeBackend extends Backend
                             $new_attr_opt->published = 1;
                             $new_attr_opt->ptable = 'tl_iso_attribute';
                             $new_attr_opt->type = 'option';
+                            
+                            // Sorting - strip everything but numbers and use that as the sorting value to easily sort out options
+                            //preg_replace("/[^0-9]/","",'604-619-5135');
+                            //$new_attr_opt->sorting = THAT_VALUE;
+                            
                             $new_attr_opt->save();
                             $linked[$attr->attribute_key][$parent->isotope_product_variant_type]['options'][$attr->attribute_value]['isotope_attribute_option'] = $new_attr_opt->id;
                             
@@ -345,6 +350,8 @@ class SalsifyAttributeBackend extends Backend
 
         if($row['linked_isotope_attribute'] != null)
             return "Status: <span style='color: green;'>PASS</span> - " . $site_category_field . $cat .  $label;
+        else
+            return "Status: <span style='color: red;'>FAIL</span> - " . $site_category_field . $cat .  $label;
             
     }
 
@@ -385,12 +392,15 @@ class SalsifyAttributeBackend extends Backend
             }
             
         }
+        $opt = [
+            'order' => 'name ASC'
+        ];
         $options = array();
-        $attributes = Attribute::findAll();
+        $attributes = Attribute::findAll($opt);
         while($attributes->next()) {
             $attr = $attributes->row();
             if(in_array($attr['field_name'], $linked_attributes)) {
-                $options[$attr['id']] = $attr['name'];
+                $options[$attr['id']] = $attr['name'] . " (" . $attr['field_name'] . ")";
             }
         }
         return $options;
@@ -399,8 +409,11 @@ class SalsifyAttributeBackend extends Backend
     // Build an array with the KEY being the ID of the Isotope Attribute Option and the VALUE is the text-readable label
     public function getIsotopeAttributeOptions()
     {
+        $opt = [
+            'order' => 'label ASC'
+        ];
         $options = array();
-        $attributes = AttributeOption::findAll();
+        $attributes = AttributeOption::findAll($opt);
         if($attributes) {
             while($attributes->next()) {
                 $attr = $attributes->row();
