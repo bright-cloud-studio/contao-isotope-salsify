@@ -10,7 +10,8 @@
     }
 
     $linked = array();
-    
+
+
 
     // LOOP THROUGH PRODUCTS
     $prod_query =  "SELECT * FROM tl_iso_product ORDER BY id ASC";
@@ -40,12 +41,23 @@
             }
         }
     }
-
+    
+    
+    // DEBUG
+    //echo "<pre>";
+    //print_r($linked);
+    //echo "</pre>";
+    //die();
+    
+    
     // Loop through $linked
     foreach($linked as $key => $skus) {
         
         $ids = array();
         foreach($skus as $sku) {
+            
+            
+            
             $prod_query =  "SELECT * FROM tl_iso_product where sku='".$sku."' ORDER BY id ASC";
             $prod_result = $dbh->query($prod_query);
             if($prod_result) {
@@ -56,11 +68,17 @@
             }
         }
         
+        echo "IDS: <br><pre>";
+        print_r($ids);
+        echo "</pre><br><hr><br>";
+        
         $rp = array();
         $rp['pid'] = $key;
         $rp['tstamp'] = time();
         $rp['category'] = 1;
+        
         $rp['products'] = implode(",", $ids);
+    
         $rp['productsOrder'] = serialize($ids);
         $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_related_product %s")->set($rp)->execute();
     }
