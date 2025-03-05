@@ -37,7 +37,7 @@ class Hooks
         {
             // Open and process file
             $reader = new JsonReader();
-            $reader->open("../files/salsify/salsify_product_feed_2025_02_13_20_22_00_752_UTC.json");
+            $reader->open("../files/salsify/salsify_product_feed_2025_03_04_19_25_19_269_UTC.json");
             $depth = $reader->depth();
             $reader->read();
             
