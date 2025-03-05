@@ -17,6 +17,9 @@ $GLOBALS['TL_LANG']['tl_salsify_attribute']['attribute_value']            = arra
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['options_legend']                  = 'Attribute Options';
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['linked_isotope_attribute']        = array('Linked Isotope Attribute', 'Select the Isotope Attribute this will be filled into.');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['linked_isotope_attribute_option'] = array('Linked Isotope Attribute Option', 'If the Isotope Attribute uses Options, the option will be linked here during setup');
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['attribute_option_sorting']        = array('Attribute Option Sorting', 'If this Attribute is a Radio or Select, choose the sorting method for imported Attribute Options');
+
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['isotope_config_legend']         = 'Isotope Configurations';
 
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['grouping_legend']              = 'Grouping Options';
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['isotope_product_type']         = array('Isotope Product Type', 'Select the Isotope Product Type for singular Products');
