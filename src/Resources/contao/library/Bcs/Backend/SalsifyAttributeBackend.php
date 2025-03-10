@@ -92,15 +92,17 @@ class SalsifyAttributeBackend extends Backend
                             // Sorting
                             if($iso_attr->attribute_option_sorting = 'sort_numerical') {
                                 // Strip everything but numbers from label, use that as sorting number
-                                $only_number = preg_replace("/[^0-9]/","",'604-619-5135');
+                                $only_number = preg_replace("/[^0-9]/","", $attr->attribute_value);
                                 $new_attr_opt->sorting = $only_number;
                             } else if($iso_attr->attribute_option_sorting = 'sort_alphabetical') {
                                 // Get just the first letter of the label, convert to number in alphabet, use as sorting number
                                 $alphabet = range('A', 'Z');
                                 $only_letter = substr($attr->attribute_value, 0);
                                 $new_attr_opt->sorting = $alphabet[$only_letter];
-                                // Apply
                             }
+                            
+                            
+                            
                             
                             $new_attr_opt->save();
                             $linked[$attr->attribute_key][$parent->isotope_product_variant_type]['options'][$attr->attribute_value]['isotope_attribute_option'] = $new_attr_opt->id;
