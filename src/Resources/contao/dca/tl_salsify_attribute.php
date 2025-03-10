@@ -170,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'search'                  => true,
             'options'                  => array('sort_alphabetical' => 'Sort Alphabetical', 'sort_numerical' => 'Sort Numerical'),
             'eval'                     => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w50', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
-            'sql'                      => "varchar(15) default NULL"
+            'sql'                      => "varchar(20) default NULL"
         ),
 
 
