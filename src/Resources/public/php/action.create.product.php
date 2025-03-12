@@ -83,6 +83,8 @@
     // Loop through our groups
     $count_single = 0;
     $count_variant = 0;
+    $count_default_kickup = 0;
+    $count_generated_parent = 0;
     
     //echo "<pre>";
     //print_r($products);
@@ -96,8 +98,6 @@
             $count_single++;
             
             foreach($group as $key2 => $prod) {
-                
-                
                 
                 // If we have a Product Page selected
                 $cat_id = unserialize($prod['orderPages']);
@@ -132,22 +132,23 @@
                     
                 }
                 
-                
             }
-            
             
         } else {
             
-            
-            
+            // VARIANT
+
             // For now, we need to use the first loop to create the parent, track if it is that loop
             $create_parent = true;
             $parent_id = 0;
+            
+            // First, create a parent if we can. If not, continue
             foreach($group as $key2 => $prod) {
-                $count_variant++;
 
                 // CREATE PARENT PRODUCT
-                if($create_parent) {
+                if($prod['default_product_variant'] == 'true') {
+                    $count_default_kickup++;
+                    
                     $create_parent = false;
                     
                     $cat_id = unserialize($prod['orderPages']);
@@ -155,11 +156,66 @@
                         
                         $parent = $prod;
                         $parent['name'] = $key;
+                        //$parent['name'] = "DEFAULT PRODUCT VARIANT: " . $key;
                         $parent['alias'] = generateAlias($key);
                         $parent['sku'] = $parent['sku'] . "_parent";
  
                         $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
+                        $parent_id = $prod_values_result->insertId;
+
                         
+                         // First, create entry in the 'tl_product_pricetier" table
+                        $prod_cat = array();
+                        $prod_cat['pid'] = $prod_values_result->insertId;
+                        $prod_cat['tstamp'] = time();
+                        foreach($cat_id as $cat) {
+                            $prod_cat['page_id'] = $cat;
+                            $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                        }
+                        
+                        // Second, create entry in the 'tl_product_price' table                    
+                        $price = array();
+                        $price['pid'] = $prod_values_result->insertId;
+                        $price['tstamp'] = time();
+                        $price['tax_class'] = 1;
+                        $price['config_id'] = 0;
+                        $price['member_group'] = 0;
+                        $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();
+                        
+                        // First, create entry in the 'tl_product_pricetier" table
+                        $priceTier = array();
+                        $priceTier['pid'] = $priceResult->insertId;
+                        $priceTier['tstamp'] = time();
+                        $priceTier['min'] = 1;
+                        $priceTier['price'] = '1.00';
+                        $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
+                    }
+                }
+            }
+            
+            // Now, continue as normal.
+            // $create_parent will be set to false if the parent was made earlier
+            // If not, it will use the first product as our fallback.
+            
+            foreach($group as $key2 => $prod) {
+                $count_variant++;
+
+                // CREATE PARENT PRODUCT
+                if($create_parent) {
+                    $count_generated_parent++;
+                    
+                    $create_parent = false;
+                    
+                    $cat_id = unserialize($prod['orderPages']);
+                    if($cat_id[0]) {
+                        
+                        $parent = $prod;
+                        $parent['name'] = $key;
+                        //$parent['name'] = "GENERATED PARENT: " . $key;
+                        $parent['alias'] = generateAlias($key);
+                        $parent['sku'] = $parent['sku'] . "_parent";
+ 
+                        $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
                         $parent_id = $prod_values_result->insertId;
 
                         
@@ -199,25 +255,34 @@
                     $variant['pid'] = $parent_id;
                     $variant['type'] = 0;
                     $variant['orderPages'] = NULL;
-                    
-                    //echo "<pre>";
-                    //print_r($variant);
-                    //die();
-                    
                     $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($variant)->execute();
                 }
 
-                
             }
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             
         }
         
         
     }
 
-    echo "Counts:<br>";
-    echo "Single Product: " . $count_single . "<br>";
+    echo "Statistics:<br>";
+    echo "Single Products: " . $count_single . "<br>";
     echo "Variant Product: " . $count_variant . "<br>";
+    
+    echo "Default Product Variant used as Parent: " . $count_default_kickup . "<br>";
+    echo "Parent generated from first variant: " . $count_generated_parent . "<br>";
+
+    
     
     function generateAlias($text) {
         // 1. Convert to lowercase:
