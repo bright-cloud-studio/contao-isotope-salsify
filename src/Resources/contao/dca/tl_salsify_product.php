@@ -91,7 +91,7 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_product_legend}, product_name, product_sku, email, category_page;{grouping_legend}, variant_group, isotope_product_variant_type, isotope_product_type;{internal_details_legend},pid ,isotope_product_type_linked, import_status, last_update;'
+        'default'                     => '{salsify_product_legend}, product_name, product_sku, email, category_page;{grouping_legend}, variant_group, isotope_product_variant_type, isotope_product_type;{internal_details_legend},isotope_product_type_linked, import_status, last_update;'
     ),
  
     // Fields
