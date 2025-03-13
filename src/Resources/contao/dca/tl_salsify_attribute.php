@@ -44,7 +44,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     (
         'sorting' => array
         (
-            'mode'                    => DataContainer::MODE_PARENT,
+            'mode'                    => DataContainer::MODE_UNSORTED,
             //'headerFields'            => array('product_sku'),
             'rootPaste'               => false,
             'icon'                    => 'pagemounts.svg',
