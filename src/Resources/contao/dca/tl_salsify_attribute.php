@@ -44,14 +44,12 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     (
         'sorting' => array
         (
-            'mode'                    => DataContainer::MODE_SORTED_PARENT,
-            'headerFields'            => array('product_sku'),
-            'rootPaste'               => false,
-            'icon'                    => 'pagemounts.svg',
+            'mode'                    => DataContainer::MODE_PARENT,
+            'fields'                  => array('attribute_key'),
+            'panelLayout'             => 'filter;sort,search,limit',
             'defaultSearchField'      => 'attribute_key',
-            'flag'                    => DataContainer::SORT_ASC,
-            'fields'                  => array('attribute_key ASC'),
-            'panelLayout'             => 'filter;sort,search,limit'
+            'headerFields'            => array('product_name'),
+            'child_record_callback'   => array('tl_salsify_attribute', 'listSalsifyAttribute'),
         ),
         'label' => array
         (
@@ -270,5 +268,8 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
 
 class tl_salsify_attribute extends Backend
 {
-    
+    public function listSalsifyAttribute($row)
+	{
+		return '<div class="tl_content_left">' . $row['attribute_key'] . ' <span class="label-info">ASDF</span></div>';
+    }
 }
