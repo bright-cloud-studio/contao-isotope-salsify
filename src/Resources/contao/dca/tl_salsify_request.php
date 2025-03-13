@@ -84,7 +84,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_request_legend}, name, category_parent_page, salsify_category_field;'
+        'default'                     => '{salsify_request_legend}, request_name, source_folder;'
     ),
  
     // Fields
@@ -112,29 +112,20 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
 
         
         // Salsify Request Fields
-        'name' => array
+        'request_name' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['name'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['request_name'],
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w100'),
             'sql'                     => "varchar(255) default ''"
         ),
-        'category_parent_page' => array
+        'source_folder' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['category_parent_page'],
-            'inputType'               => 'pageTree',
-            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'w50'),
-			'sql'                     => "blob NULL",
-            'relation'                => array('table'=>'tl_page', 'type'=>'hasMany', 'load'=>'lazy')
-        ),
-        'salsify_category_field' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['salsify_category_field'],
-            'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) default ''"
-        ),
-        
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['source_folder'],
+            'inputType'               => 'fileTree',
+            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>false, 'tl_class'=>'w50'),
+			'sql'                     => "blob NULL"
+        )
     )
 );
 
