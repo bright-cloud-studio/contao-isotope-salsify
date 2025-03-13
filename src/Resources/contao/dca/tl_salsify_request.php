@@ -84,7 +84,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_request_legend}, request_name, source_folder;'
+        'default'                     => '{salsify_request_legend}, request_name, source_folder, last_update;'
     ),
  
     // Fields
