@@ -48,7 +48,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'fields'                  => array('pid'),
             'panelLayout'             => 'filter;sort,search,limit',
             'defaultSearchField'      => 'attribute_key',
-            'headerFields'            => array('product_name')
+            'headerFields'            => array('id')
             //'child_record_callback'   => array('tl_salsify_attribute', 'listSalsifyAttribute'),
         ),
         'label' => array
