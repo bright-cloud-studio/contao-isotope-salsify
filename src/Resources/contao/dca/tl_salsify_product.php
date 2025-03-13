@@ -42,12 +42,12 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
     (
         'sorting' => array
         (
-            'mode'                    => DataContainer::MODE_SORTED_PARENT,
+            'mode'                    => DataContainer::MODE_TREE_EXTENDED,
             'rootPaste'               => false,
             'showRootTrails'          => false,
             'icon'                    => 'pagemounts.svg',
             'flag'                    => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'fields'                  => array('pid ASC'),
+            'fields'                  => array('id ASC'),
             'panelLayout'             => 'filter;sort,search,limit'
         ),
         'label' => array
