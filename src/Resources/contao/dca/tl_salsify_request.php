@@ -125,7 +125,14 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'inputType'               => 'fileTree',
             'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>false, 'tl_class'=>'w50'),
 			'sql'                     => "blob NULL"
-        )
+        ),
+        'last_update' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['last_update'],
+            'inputType'               => 'text',
+            'eval'                    => array('rgxp'=>'datim', 'datepicker'=>true, 'mandatory'=>false, 'tl_class'=>'w50'),
+			'sql'                     => "int(10) unsigned NOT NULL default 0"
+        ),
     )
 );
 
