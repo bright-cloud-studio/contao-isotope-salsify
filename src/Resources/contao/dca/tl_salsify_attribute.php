@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         ),
         'pid' => array
         (
-		    'foreignKey'              => 'tl_salsify_product.product_name',
+		    'foreignKey'              => 'tl_salsify_product.product_sku',
 		    'sql'                     => "int(10) unsigned NOT NULL default 0",
 		    'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
         ),
