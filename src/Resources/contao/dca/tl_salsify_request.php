@@ -84,7 +84,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_request_legend}, request_name, source_folder, last_update; {customization_options} autolink_isotope_attributes;'
+        'default'                     => '{salsify_request_legend}, request_name, source_folder, last_update; {customization_options}, autolink_isotope_attributes;'
     ),
  
     // Fields
@@ -137,7 +137,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         // Customization Options
         'autolink_isotope_attributes' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['autolink_isotope_attributes'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['autolink_isotope_attributes'],
             'inputType'               => 'checkbox',
             'default'				  => '',
             'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
