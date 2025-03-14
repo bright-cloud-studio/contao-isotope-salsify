@@ -84,7 +84,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_request_legend}, request_name, source_folder, last_update;'
+        'default'                     => '{salsify_request_legend}, request_name, source_folder, last_update; {customization_options} autolink_isotope_attributes;'
     ),
  
     // Fields
@@ -133,6 +133,19 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'eval'                    => array('rgxp'=>'datim', 'datepicker'=>true, 'mandatory'=>false, 'tl_class'=>'w50'),
 			'sql'                     => "int(10) unsigned NOT NULL default 0"
         ),
+
+        // Customization Options
+        'autolink_isotope_attributes' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['autolink_isotope_attributes'],
+            'inputType'               => 'checkbox',
+            'default'				  => '',
+            'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "char(1) NOT NULL default ''"
+        ),
+
+
+        
     )
 );
 
