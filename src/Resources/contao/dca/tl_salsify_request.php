@@ -84,7 +84,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_request_legend}, autolink_isotope_attributes, request_name, source_folder, last_update;'
+        'default'                     => '{salsify_request_legend}, request_name, source_folder, last_update; {customiation_legend}, autolink_isotope_attributes'
     ),
  
     // Fields
@@ -130,7 +130,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['last_update'],
             'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'datim', 'datepicker'=>true, 'mandatory'=>false, 'tl_class'=>'w50'),
+            'eval'                    => array('rgxp'=>'datim', 'datepicker'=>true, 'mandatory'=>false, 'tl_class'=>'w50 clr'),
 			'sql'                     => "int(10) unsigned NOT NULL default 0"
         ),
 
