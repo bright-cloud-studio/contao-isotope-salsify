@@ -16,3 +16,6 @@ $GLOBALS['TL_LANG']['tl_salsify_request']['source_folder']            = array('S
 
 $GLOBALS['TL_LANG']['tl_salsify_request']['customization_legend']         = 'Customization Options';
 $GLOBALS['TL_LANG']['tl_salsify_request']['autolink_isotope_attributes']  = array('Autolink Isotope Attributes', 'By checking this box, when generating Salsify Attributes an attempt will be made to autolink these to Isotope Attributes where the field name matches the Attribute Key');
+
+$GLOBALS['TL_LANG']['tl_salsify_request']['internal_information']    = 'Internal Information';
+$GLOBALS['TL_LANG']['tl_salsify_request']['last_update']             = array('Last Update', 'Date and Time of when the last update was performed for this request');
