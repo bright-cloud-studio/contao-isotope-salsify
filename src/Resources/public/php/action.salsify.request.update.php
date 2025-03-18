@@ -11,3 +11,11 @@
     
     
     echo "Bing Bong Noise<br>";
+
+
+    // 1 - Loop through all Salsify Requests
+
+        // Process
+
+            // Create if Doesnt Exist
+            // Update if Exists
