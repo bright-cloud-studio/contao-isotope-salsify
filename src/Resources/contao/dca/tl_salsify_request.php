@@ -124,7 +124,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['source_folder'],
             'inputType'               => 'fileTree',
             'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>false, 'tl_class'=>'w50'),
-			'sql'                     => "blob NULL"
+			'sql'                     => ['type' => 'string', 'length' => 255, 'default' => '']
         ),
         
 
