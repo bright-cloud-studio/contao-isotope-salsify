@@ -10,7 +10,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Psr\Log\LoggerInterface;
 
 #[AsCronJob('minutely')]
-class PurgeSubscriptionsCron
+class UpdaterSalsifyRequests
 {
     public function __construct(private ContaoFramework $framework, private LoggerInterface|null $logger)
     {
