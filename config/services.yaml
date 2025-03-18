@@ -1,0 +1,11 @@
+services:
+    _defaults:
+        autoconfigure: true
+        autowire: true
+
+    Bcs\ContaoIsotopeSalsify\Cron\UpdaterSalsifyRequests:
+        public: true
+        tags:
+            - { name: contao.cron, cli: true, priority: 10 }
+        arguments:
+            - '@contao.framework'
