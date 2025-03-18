@@ -126,13 +126,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>false, 'tl_class'=>'w50'),
 			'sql'                     => "blob NULL"
         ),
-        'last_update' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['last_update'],
-            'inputType'               => 'text',
-            'eval'                    => array('rgxp'=>'datim', 'datepicker'=>true, 'mandatory'=>false, 'tl_class'=>'w50 clr'),
-			'sql'                     => "int(10) unsigned NOT NULL default 0"
-        ),
+        
 
         // Customization Options
         'autolink_isotope_attributes' => array
@@ -144,6 +138,15 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'sql'                     => "char(1) NOT NULL default ''"
         ),
 
+
+        'last_update' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['last_update'],
+            'inputType'               => 'text',
+            'default'                 => NULL,
+            'eval'                    => array('rgxp'=>'datim', 'datepicker'=>true, 'mandatory'=>false, 'tl_class'=>'w50 clr'),
+			'sql'                     => "int(10) default null"
+        ),
 
         
     )
