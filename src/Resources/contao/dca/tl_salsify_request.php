@@ -84,7 +84,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_request_legend}, request_name, source_folder, latest_file; {customization_legend}, autolink_isotope_attributes; {internal_information}, flag_update;'
+        'default'                     => '{salsify_request_legend}, request_name, source_folder, latest_file; {customization_legend}, autolink_isotope_attributes; {internal_information:hide}, flag_update;'
     ),
  
     // Fields
