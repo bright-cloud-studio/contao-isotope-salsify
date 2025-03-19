@@ -61,7 +61,7 @@
                 //$sr_query =  "SELECT * FROM tl_salsify_request ORDER BY id ASC";
                 //$sr_result = $dbh->query($sr_query);
                 
-                $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "' WHERE id='".$request['id']."'")->execute();
+                $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', flag_update='1' WHERE id='".$request['id']."'")->execute();
                 
                 
                 
