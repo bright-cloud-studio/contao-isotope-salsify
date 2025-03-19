@@ -10,7 +10,6 @@
     die("Connection failed: " . $dbh->connect_error);
     }
     
-    
     // Loop through all Salsify Requests
     $sr_query =  "SELECT * FROM tl_salsify_request ORDER BY id ASC";
     $sr_result = $dbh->query($sr_query);
@@ -36,7 +35,6 @@
             
             // Loop throuhg our found files
             foreach($files as $file) {
-                
                 $file_date = filemtime($folder . "/" . $file);
                 
                 // DEBUGS
@@ -48,31 +46,19 @@
                     $latest_file_url = $file;
                     $latest_file_date = $file_date;
                 }
-                
-                
             }
-            
             
             // If our found file's date is newer, update
             if($latest_file_date > (int)$request['file_date']) {
-                echo "Newer File Found!<br>";
                 
-                
-                //$sr_query =  "SELECT * FROM tl_salsify_request ORDER BY id ASC";
-                //$sr_result = $dbh->query($sr_query);
+                // DEBUGS
+                echo "Request ID:" . $request['id'] . " has found a new file!<br>";
+                echo "New File URL: " . $latest_file_url . "<br>";
+                echo "New File Date: " . date("m/d/y h:i:s A", $latest_file_date) . "<br>";
                 
                 $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', flag_update='1' WHERE id='".$request['id']."'")->execute();
-                
-                
-                
             }
-            
-            
-            
-            echo "Latest File: " . $latest_file_url . "<br>";
-            echo "Latest Date: " . date("m/d/y h:i:s A", $latest_file_date) . "<br>";
-            
-            
+
             // DEBUGS
             echo "<hr><br>";
             
