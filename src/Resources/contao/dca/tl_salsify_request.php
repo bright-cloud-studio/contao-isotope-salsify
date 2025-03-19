@@ -141,7 +141,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'default'                 => '',
             'filter'                  => true,
             'search'                  => true,
-            'eval'                    => array('rgxp'=>'datetim', 'datepicker'=>true, 'tl_class'=>'w50'),
+            'eval'                    => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50'),
             'sql'                     => "varchar(20) NOT NULL default ''",
         ),
         
