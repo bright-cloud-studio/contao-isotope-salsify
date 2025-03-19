@@ -47,11 +47,27 @@
                 if($file_date > $latest_file_date) {
                     $latest_file_url = $file;
                     $latest_file_date = $file_date;
-                    echo "NEWER!<br>";
                 }
                 
                 
             }
+            
+            
+            // If our found file's date is newer, update
+            if($latest_file_date > (int)$request['file_date']) {
+                echo "Newer File Found!<br>";
+                
+                
+                //$sr_query =  "SELECT * FROM tl_salsify_request ORDER BY id ASC";
+                //$sr_result = $dbh->query($sr_query);
+                
+                $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "' WHERE id='".$request['id']."'")->execute();
+                
+                
+                
+            }
+            
+            
             
             echo "Latest File: " . $latest_file_url . "<br>";
             echo "Latest Date: " . date("m/d/y h:i:s A", $latest_file_date) . "<br>";
