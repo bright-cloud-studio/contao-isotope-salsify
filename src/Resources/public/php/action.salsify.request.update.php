@@ -30,11 +30,32 @@
                 return $file[0] !== '.';
             });
             
+            // Store the values of the latest file as we loop through them
+            $latest_file_url = '';
+            $latest_file_date = '';
+            
             // Loop throuhg our found files
             foreach($files as $file) {
+                
+                $file_date = filemtime($folder . "/" . $file);
+                
+                // DEBUGS
                 echo "File: $file<br>";
                 echo "Last Modified: " . date("m/d/y h:i:s A", filemtime($folder . "/" . $file)) . "<br>";
+                
+                // If the files date is newer, save the values
+                if($file_date > $latest_file_date) {
+                    $latest_file_url = $file;
+                    $latest_file_date = $file_date;
+                    echo "NEWER!<br>";
+                }
+                
+                
             }
+            
+            echo "Latest File: " . $latest_file_url . "<br>";
+            echo "Latest Date: " . date("m/d/y h:i:s A", $latest_file_date) . "<br>";
+            
             
             // DEBUGS
             echo "<hr><br>";
