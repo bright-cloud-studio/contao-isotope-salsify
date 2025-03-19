@@ -84,7 +84,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_request_legend}, request_name, source_folder, latest_file; {customization_legend}, autolink_isotope_attributes; {internal_information:hide}, flag_update;'
+        'default'                     => '{salsify_request_legend}, request_name, source_folder, file_url, file_date; {customization_legend}, autolink_isotope_attributes; {internal_information:hide}, flag_update;'
     ),
  
     // Fields
@@ -126,12 +126,23 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50'),
             'sql'                     => "varchar(255) default ''"
         ),
-        'latest_file' => array
+        
+        'file_url' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['latest_file'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['file_url'],
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w100'),
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w100 clr'),
             'sql'                     => "varchar(255) default ''"
+        ),
+        'file_date' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_assignment']['file_date'],
+            'inputType'               => 'text',
+            'default'                 => '',
+            'filter'                  => true,
+            'search'                  => true,
+            'eval'                    => array('rgxp'=>'datetim', 'datepicker'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "varchar(20) NOT NULL default ''",
         ),
         
 
