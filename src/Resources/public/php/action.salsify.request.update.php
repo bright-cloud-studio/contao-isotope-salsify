@@ -33,6 +33,7 @@
             // Loop throuhg our found files
             foreach($files as $file) {
                 echo "File: $file<br>";
+                echo "Last Modified: " . date("m/d/y h:i:s A", filemtime($folder . "/" . $file)) . "<br>";
             }
             
             // DEBUGS
