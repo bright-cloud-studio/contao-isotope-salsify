@@ -56,7 +56,7 @@
                 echo "New File URL: " . $latest_file_url . "<br>";
                 echo "New File Date: " . date("m/d/y h:i:s A", $latest_file_date) . "<br>";
                 
-                $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', flag_update='1' WHERE id='".$request['id']."'")->execute();
+                $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $folder . "/" . $latest_file_url ."', file_date='" . $latest_file_date . "', flag_update='1' WHERE id='".$request['id']."'")->execute();
             }
 
             // DEBUGS
