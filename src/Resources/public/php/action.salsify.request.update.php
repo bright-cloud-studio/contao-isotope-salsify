@@ -85,8 +85,6 @@
             	foreach($array_parent as $array_child) {
             		$prod_count++;
 
-
-
                     // Find and update, else create
                     $salsify_product;
                     $update_sp = SalsifyProduct::findOneBy(['tl_salsify_product.product_sku=?'],[$array_child[$request['isotope_sku_key']][0]]);
@@ -109,19 +107,13 @@
                 		$salsify_product->save();
                     }
             		
-            		
-            		
-            		
-            		
-            		
 
-                    
                     $attributes = array();
                     $prod_values = array();
-                    
                     foreach($array_child as $key => $val) {
                         $prod_values[$key] = $val[0];
                         
+                        // Find and update, else create
                         $salsify_attribute;
                         $update_sa = SalsifyAttribute::findOneBy(['tl_salsify_attribute.pid=?', 'tl_salsify_attribute.attribute_key=?'],[$salsify_product->id, $key]);
                         if($update_sa != null) {
@@ -146,7 +138,6 @@
                         $log[$salsify_product->id]['attributes'] = $attributes;
                     }
                     
-
             	}
             
             } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
