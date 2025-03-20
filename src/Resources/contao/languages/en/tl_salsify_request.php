@@ -13,6 +13,10 @@ $GLOBALS['TL_LANG']['tl_salsify_request']['toggle']                     = array(
 $GLOBALS['TL_LANG']['tl_salsify_request']['salsify_request_legend']   = 'Salsify Request Details';
 $GLOBALS['TL_LANG']['tl_salsify_request']['request_name']             = array('Request Name', 'An internal-only name used to identify in the Backend');
 $GLOBALS['TL_LANG']['tl_salsify_request']['source_folder']            = array('Source Folder', 'Starting in \'public_html/files\', enter the folder location for where to poll for updates.');
+$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_name_key']         = array('Isotope Name Key', 'Enter the \'key\' for the Attribute we will use as our Isotope Product Name.');
+$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_sku_key']         = array('Isotope SKU Key', 'Enter the \'key\' for the Attribute we will use as our Isotope Product SKU.');
+
+$GLOBALS['TL_LANG']['tl_salsify_request']['latest_file_legend']   = 'Latest File Details';
 $GLOBALS['TL_LANG']['tl_salsify_request']['file_url']              = array('File URL', 'The URL of the latest file we\'ve found.');
 $GLOBALS['TL_LANG']['tl_salsify_request']['file_date']              = array('File Date', 'The \'Last Modified\' date of the latest file we\'ve found');
 
