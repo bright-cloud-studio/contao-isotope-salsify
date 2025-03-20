@@ -31,9 +31,9 @@ class SalsifyAttributeBackend extends Backend
         // Stores the KEY of whatever attribute that is checked as a category field
         $cat_field_key = '';
         // Stores the KEY of whatever attribute that is checked as being used for the SKU
-        $sku_field_key = '';
+        //$sku_field_key = '';
         // Stores the KEY of whatever attribute that is checked is being used for the Product Name
-        $product_name_field_key = '';
+        //$product_name_field_key = '';
 
         // Stores the KEY of whatever attribute that is checked as being use for grouping
         $grouping_field_key = '';
@@ -172,11 +172,11 @@ class SalsifyAttributeBackend extends Backend
             
                 
             // If this is checked as a category field, save it for the next full loop
-            if($attr->is_sku)
-                $sku_field_key = $attr->attribute_key;
+            //if($attr->is_sku)
+            //    $sku_field_key = $attr->attribute_key;
 
-            if($attr->is_name)
-                $product_name_field_key = $attr->attribute_key;
+            //if($attr->is_name)
+            //    $product_name_field_key = $attr->attribute_key;
 
             if($attr->category_parent_page != null) {
                 $cat = unserialize($attr->category_parent_page);
@@ -223,6 +223,7 @@ class SalsifyAttributeBackend extends Backend
             }
 
             // Product SKU
+            /*
             if($attr->attribute_key == $sku_field_key) {
                 $attr->is_sku = 1;
 
@@ -247,6 +248,7 @@ class SalsifyAttributeBackend extends Backend
                 }
                 $save = true;
             }
+            */
             
             // Variant Grouping
             if($attr->attribute_key == $grouping_field_key) {
