@@ -84,7 +84,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_request_legend}, request_name, source_folder, file_url, file_date; {customization_legend}, autolink_isotope_attributes; {internal_information:hide}, flag_update;'
+        'default'                     => '{salsify_request_legend}, request_name, source_folder, isotope_name_key, isotope_sku_key; (latest_file_legend}, file_url, file_date; {customization_legend}, autolink_isotope_attributes; {internal_information:hide}, flag_update;'
     ),
  
     // Fields
@@ -126,6 +126,22 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50'),
             'sql'                     => "varchar(255) default ''"
         ),
+        'isotope_name_key' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_name_key'],
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'                     => "varchar(255) default ''"
+        ),
+        'isotope_sku_key' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_sku_key'],
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'                     => "varchar(255) default ''"
+        ),
+
+        
         
         'file_url' => array
         (
