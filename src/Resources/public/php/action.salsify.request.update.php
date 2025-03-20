@@ -3,11 +3,9 @@
     use Bcs\Model\SalsifyAttribute;
     use Bcs\Model\SalsifyProduct;
     use Bcs\Model\SalsifyRequest;
-    
     use pcrov\JsonReader\JsonReader;
     
     
-
     // INITS
     session_start();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
@@ -18,8 +16,6 @@
     die("Connection failed: " . $dbh->connect_error);
     }
 
-    
-    echo "START<br>";
 
 
     // Loop through all Salsify Requests
@@ -88,13 +84,22 @@
             	foreach($array_parent as $array_child) {
             		$prod_count++;
             		
+            		
+            		
+            		// Check if this product already exists
+            		
             		// Create a Salsify Product to hold our Salsify Attributes
             		$salsify_product = new SalsifyProduct();
             		$salsify_product->pid = $request['id'];
             		$salsify_product->tstamp = time();
-            		$salsify_product->product_sku = $do_loop . '_' . $prod_count;
-            		$salsify_product->name = 'product_' . $do_loop . '_' . $prod_count;
+            		$salsify_product->product_sku = $array_child[$request['isotope_sku_key']];
+            		$salsify_product->name = $array_child[$request['isotope_name_key']];
             		$salsify_product->save();
+            		
+            		
+            		
+            		
+            		
             		
             		//echo "CREATED: Salsify Product - " . $salsify_product->name . "<br>";
 
