@@ -83,17 +83,20 @@
             	// Loop through children arrays, these are what store the actual values here
             	foreach($array_parent as $array_child) {
             		$prod_count++;
-            		
-            		
-            		
+
+
+
+
+
+
             		// Check if this product already exists
             		
             		// Create a Salsify Product to hold our Salsify Attributes
             		$salsify_product = new SalsifyProduct();
             		$salsify_product->pid = $request['id'];
             		$salsify_product->tstamp = time();
-            		$salsify_product->product_sku = $array_child[$request['isotope_sku_key']];
-            		$salsify_product->name = $array_child[$request['isotope_name_key']];
+            		$salsify_product->product_sku = $array_child[$request['isotope_sku_key']][0];
+            		$salsify_product->product_name = $array_child[$request['isotope_name_key']][0];
             		$salsify_product->save();
             		
             		
@@ -101,7 +104,7 @@
             		
             		
             		
-            		//echo "CREATED: Salsify Product - " . $salsify_product->name . "<br>";
+
 
                     $attributes = array();
                     $prod_values = array();
