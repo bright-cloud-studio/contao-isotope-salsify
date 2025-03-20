@@ -18,6 +18,10 @@
     die("Connection failed: " . $dbh->connect_error);
     }
 
+    
+    echo "START<br>";
+
+
     // Loop through all Salsify Requests
     $sr_query =  "SELECT * FROM tl_salsify_request ORDER BY id ASC";
     $sr_result = $dbh->query($sr_query);
@@ -30,11 +34,6 @@
 
             // Build complete folder address
             $folder = $_SERVER['DOCUMENT_ROOT'] . "/../files/" . $request['source_folder'];
-            
-            // DEBUGS
-            echo "Request ID: " . $request['id'] . "<br>";
-            echo "Request Name: " . $request['request_name'] . "<br>";
-            echo "Folder URL: " . $folder . "<br><br>";
             
             // Filter for only things that contain a period in the name
             $files = array_filter(scandir($folder), function($file) {
@@ -49,10 +48,6 @@
             foreach($files as $file) {
                 $file_date = filemtime($folder . "/" . $file);
                 
-                // DEBUGS
-                echo "File: $file<br>";
-                echo "Last Modified: " . date("m/d/y h:i:s A", filemtime($folder . "/" . $file)) . "<br>";
-                
                 // If the files date is newer, save the values
                 if($file_date > $latest_file_date) {
                     $latest_file_url = $file;
@@ -62,22 +57,20 @@
             
             // If our found file's date is newer, update
             if($latest_file_date > (int)$request['file_date']) {
-                
-                // DEBUGS
-                echo "Request ID:" . $request['id'] . " has found a new file!<br>";
-                echo "New File URL: " . $latest_file_url . "<br>";
-                echo "New File Date: " . date("m/d/y h:i:s A", $latest_file_date) . "<br>";
-                
-                $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $folder . "/" . $latest_file_url ."', file_date='" . $latest_file_date . "', flag_update='1' WHERE id='".$request['id']."'")->execute();
+                $request['file_url'] = $latest_file_url;
+                $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', flag_update='1' WHERE id='".$request['id']."'")->execute();
             }
-
             
-
+            
+            
+            
+            
+            
             // STEP TWO - Create or update Salsify Products and Salsify Attributes
             
+            // Open and process file
             $reader = new JsonReader();
-            // Update to use Salsify Request file
-            $reader->open($folder . "/" . $latest_file_url);
+            $reader->open("../files/" . $request['source_folder'] . "/" . $request['file_url']);
             $depth = $reader->depth();
             $reader->read();
             
@@ -97,21 +90,18 @@
             		
             		// Create a Salsify Product to hold our Salsify Attributes
             		$salsify_product = new SalsifyProduct();
+            		$salsify_product->pid = $request['id'];
             		$salsify_product->tstamp = time();
             		$salsify_product->product_sku = $do_loop . '_' . $prod_count;
             		$salsify_product->name = 'product_' . $do_loop . '_' . $prod_count;
             		$salsify_product->save();
+            		
+            		//echo "CREATED: Salsify Product - " . $salsify_product->name . "<br>";
 
                     $attributes = array();
-                
                     $prod_values = array();
-
-
-
                     foreach($array_child as $key => $val) {
-                        
                         $prod_values[$key] = $val[0];
-                        
                         
                         $salsify_attribute = new SalsifyAttribute();
                         $salsify_attribute->pid = $salsify_product->id;
@@ -121,10 +111,11 @@
                         $salsify_attribute->tstamp = time();
                         $salsify_attribute->save();
                         
+                        //echo "CREATED: Salsify Attribute - " . $key . "/" . $val[0] . "<br>";
+                        
                         $attributes[$salsify_attribute->id]['key'] = $key;
                         $attributes[$salsify_attribute->id]['value'] = $val[0];
                         $log[$salsify_product->id]['attributes'] = $attributes;
-                        
                     }
 
             	}
@@ -132,21 +123,7 @@
             } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
             
             $reader->close();
-            
-            
-            
-            
-            
-            
-            
-            
-            
-        
-            // STEP THREE - Create or update Isotope Products
-            
-            
-            
-            // DEBUGS
-            echo "<hr><br>";
+
+
         }
     }
