@@ -9,12 +9,18 @@
     if ($dbh->connect_error) {
     die("Connection failed: " . $dbh->connect_error);
     }
-    
+
     // Loop through all Salsify Requests
     $sr_query =  "SELECT * FROM tl_salsify_request ORDER BY id ASC";
     $sr_result = $dbh->query($sr_query);
     if($sr_result) {
         while($request = $sr_result->fetch_assoc()) {
+
+
+
+            // STEP ONE - Determine which file is the latest
+
+            
             
             // Build complete folder address
             $folder = $_SERVER['DOCUMENT_ROOT'] . "/../files/" . $request['source_folder'];
@@ -61,6 +67,16 @@
 
             // DEBUGS
             echo "<hr><br>";
+
+
+            
+            // STEP TWO - Create or update Salsify Products and Salsify Attributes
+            
+            
+        
+            // STEP THREE - Create or update Isotope Products
+            
+            
             
         }
     }
