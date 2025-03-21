@@ -67,6 +67,7 @@ class SalsifyAttributeBackend extends Backend
                     
                     // Store 'Select' settings
                     if($iso_attr->type == 'select' || $iso_attr->type == 'radio') {
+                        
                         // Find all Options for this Attribute
                         $iso_attr_opts = AttributeOption::findByPid($attr->linked_isotope_attribute);
                         $opt_found = false;
@@ -104,7 +105,8 @@ class SalsifyAttributeBackend extends Backend
                             }
                             
                             
-                            
+                            echo "NEW!";
+                            die();
                             
                             $new_attr_opt->save();
                             $linked[$attr->attribute_key][$parent->isotope_product_variant_type]['options'][$attr->attribute_value]['isotope_attribute_option'] = $new_attr_opt->id;
