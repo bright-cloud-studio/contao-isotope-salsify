@@ -123,8 +123,14 @@
                             
                             // If autolink, find iso attribute, otherwise return null
                             if($request['autolink_isotope_attributes'] == '1') {
+                                
                                 $iso_attr = Attribute::findBy(['field_name = ?'], [$key]);
                                 $update_sa->linked_isotope_attribute = $iso_attr->id;
+                                
+                                // Update,
+                                // Link, or create, Isotope Attribute Option
+                                
+                                
                             } else {
                                 $update_sa->linked_isotope_attribute = null;
                             }
@@ -141,8 +147,13 @@
                             
                             // If autolink, find iso attribute, otherwise return null
                             if($request['autolink_isotope_attributes'] == '1') {
+                                
                                 $iso_attr = Attribute::findBy(['field_name = ?'], [$key]);
                                 $salsify_attribute->linked_isotope_attribute = $iso_attr->id;
+                                
+                                // Update
+                                // Link, or create, Isotope Attribute Option
+                                
                                 
                             } else {
                                 $salsify_attribute->linked_isotope_attribute = null;
