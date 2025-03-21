@@ -3,6 +3,7 @@
     use Bcs\Model\SalsifyAttribute;
     use Bcs\Model\SalsifyProduct;
     use Bcs\Model\SalsifyRequest;
+    use Isotope\Model\Attribute;
     use pcrov\JsonReader\JsonReader;
     
     
@@ -119,18 +120,37 @@
                         if($update_sa != null) {
                             echo "SalsifyAttribute Found and Updated!<br>";
                             $update_sa->attribute_value = $val[0];
-                            $update_sa->isotope_linked_attribute = null;
+                            
+                            // If autolink, find iso attribute, otherwise return null
+                            if($request['autolink_isotope_attributes'] == '1') {
+                                $iso_attr = Attribute::findBy(['field_name = ?'], [$key]);
+                                $update_sa->linked_isotope_attribute = $iso_attr->id;
+                            } else {
+                                $update_sa->linked_isotope_attribute = null;
+                            }
+                            
                             $update_sa->tstamp = time();
                             $update_sa->save();
+
                         } else {
                             echo "SalsifyAttribute Created!<br>";
                             $salsify_attribute = new SalsifyAttribute();
                             $salsify_attribute->pid = $salsify_product->id;
                             $salsify_attribute->attribute_key = $key;
                             $salsify_attribute->attribute_value = $val[0];
-                            $salsify_attribute->isotope_linked_attribute = null;
+                            
+                            // If autolink, find iso attribute, otherwise return null
+                            if($request['autolink_isotope_attributes'] == '1') {
+                                $iso_attr = Attribute::findBy(['field_name = ?'], [$key]);
+                                $salsify_attribute->linked_isotope_attribute = $iso_attr->id;
+                                
+                            } else {
+                                $salsify_attribute->linked_isotope_attribute = null;
+                            }
+                            
                             $salsify_attribute->tstamp = time();
                             $salsify_attribute->save();
+
                         }
                         
                         $attributes[$salsify_attribute->id]['key'] = $key;
