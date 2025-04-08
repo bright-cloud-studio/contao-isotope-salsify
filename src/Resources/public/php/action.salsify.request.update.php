@@ -6,6 +6,10 @@
     use Isotope\Model\Attribute;
     use pcrov\JsonReader\JsonReader;
     
+    // Stores log messages until the end
+    $log_messages = '';
+    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_request_update_'.strtolower(date('m_d_y_H:m:s')).".txt", "w") or die("Unable to open file!");
+    
     
     // INITS
     session_start();
@@ -84,90 +88,106 @@
             	$prod_count = 0;
             	// Loop through children arrays, these are what store the actual values here
             	foreach($array_parent as $array_child) {
-            		$prod_count++;
-
-                    // Find and update, else create
-                    $salsify_product;
-                    $update_sp = SalsifyProduct::findOneBy(['tl_salsify_product.product_sku=?'],[$array_child[$request['isotope_sku_key']][0]]);
-                    if($update_sp != null) {
-                        echo "SalsifyProduct Found and Updated!<br>";
-                        $update_sp->pid = $request['id'];
-                		$update_sp->tstamp = time();
-                		$update_sp->product_sku = $array_child[$request['isotope_sku_key']][0];
-                		$update_sp->product_name = $array_child[$request['isotope_name_key']][0];
-                		$update_sp->save();
-                		$salsify_product = $update_sp;
-                        
-                    } else {
-                        echo "SalsifyProduct Created!<br>";
-                		$salsify_product = new SalsifyProduct();
-                		$salsify_product->pid = $request['id'];
-                		$salsify_product->tstamp = time();
-                		$salsify_product->product_sku = $array_child[$request['isotope_sku_key']][0];
-                		$salsify_product->product_name = $array_child[$request['isotope_name_key']][0];
-                		$salsify_product->save();
-                    }
             		
+            		
+            		$required_sku = $array_child[$request['isotope_sku_key']][0];
+            		$required_name = $array_child[$request['isotope_name_key']][0];
+            		
+            		
+            		if($required_sku == '' || $required_name == '') {
+            		    
+            		    fwrite($myfile, "Skipping Salsify Product: " . $required_sku . " | " . $required_name . "\n");
+            		    
+            		} else {
 
-                    $attributes = array();
-                    $prod_values = array();
-                    foreach($array_child as $key => $val) {
-                        $prod_values[$key] = $val[0];
+                        $prod_count++;
                         
+                        fwrite($myfile, "Creating Salsify Product: " . $array_child[$request['isotope_sku_key']][0] . "\n");
+    
                         // Find and update, else create
-                        $salsify_attribute;
-                        $update_sa = SalsifyAttribute::findOneBy(['tl_salsify_attribute.pid=?', 'tl_salsify_attribute.attribute_key=?'],[$salsify_product->id, $key]);
-                        if($update_sa != null) {
-                            echo "SalsifyAttribute Found and Updated!<br>";
-                            $update_sa->attribute_value = $val[0];
+                        $salsify_product;
+                        $update_sp = SalsifyProduct::findOneBy(['tl_salsify_product.product_sku=?'],[$array_child[$request['isotope_sku_key']][0]]);
+                        if($update_sp != null) {
+                            echo "SalsifyProduct Found and Updated!<br>";
+                            $update_sp->pid = $request['id'];
+                    		$update_sp->tstamp = time();
+                    		$update_sp->product_sku = $array_child[$request['isotope_sku_key']][0];
+                    		$update_sp->product_name = $array_child[$request['isotope_name_key']][0];
+                    		$update_sp->save();
+                    		$salsify_product = $update_sp;
                             
-                            // If autolink, find iso attribute, otherwise return null
-                            if($request['autolink_isotope_attributes'] == '1') {
-                                
-                                $iso_attr = Attribute::findBy(['field_name = ?'], [$key]);
-                                $update_sa->linked_isotope_attribute = $iso_attr->id;
-                                
-                                // Update,
-                                // Link, or create, Isotope Attribute Option
-                                
-                                
-                            } else {
-                                $update_sa->linked_isotope_attribute = null;
-                            }
-                            
-                            $update_sa->tstamp = time();
-                            $update_sa->save();
-
                         } else {
-                            echo "SalsifyAttribute Created!<br>";
-                            $salsify_attribute = new SalsifyAttribute();
-                            $salsify_attribute->pid = $salsify_product->id;
-                            $salsify_attribute->attribute_key = $key;
-                            $salsify_attribute->attribute_value = $val[0];
+                            echo "SalsifyProduct Created!<br>";
+                    		$salsify_product = new SalsifyProduct();
+                    		$salsify_product->pid = $request['id'];
+                    		$salsify_product->tstamp = time();
+                    		$salsify_product->product_sku = $array_child[$request['isotope_sku_key']][0];
+                    		$salsify_product->product_name = $array_child[$request['isotope_name_key']][0];
+                    		$salsify_product->save();
+                        }
+                		
+    
+                        $attributes = array();
+                        $prod_values = array();
+                        foreach($array_child as $key => $val) {
+                            $prod_values[$key] = $val[0];
                             
-                            // If autolink, find iso attribute, otherwise return null
-                            if($request['autolink_isotope_attributes'] == '1') {
+                            // Find and update, else create
+                            $salsify_attribute;
+                            $update_sa = SalsifyAttribute::findOneBy(['tl_salsify_attribute.pid=?', 'tl_salsify_attribute.attribute_key=?'],[$salsify_product->id, $key]);
+                            if($update_sa != null) {
+                                echo "SalsifyAttribute Found and Updated!<br>";
+                                $update_sa->attribute_value = $val[0];
                                 
-                                $iso_attr = Attribute::findBy(['field_name = ?'], [$key]);
-                                $salsify_attribute->linked_isotope_attribute = $iso_attr->id;
+                                // If autolink, find iso attribute, otherwise return null
+                                if($request['autolink_isotope_attributes'] == '1') {
+                                    
+                                    $iso_attr = Attribute::findBy(['field_name = ?'], [$key]);
+                                    $update_sa->linked_isotope_attribute = $iso_attr->id;
+                                    
+                                    // Update,
+                                    // Link, or create, Isotope Attribute Option
+                                    
+                                    
+                                } else {
+                                    $update_sa->linked_isotope_attribute = null;
+                                }
                                 
-                                // Update
-                                // Link, or create, Isotope Attribute Option
-                                
-                                
+                                $update_sa->tstamp = time();
+                                $update_sa->save();
+    
                             } else {
-                                $salsify_attribute->linked_isotope_attribute = null;
+                                echo "SalsifyAttribute Created!<br>";
+                                $salsify_attribute = new SalsifyAttribute();
+                                $salsify_attribute->pid = $salsify_product->id;
+                                $salsify_attribute->attribute_key = $key;
+                                $salsify_attribute->attribute_value = $val[0];
+                                
+                                // If autolink, find iso attribute, otherwise return null
+                                if($request['autolink_isotope_attributes'] == '1') {
+                                    
+                                    $iso_attr = Attribute::findBy(['field_name = ?'], [$key]);
+                                    $salsify_attribute->linked_isotope_attribute = $iso_attr->id;
+                                    
+                                    // Update
+                                    // Link, or create, Isotope Attribute Option
+                                    
+                                    
+                                } else {
+                                    $salsify_attribute->linked_isotope_attribute = null;
+                                }
+                                
+                                $salsify_attribute->tstamp = time();
+                                $salsify_attribute->save();
+    
                             }
                             
-                            $salsify_attribute->tstamp = time();
-                            $salsify_attribute->save();
-
+                            $attributes[$salsify_attribute->id]['key'] = $key;
+                            $attributes[$salsify_attribute->id]['value'] = $val[0];
+                            $log[$salsify_product->id]['attributes'] = $attributes;
                         }
-                        
-                        $attributes[$salsify_attribute->id]['key'] = $key;
-                        $attributes[$salsify_attribute->id]['value'] = $val[0];
-                        $log[$salsify_product->id]['attributes'] = $attributes;
-                    }
+
+            		}
                     
             	}
             
@@ -178,3 +198,5 @@
 
         }
     }
+    
+    fclose($myfile);
