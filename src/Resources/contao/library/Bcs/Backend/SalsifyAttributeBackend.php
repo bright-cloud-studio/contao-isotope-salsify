@@ -105,8 +105,8 @@ class SalsifyAttributeBackend extends Backend
                             }
                             
                             
-                            echo "NEW!";
-                            die();
+                            //echo "NEW!";
+                            //die();
                             
                             $new_attr_opt->save();
                             $linked[$attr->attribute_key][$parent->isotope_product_variant_type]['options'][$attr->attribute_value]['isotope_attribute_option'] = $new_attr_opt->id;
