@@ -47,7 +47,8 @@
             // Now, if we have our product types we can auto-link attributes
             if($product_single != '' && $product_variant != '') {
                 
-
+                
+                
                 // Loop through each Salsify Attribute
                 $sa_query =  "SELECT * FROM tl_salsify_attribute WHERE pid='".$product['id']."' AND linked_isotope_attribute IS NULL ORDER BY id ASC";
                 $sa_result = $dbh->query($sa_query);
@@ -80,8 +81,8 @@
                                                     
                                                     echo "Linked: single<br>";
 
-                                                    $update =  "update tl_salsify_attribute set linked_isotope_attribute='".$iso_attribute['id']."' WHERE id='".$attribute['id']."'";
-                                                    $result_update = $dbh->query($update);
+                                                    //$update =  "update tl_salsify_attribute set linked_isotope_attribute='".$iso_attribute['id']."' WHERE id='".$attribute['id']."'";
+                                                    //$result_update = $dbh->query($update);
                                             
                                                     fwrite($myfile, "Linked Salsify Attribute ID: " . $attribute['id'] . " to Isotope Attribute ID: " . $iso_attribute['id'] . "\n");
 
@@ -129,11 +130,32 @@
 
                                     }
                                 }
+                                
+                                
                                 break;
                         }
+                        
+                        
+                        
+                        
+                        
+                        
                     }
                 }
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
             }
+            
+
+
         }
     }
     
