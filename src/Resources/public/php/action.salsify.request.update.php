@@ -62,12 +62,10 @@
                 $request['file_url'] = $latest_file_url;
                 $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', flag_update='1' WHERE id='".$request['id']."'")->execute();
             }
+
             
             
-            
-            
-            
-            
+
             // STEP TWO - Create or update Salsify Products and Salsify Attributes
             
             // Open and process file
@@ -75,6 +73,8 @@
             $reader->open("../files/" . $request['source_folder'] . "/" . $request['file_url']);
             $depth = $reader->depth();
             $reader->read();
+            
+
             
             $do_loop = 0;
             // Process loaded XML data
