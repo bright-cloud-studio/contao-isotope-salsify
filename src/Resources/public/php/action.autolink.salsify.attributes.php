@@ -5,8 +5,7 @@
     use Bcs\Model\SalsifyRequest;
     use Isotope\Model\Attribute;
     
-    // Stores log messages until the end
-    $log_messages = '';
+    // LOG - Create log file
     $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_autolink_'.strtolower(date('m_d_y_H:m:s')).".txt", "w") or die("Unable to open file!");
     
     // INITS
@@ -94,8 +93,7 @@
                                     }
                                 }
                                 
-                                
-                                break;
+                            break;
                             case "variant":
                                 
                                 // get our Product Type
@@ -122,41 +120,19 @@
                                                     $result_update = $dbh->query($update);
                                             
                                                     fwrite($myfile, "VARIANT: Linked Salsify Attribute ID: " . $attribute['id'] . " to Isotope Attribute ID: " . $iso_attribute['id'] . "\n");
-
                                                 }
                                             }
-
                                         }
-
                                     }
                                 }
                                 
-                                
-                                break;
+                            break;
                         }
-                        
-                        
-                        
-                        
-                        
-                        
                     }
                 }
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
             }
-            
-
-
         }
     }
     
+    // LOG - Close our log file
     fclose($myfile);
