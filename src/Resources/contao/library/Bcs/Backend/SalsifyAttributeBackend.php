@@ -34,6 +34,8 @@ class SalsifyAttributeBackend extends Backend
         //$sku_field_key = '';
         // Stores the KEY of whatever attribute that is checked is being used for the Product Name
         //$product_name_field_key = '';
+        $is_cat_field_key = '';
+        
 
         // Stores the KEY of whatever attribute that is checked as being use for grouping
         $grouping_field_key = '';
@@ -179,6 +181,9 @@ class SalsifyAttributeBackend extends Backend
 
             //if($attr->is_name)
             //    $product_name_field_key = $attr->attribute_key;
+            
+            if($attr->is_cat)
+                $is_cat_field_key = $attr->attribute_key;
 
             if($attr->category_parent_page != null) {
                 $cat = unserialize($attr->category_parent_page);
@@ -251,6 +256,12 @@ class SalsifyAttributeBackend extends Backend
                 $save = true;
             }
             */
+            
+            // Is Cat
+            if($attr->attribute_key == $is_cat_field_key) {
+                $attr->is_cat = 1;
+                $save = true;
+            }
             
             // Variant Grouping
             if($attr->attribute_key == $grouping_field_key) {
@@ -360,12 +371,15 @@ class SalsifyAttributeBackend extends Backend
         if($row['is_grouping'] == 1) {
             $site_category_field = "GROUP: <span style='color: green;'>TRUE</span> - ";
         }
-        if($row['category_page'] != '') {
-            $cat = "CAT: <span style='color: green;'>".$row['category_page']."</span> - ";
+        if($row['is_cat'] != '') {
+            if(!$row['category_page'])
+                $cat = "CAT: <span style='color: red;'>UNSET</span> - ";
+            else
+                $cat = "CAT: <span style='color: green;'>".$row['category_page']."</span> - ";
         }
         
 
-        if($row['linked_isotope_attribute'] != null)
+        if($row['status'] == 'pass')
             return "Status: <span style='color: green;'>PASS</span> - " . $site_category_field . $cat .  $label;
         else
             return "Status: <span style='color: red;'>FAIL</span> - " . $site_category_field . $cat .  $label;
