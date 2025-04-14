@@ -25,6 +25,10 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
 		(
 			array('tl_salsify_request', 'setRootType')
 		),
+        'ondelete_callback' => array
+		(
+			array('Bcs\Backend\SalsifyRequestBackend', 'onDeleteSalsifyRequest')
+		),
         'sql' => array
         (
             'keys' => array
