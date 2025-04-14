@@ -76,6 +76,13 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
                 'href'                => 'act=edit',
                 'icon'                => 'edit.gif'
             ),
+            'delete' => array
+            (
+                'label'               => &$GLOBALS['TL_LANG']['tl_salsify_request']['delete'],
+                'href'                => 'act=delete',
+                'icon'                => 'delete.gif',
+                'attributes'          => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
+            ),
             'show' => array
             (
                 'label'               => &$GLOBALS['TL_LANG']['tl_salsify_request']['show'],
