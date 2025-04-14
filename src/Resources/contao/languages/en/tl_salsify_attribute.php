@@ -25,6 +25,7 @@ $GLOBALS['TL_LANG']['tl_salsify_attribute']['grouping_legend']              = 'G
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['isotope_product_type']         = array('Isotope Product Type', 'Select the Isotope Product Type for singular Products');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['isotope_product_type_variant'] = array('Isotope Product Type Variant', 'Select the Isotope Product Type for Variant Products');
 
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['is_cat']                      = array('Use as Category', 'Choose if this Attribute should be used as the Category and controls what Pages this Product shows up on');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['is_sku']                      = array('Use as SKU', 'Choose if this Attribute is also used for the product\'s unique SKU');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['is_name']                     = array('Use as Name', 'Choose if this Attribute is also used for the product\'s name');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['is_grouping']                 = array('Use as Grouping', 'Select if this attribute is used to \'link\' products together as Variants');
