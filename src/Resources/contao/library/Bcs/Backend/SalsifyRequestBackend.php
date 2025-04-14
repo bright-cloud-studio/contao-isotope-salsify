@@ -80,5 +80,18 @@ class SalsifyRequestBackend extends Backend
 
 		return $varValue;
 	}
+
+    public function onDeleteSalsifyRequest(DataContainer $dc) {
+
+        echo "We Deleting!";
+        die();
+        
+        // Loop through all Salsify Products belonging to this Salsify Request
+
+            // Loop through all Salsify Attributes that belong to this
+                // Delete them
+            // Delete Isotope Product
+        
+    }
     
 }
