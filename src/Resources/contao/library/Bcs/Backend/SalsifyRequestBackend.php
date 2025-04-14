@@ -8,8 +8,57 @@ use Contao\Input;
 use Contao\DataContainer;
 use Contao\StringUtil;
 
+use Bcs\Model\SalsifyProduct;
+use Bcs\Model\SalsifyAttribute;
+
+use Isotope\Model\Product;
+
 class SalsifyRequestBackend extends Backend
 {
+    
+    
+    // Delete everything spawned from this SalsifyRequest
+    public function onDeleteSalsifyRequest(DataContainer $dc) {
+
+        // Loop through all SalsifyProducts that belong to this SalsifyRequest
+        $options = ['order' => 'id ASC'];
+        $salsify_products = SalsifyProduct::findBy('pid', $dc->id, $options);
+		if ($salsify_products)
+		{
+			foreach ($salsify_products as $product)
+		    {
+		        
+		        // Loop through each SalsifyAttribute that belongs to this SalsifyProduct
+		        $salsify_attributes = SalsifyAttribute::findBy('pid', $product->id);
+        		if ($salsify_attributes)
+        		{
+        			foreach ($salsify_attributes as $attribute)
+        		    {
+        		        // Delete this SalsifyAttribute
+        		        $attribute->delete();
+        		        //echo "DELETE SalsifyAttribute: " . $attribute->id . "<br>";
+        		    }
+        		}
+        		
+        		// Try to delete the Isotope Product in the event it was generated
+        		$isotope_product = Product::findOneBy(['tl_iso_product.sku=?'],[$product->product_sku]);
+                if($isotope_product != null) {
+                    
+                    $isotope_product->delete();
+                    //echo "DELETE Isotope Product: " . $isotope_product->sku . "<br>";
+                }
+    		
+        		// Delete this SalsifyProduct
+        		$product->delete();
+        		//echo "DELETE Salsify Product: " . $product->id . "<br><hr><br>";
+		    }
+		}
+
+        //die();
+    }
+    
+    
+    
     
 	public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
 	{
@@ -81,17 +130,4 @@ class SalsifyRequestBackend extends Backend
 		return $varValue;
 	}
 
-    public function onDeleteSalsifyRequest(DataContainer $dc) {
-
-        echo "We Deleting!";
-        die();
-        
-        // Loop through all Salsify Products belonging to this Salsify Request
-
-            // Loop through all Salsify Attributes that belong to this
-                // Delete them
-            // Delete Isotope Product
-        
-    }
-    
 }
