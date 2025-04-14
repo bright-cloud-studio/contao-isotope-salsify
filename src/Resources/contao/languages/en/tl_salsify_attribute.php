@@ -29,6 +29,8 @@ $GLOBALS['TL_LANG']['tl_salsify_attribute']['is_sku']                      = arr
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['is_name']                     = array('Use as Name', 'Choose if this Attribute is also used for the product\'s name');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['is_grouping']                 = array('Use as Grouping', 'Select if this attribute is used to \'link\' products together as Variants');
 
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['status']                      = array('Status', 'Tracks the Status of this Salsify Attribute.');
+
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['category_parent_page']        = array('Category Parent Page', 'Select the Parent Page this will live inside');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['category_reader_page']        = array('Category Reader Page', 'Select the Reader page for this product');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['category_page']               = array('Category Page', 'The selected, or generated, product page.');
