@@ -84,7 +84,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_request_legend}, request_name, source_folder, isotope_name_key, isotope_sku_key; {latest_file_legend}, file_url, file_date; {customization_legend}, autolink_isotope_attributes; {internal_information:hide}, flag_update;'
+        'default'                     => '{salsify_request_legend}, request_name, source_folder, isotope_name_key, isotope_sku_key; {latest_file_legend}, file_url, file_date; {website_root_legend}, website_root; {customization_legend}, autolink_isotope_attributes; {internal_information:hide}, flag_update;'
     ),
  
     // Fields
@@ -159,6 +159,16 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'search'                  => true,
             'eval'                    => array('rgxp'=>'datim', 'datepicker'=>true, 'tl_class'=>'w50'),
             'sql'                     => "varchar(20) NOT NULL default ''",
+        ),
+
+
+        'website_root' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['website_root'],
+            'inputType'               => 'pageTree',
+            'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'w50'),
+			'sql'                     => "blob NULL",
+            'relation'                => array('table'=>'tl_page', 'type'=>'hasMany', 'load'=>'lazy')
         ),
         
 
