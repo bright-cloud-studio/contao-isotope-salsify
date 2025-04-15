@@ -50,13 +50,22 @@
                             
                             echo "Page ID: " . $page['id'] . "<br>";
                             echo "Page Title: " . $page['title'] . "<br>";
-                            echo "Reader Page ID: " . $page['iso_readerJumpTo'] . "<br>";
+                            echo "Reader Page ID: " . $page['iso_readerJumpTo'] . "<br><br>";
                             
                             // Validate that this page belongs to this root
                             
                             // Save category page id to Salsify Product
-                            $update =  "update tl_salsify_product set category_page='".$page['id']."', reader_page='".$page['iso_readerJumpTo']."' WHERE id='".$attribute['id']."'";
+                            //$update =  "update tl_salsify_product set category_page='".$page['id']."', reader_page='".$page['iso_readerJumpTo']."' WHERE id='".$attribute['id']."'";
+                            
+                            $update =  "update tl_salsify_attribute set category_page='".$page['id']."' WHERE id='".$attribute['id']."'";
                             $result_update = $dbh->query($update);
+                            
+                            echo "SalsifyAttribute Linked!<br>";
+                            
+                            $update =  "update tl_salsify_product set category_page='".$page['id']."' WHERE id='".$product['id']."'";
+                            $result_update = $dbh->query($update);
+                            
+                            echo "SalsifyProduct Linked!<br>";
                             
                             
                         }
