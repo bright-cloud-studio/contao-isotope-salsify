@@ -49,12 +49,11 @@ class SalsifyRequestBackend extends Backend
                 }
                 
                 // NOW, Try to delete and SKU + '_parent' product that we may have generated as a parent holder product
-                //$isotope_product = Product::findOneBy(['tl_iso_product.sku=?'],[$product->product_sku + "_parent"]);
-                //if($isotope_product != null) {
-                    
-                 //   $isotope_product->delete();
-                    //echo "DELETE Isotope Generated Product: " . $isotope_product->sku . "<br>";
-               // }
+                $isotope_product = Product::findOneBy(['tl_iso_product.sku=?'],[$product->product_sku . "_parent"]);
+                if($isotope_product != null) { 
+                    $isotope_product->delete();
+                    echo "DELETE Isotope Generated Product: " . $isotope_product->sku . "<br>";
+                }
     		
         		// Delete this SalsifyProduct
         		$product->delete();
