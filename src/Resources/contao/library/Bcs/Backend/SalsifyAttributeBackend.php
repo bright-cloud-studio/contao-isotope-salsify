@@ -22,21 +22,24 @@ use Isotope\Model\ProductType;
 class SalsifyAttributeBackend extends Backend
 {
 
+    
     public function addLinkMatchingAttributes($arrButtons, DataContainer $dc)
 	{
-	    
-	    // Generate the aliases
+	    // If we have submiited the page
 		if (Input::post('link_similar') !== null && Input::post('FORM_SUBMIT') == 'tl_salsify_attribute')
 		{
-            echo "HEY!";
-            //die();
+		    // Do actions here
 
+            
+            // Redirect back to the list view
 		    $this->redirect($this->getReferer());
 		}
 	    
+	    // Create and add our button
 	    $arrButtons['link_similar'] = '<input type="submit" name="link_similar" id="link_similar" class="tl_submit" accesskey="a" value="'.$GLOBALS['TL_LANG']['tl_salsify_attribute']['link_similar'].'"> ';
 		return $arrButtons;
 	}
+
     
     // Loop through all of our Attributes, find ones that are identical to this, and link them to the same Isotope Attribute
     public function linkSimilarAttributes($arrButtons, DataContainer $dc)
