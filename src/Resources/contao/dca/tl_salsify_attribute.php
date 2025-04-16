@@ -83,6 +83,15 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             )
         )
     ),
+
+    // Edit
+    'edit' => array
+    (
+        'buttons_callback' => array
+        (
+            array('Bcs\Backend\SalsifyAttributeBackend', 'addLinkMatchingAttributes')
+        )
+    ),
  
     // Palettes
     'palettes' => array
