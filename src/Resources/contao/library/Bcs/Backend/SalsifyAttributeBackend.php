@@ -29,41 +29,61 @@ class SalsifyAttributeBackend extends Backend
 		if (Input::post('link_similar') !== null && Input::post('FORM_SUBMIT') == 'tl_salsify_attribute')
 		{
 		    
+		    // Create log file
+		    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/link_matching_attributes_'.strtolower(date('m_d_y_H:m:s')).".txt", "w") or die("Unable to open file!");
+		    
 		    // Find  all SalsifyAttributes where the the 'KEY' is the same
 		    $matching_attributes = SalsifyAttribute::findBy(['attribute_key = ?'], [$dc->activeRecord->attribute_key]);
 		    if($matching_attributes) {
 		        
+		        // Write to log
+	            fwrite($myfile, "Kickoff SalsifyAttribute ID: " . $dc->activeRecord->id . "\n");
+		        
 		        foreach($matching_attributes as $attribute) {
 		            $save = false;
+		            
+		            // Write to log
+	                fwrite($myfile, "Matching SalsifyAttribute ID: " . $attribute->id . "\n");
 		        
-		        // If 'attribute_value' matches, link Isotope Attribute
-		        
-		        // If 'is_grouping'
-		        if($dc->activeRecord->is_grouping && $dc->activeRecord->isotope_product_type != null && $dc->activeRecord->isotope_product_type_variant != null) {
-		            
-		            // Apply the same settings to this matching SalsifyAttribute
-		            $attribute->is_grouping = 1;
-		            $attribute->isotope_product_type = $dc->activeRecord->isotope_product_type;
-		            $attribute->isotope_product_type_variant = $dc->activeRecord->isotope_product_type_variant;
-		            
-		            // Update the SalsifyProduct parent
-                    $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attribute->pid]);
-                    if($salsify_product != null) {
-                        $salsify_product->variant_group = $attribute->attribute_value;
-                        $salsify_product->save();
-                    }
-		            
-		            // Flag for saving
-		            $save = true;
-		            
-		        }
+    		        // If 'attribute_value' matches, link Isotope Attribute
+    		        
+    		        // If 'is_grouping'
+    		        if($dc->activeRecord->is_grouping && $dc->activeRecord->isotope_product_type != null && $dc->activeRecord->isotope_product_type_variant != null) {
+    		            
+    		            // Apply the same settings to this matching SalsifyAttribute
+    		            $attribute->is_grouping = 1;
+    		            $attribute->isotope_product_type = $dc->activeRecord->isotope_product_type;
+    		            $attribute->isotope_product_type_variant = $dc->activeRecord->isotope_product_type_variant;
+    		            
+    		            // Write to log
+	                    fwrite($myfile, "Grouping applied to SalsifyAttribute ID: " . $attribute->id . "\n");
+    		            
+    		            
+    		            // Update the SalsifyProduct parent
+                        $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attribute->pid]);
+                        if($salsify_product != null) {
+                            $salsify_product->variant_group = $attribute->attribute_value;
+                            $salsify_product->save();
+                            
+                            // Write to log
+	                        fwrite($myfile, "Updating Parent SalsifyProduct ID: " . $salsify_product->id . "\n");
+                            
+                        }
+    		            
+    		            // Flag for saving
+    		            $save = true;
+    		            
+    		        }
 		        
 		        
 		        }
 		        
 		        // Save if flagged for it
-		        if($save)
+		        if($save) {
 		            $attribute->save();
+		            // Write to log
+	               fwrite($myfile, "Saving SalsifyAttribute ID: " . $attribute->id . "\n\n");
+		        }
 
 		    }
 
