@@ -21,6 +21,18 @@ use Isotope\Model\ProductType;
 
 class SalsifyAttributeBackend extends Backend
 {
+
+    public function addLinkMatchingAttributes()
+	{
+		if (Input::post('FORM_SUBMIT') == 'tl_select' && isset($_POST['link_similar']))
+		{
+            echo "HEY!";
+            die();
+			$this->redirect($this->getReferer());
+		}
+
+		return '<input type="submit" name="link_similar" id="link_similar" class="tl_submit" accesskey="a" value="Link Similar Attributes"> ';
+	}
     
     // Loop through all of our Attributes, find ones that are identical to this, and link them to the same Isotope Attribute
     public function linkSimilarAttributes()
