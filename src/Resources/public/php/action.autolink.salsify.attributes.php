@@ -80,7 +80,7 @@
                                                     
                                                     echo "Linked: single<br>";
 
-                                                    $update =  "update tl_salsify_attribute set linked_isotope_attribute='".$iso_attribute['id']."' WHERE id='".$attribute['id']."'";
+                                                    $update =  "update tl_salsify_attribute set linked_isotope_attribute='".$iso_attribute['id']."', status='pass' WHERE id='".$attribute['id']."'";
                                                     $result_update = $dbh->query($update);
                                             
                                                     fwrite($myfile, "Linked Salsify Attribute ID: " . $attribute['id'] . " to Isotope Attribute ID: " . $iso_attribute['id'] . "\n");
@@ -116,7 +116,7 @@
                                                     
                                                     echo "Linked: variant<br>";
                                                     
-                                                    $update =  "update tl_salsify_attribute set linked_isotope_attribute='".$iso_attribute['id']."' WHERE id='".$attribute['id']."'";
+                                                    $update =  "update tl_salsify_attribute set linked_isotope_attribute='".$iso_attribute['id']."', status='pass' WHERE id='".$attribute['id']."'";
                                                     $result_update = $dbh->query($update);
                                             
                                                     fwrite($myfile, "VARIANT: Linked Salsify Attribute ID: " . $attribute['id'] . " to Isotope Attribute ID: " . $iso_attribute['id'] . "\n");
