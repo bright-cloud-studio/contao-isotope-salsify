@@ -42,9 +42,9 @@ class SalsifyAttributeBackend extends Backend
 
     
     // Loop through all of our Attributes, find ones that are identical to this, and link them to the same Isotope Attribute
-    public function linkSimilarAttributes($arrButtons, DataContainer $dc)
+    public function linkSimilarAttributes()
     {
-        
+        /*
         // Stores our linked attribute values so we can apply them on the second loop
         $linked = array();
         // Stores the KEY of whatever attribute that is checked as a category field
@@ -68,7 +68,10 @@ class SalsifyAttributeBackend extends Backend
         
         // Get all SalsifyAttributes with the same key
         $salsify_attributes = SalsifyAttribute::findAll();
-
+        */
+        
+        
+        /*
         // LOOP ONE - STAGE DATA
         foreach($salsify_attributes as $attr) {
             
@@ -221,8 +224,11 @@ class SalsifyAttributeBackend extends Backend
             }
             
         }
-
+            
+            */
         
+        
+        /*
         // LOOP TWO: Link matching SalsifyAttributes
         foreach($salsify_attributes as $attr) {
             
@@ -248,33 +254,6 @@ class SalsifyAttributeBackend extends Backend
                 $save = true;
             }
 
-            // Product SKU
-            /*
-            if($attr->attribute_key == $sku_field_key) {
-                $attr->is_sku = 1;
-
-                // Find the parent SalsifyProduct and update the SKU to match this
-                $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attr->pid]);
-                if($salsify_product != null) {
-                    $salsify_product->product_sku = $attr->attribute_value;
-                    $salsify_product->save();
-                }
-                $save = true;
-            }
-
-            // Product Name
-            if($attr->attribute_key == $product_name_field_key) {
-                $attr->is_name = 1;
-
-                // Find the parent SalsifyProduct and update the SKU to match this
-                $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attr->pid]);
-                if($salsify_product != null) {
-                    $salsify_product->product_name = $attr->attribute_value;
-                    $salsify_product->save();
-                }
-                $save = true;
-            }
-            */
             
             // Is Cat
             if($attr->attribute_key == $is_cat_field_key) {
@@ -302,24 +281,7 @@ class SalsifyAttributeBackend extends Backend
                 $save = true;
             }
 
-            // Product Type
-            /*
-            if($attr->attribute_key == $isotope_product_type_key) {
-                if($attr->attribute_value == $isotope_product_type_value) {
-                    $attr->isotope_product_type = $isotope_product_type;
-                    $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attr->pid]);
-                    if($salsify_product != null) {
-                        $salsify_product->isotope_product_type = $isotope_product_type;
-                        $salsify_product->isotope_product_type_linked = 'linked';
-                        $salsify_product->save();
-                    }
-                    $save = true;
-                }
-            }
-            */
-            
-            
-            
+
             // Check if our attribute_key/attribute_value has stored info in $linked
             if($linked[$attr->attribute_key][$attr->attribute_value]['category_page'] != null) {
                 
@@ -343,8 +305,10 @@ class SalsifyAttributeBackend extends Backend
                 $attr->save();
                 
         }
+        */
         
         
+        /*
         // Third Grouping Loop
         if($group_counter != null) {
             
@@ -368,8 +332,9 @@ class SalsifyAttributeBackend extends Backend
             }
             
         }
+        */
         
-        
+    
     }
 
     
