@@ -28,27 +28,45 @@ class SalsifyAttributeBackend extends Backend
 	    // If we have submiited the page
 		if (Input::post('link_similar') !== null && Input::post('FORM_SUBMIT') == 'tl_salsify_attribute')
 		{
-		    // Do actions here
+		    
+		    // Find  all SalsifyAttributes where the the 'KEY' is the same
+		    $matching_attributes = SalsifyAttribute::findBy(['attribute_key = ?'], [$dc->activeRecord->attribute_key]);
+		    if($matching_attributes) {
+		        
+		        foreach($matching_attributes as $attribute) {
+		            $save = false;
+		        
+		        // If 'attribute_value' matches, link Isotope Attribute
+		        
+		        // If 'is_grouping'
+		        if($dc->activeRecord->is_grouping && $dc->activeRecord->isotope_product_type != null && $dc->activeRecord->isotope_product_type_variant != null) {
+		            
+		            // Apply the same settings to this matching SalsifyAttribute
+		            $attribute->is_grouping = 1;
+		            $attribute->isotope_product_type = $dc->activeRecord->isotope_product_type;
+		            $attribute->isotope_product_type_variant = $dc->activeRecord->isotope_product_type_variant;
+		            
+		            // Update the SalsifyProduct parent
+                    $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attribute->pid]);
+                    if($salsify_product != null) {
+                        $salsify_product->variant_group = $attribute->attribute_value;
+                        $salsify_product->save();
+                    }
+		            
+		            // Flag for saving
+		            $save = true;
+		            
+		        }
+		        
+		        
+		        }
+		        
+		        // Save if flagged for it
+		        if($save)
+		            $attribute->save();
 
-            // Find  all SalsifyAttributes where the the 'KEY' is the same
+		    }
 
-                // if "VALUE" is idential
-                    // Link Isotope Attribute
-                        // Link Isotope Attribute Option
-                        // Status becomes PASS
-
-                // if 'GROUPING'
-                    // MATCH
-
-                // if CATEGORY
-                    // MATCH
-            
-
-
-
-            
-
-            
             // Redirect back to the list view
 		    $this->redirect($this->getReferer());
 		}
