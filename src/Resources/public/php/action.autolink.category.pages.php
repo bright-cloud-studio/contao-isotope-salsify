@@ -41,6 +41,7 @@
                     echo "Attribute Key: " . $attribute['attribute_key'] . "<br>";
                     echo "Attribute Value: " . $attribute['attribute_value'] . "<br><br>";
                     
+                    
                     // Find a page with this title
                     $page_query =  "SELECT * FROM tl_page WHERE title='".$attribute['attribute_value']."' AND published='1' ORDER BY id ASC";
                     $page_result = $dbh->query($page_query);
@@ -52,18 +53,9 @@
                             echo "Reader Page ID: " . $page['iso_readerJumpTo'] . "<br><br>";
                             
                             // Validate that this page belongs to this root
-                            $type = $page['type'];
                             
-                            // If we don't have 'root', we are still on a child page
-                            while($type != 'root') {
-
-                            }
-
-                            // If we are here, we have the 'root' page
-
-                            // i page id == selected root, validate
-                            
-    
+                            // Save category page id to Salsify Product
+                            //$update =  "update tl_salsify_product set category_page='".$page['id']."', reader_page='".$page['iso_readerJumpTo']."' WHERE id='".$attribute['id']."'";
                             
                             $update =  "update tl_salsify_attribute set category_page='".$page['id']."' WHERE id='".$attribute['id']."'";
                             $result_update = $dbh->query($update);
@@ -81,8 +73,11 @@
                     
                     echo "<hr><br>";
                     
+                    
+                    
                 }
             }
+            
 
         }
     }
