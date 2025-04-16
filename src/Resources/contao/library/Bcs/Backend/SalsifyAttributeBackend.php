@@ -34,7 +34,7 @@ class SalsifyAttributeBackend extends Backend
 		    $this->redirect($this->getReferer());
 		}
 	    
-	    $arrButtons['link_similar'] = '<input type="submit" name="link_similar" id="link_similar" class="tl_submit" accesskey="a" value="Link Similar Attributes"> ';
+	    $arrButtons['link_similar'] = '<input type="submit" name="link_similar" id="link_similar" class="tl_submit" accesskey="a" value="'.$GLOBALS['TL_LANG']['tl_salsify_attribute']['link_similar'].'"> ';
 		return $arrButtons;
 	}
     
