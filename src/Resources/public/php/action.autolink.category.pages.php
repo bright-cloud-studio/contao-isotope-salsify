@@ -57,7 +57,7 @@
                             // Save category page id to Salsify Product
                             //$update =  "update tl_salsify_product set category_page='".$page['id']."', reader_page='".$page['iso_readerJumpTo']."' WHERE id='".$attribute['id']."'";
                             
-                            $update =  "update tl_salsify_attribute set category_page='".$page['id']."', status='pass' WHERE id='".$attribute['id']."'";
+                            $update =  "update tl_salsify_attribute set category_page='".$page['id']."' WHERE id='".$attribute['id']."'";
                             $result_update = $dbh->query($update);
                             
                             echo "SalsifyAttribute Linked!<br>";
