@@ -1,7 +1,7 @@
 <?php
 
 /* Custom Button on 'act'='edit' */
-$GLOBALS['TL_LANG']['tl_salsify_attribute']['link_similar']               = "Link Similar Attrs!";
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['link_similar']               = "Link Matching SalsifyAttributes";
 
 /* System Buttons */
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['new']                        = array('New Salsify Attribute', 'Add a new record');
