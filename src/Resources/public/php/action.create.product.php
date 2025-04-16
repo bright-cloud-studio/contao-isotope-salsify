@@ -302,6 +302,7 @@
         if (empty($text)) {
             $text = 'default_alias'; // Or any other default you prefer
         }
-    
-        return $text;
+
+        // Return a truncated version of the alias, max length of 12
+        return substr($text, 0,125);
     }
