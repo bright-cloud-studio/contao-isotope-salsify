@@ -30,6 +30,24 @@ class SalsifyAttributeBackend extends Backend
 		{
 		    // Do actions here
 
+            // Find  all SalsifyAttributes where the the 'KEY' is the same
+
+                // if "VALUE" is idential
+                    // Link Isotope Attribute
+                        // Link Isotope Attribute Option
+                        // Status becomes PASS
+
+                // if 'GROUPING'
+                    // MATCH
+
+                // if CATEGORY
+                    // MATCH
+            
+
+
+
+            
+
             
             // Redirect back to the list view
 		    $this->redirect($this->getReferer());
