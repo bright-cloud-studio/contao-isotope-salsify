@@ -295,6 +295,8 @@
         if (empty($text)) {
             $text = 'default_alias'; // Or any other default you prefer
         }
-    
-        return $text;
+        $max_length = 125;
+        $length_limited = substr($text, 0, $max_length);
+        
+        return $length_limited;
     }
