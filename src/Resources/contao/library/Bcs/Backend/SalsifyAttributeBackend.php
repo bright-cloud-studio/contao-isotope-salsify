@@ -108,15 +108,23 @@ class SalsifyAttributeBackend extends Backend
             // Update Grouping values once all other updates have processed
             if($group_counter != null) {
                 
+                fwrite($myfile, "Grouping SalsifyProducts \n\n");
+                
                 $salsify_products = SalsifyProduct::findAll();
                 foreach($salsify_products as $prod) {
                     
                     if($group_counter[$prod->variant_group] == 1) {
                         $prod->isotope_product_variant_type = 'single';
                         $prod->isotope_product_type = $isotope_product_type;
+                        
+                        fwrite($myfile, "SalsifyProduct ID: " . $prod->id . " set as 'single' using Isotope Product Type ID: " . $isotope_product_type . "\n\n");
+                        
                     } else {
                         $prod->isotope_product_variant_type = 'variant';
                         $prod->isotope_product_type = $isotope_product_type_variant;
+                        
+                        fwrite($myfile, "SalsifyProduct ID: " . $prod->id . " set as 'variant' using Isotope Product Type ID: " . $isotope_product_type_variant . "\n\n");
+                        
                     }
                     $prod->isotope_product_type_linked = 'linked';
                     $prod->save();
@@ -127,6 +135,10 @@ class SalsifyAttributeBackend extends Backend
             // Redirect back to the list view
 		    $this->redirect($this->getReferer());
 		}
+	    
+	    
+	    // Close our log file
+	    fclose($myfile);
 	    
 	    // Create and add our button
 	    $arrButtons['link_similar'] = '<input type="submit" name="link_similar" id="link_similar" class="tl_submit" accesskey="a" value="'.$GLOBALS['TL_LANG']['tl_salsify_attribute']['link_similar'].'"> ';
