@@ -26,12 +26,12 @@ class SalsifyAttributeBackend extends Backend
     public function addLinkMatchingAttributes($arrButtons, DataContainer $dc)
 	{
 	    
-	    // Create log file
-	    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/link_matching_attributes_'.strtolower(date('m_d_y_H:m:s')).".txt", "w") or die("Unable to open file!");
-		    
 	    // If we have submiited the page
 		if (Input::post('link_similar') !== null && Input::post('FORM_SUBMIT') == 'tl_salsify_attribute')
 		{
+		    // Create log file
+	        $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/link_matching_attributes_'.strtolower(date('m_d_y_H:m:s')).".txt", "w") or die("Unable to open file!");
+	    
             // Stores counts of the uses of the grouping value
             $group_counter = array();
             $isotope_product_type = '';
@@ -46,15 +46,80 @@ class SalsifyAttributeBackend extends Backend
 		        
 		        foreach($matching_attributes as $attribute) {
 		            $save = false;
-		            
-		            // Write to log
-	                fwrite($myfile, "Matching SalsifyAttribute ID: " . $attribute->id . "\n");
-		        
-		        
-		        
-    		        // If 'attribute_value' matches, link Isotope Attribute
-    		        
-    		        
+	                
+	                // ISOTOPE ATTRIBUTE LINKING
+	                if($dc->activeRecord->linked_isotope_attribute != null) {
+	                    
+		                // Get our parents
+		                $kickoff_parent = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$dc->activeRecord->pid]);
+		                $matching_parent = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attribute->pid]);
+		                
+		                // If the variant type matches
+		                if($kickoff_parent->isotope_product_variant_type == $matching_parent->isotope_product_variant_type) {
+		                    
+		                    fwrite($myfile, "Variant Type Match!" . "\n");
+		                    
+		                    // Apply the linked attribute
+		                    $attribute->linked_isotope_attribute = $dc->activeRecord->linked_isotope_attribute;
+		                    $attribute->attribute_option_sorting = $dc->activeRecord->attribute_option_sorting;
+		                    $attribute->status = 'pass';
+		                    fwrite($myfile, "New Attribute Linked ID: " . $attribute->id . "\n");
+		                    
+		                    // Link or Create Option
+		                    $iso_attr = Attribute::findBy(['id = ?'], [$attribute->linked_isotope_attribute]);
+		                    if($iso_attr->type == 'select' || $iso_attr->type == 'radio') {
+		                        
+		                        fwrite($myfile, "Option Required \n");
+
+		                        // Find all Options for this Attribute
+                				$existing_options = AttributeOption::findByPid($attribute->linked_isotope_attribute);
+                				$opt_found = false;
+                				foreach($existing_options as $option) {
+                					// If an Option's label matches our Attribute Value, it already exists
+                					if($option->label == $attribute->attribute_value) {
+                						$opt_found = true;
+                						$attribute->linked_isotope_attribute_option = $option->id;
+                						fwrite($myfile, "Existing Option Linked \n");
+                					}
+                				}
+                				// If no Attribute Option is found, create it
+                				if($opt_found != true) {
+                					$new_option = new AttributeOption();
+                					$new_option->pid = $attribute->linked_isotope_attribute;
+                					$new_option->label = $attribute->attribute_value;
+                					$new_option->tstamp = time();
+                					$new_option->published = 1;
+                					$new_option->ptable = 'tl_iso_attribute';
+                					$new_option->type = 'option';
+                					
+                					// Sorting
+                					if($attribute->attribute_option_sorting == 'sort_numerical') {
+                						// Strip everything but numbers from label, use that as sorting number
+                						$only_number = preg_replace("/[^0-9]/","", $attr->attribute_value);
+                						$new_option->sorting = $only_number;
+                						
+                					} else if($attribute->attribute_option_sorting == 'sort_alphabetical') {
+                						// Get just the first letter of the label, convert to number in alphabet, use as sorting number
+                						$alphabet = range('A', 'Z');
+                						$only_letter = substr($attr->attribute_value, 0);
+                						
+                						$new_option->sorting = $alphabet[$only_letter];
+                					}
+
+                					$new_option->save();
+                					$attribute->linked_isotope_attribute_option = $new_option->id;
+                					fwrite($myfile, "New Option Created and Linked \n");
+                				}
+		                        
+		                    }
+		                    
+                            $save = true;
+		                }
+	                }
+	                
+	                
+	                
+	                
     		        
     		        // GROUPING - Spread to matching 'attribute_key'
     		        if($dc->activeRecord->is_grouping && $dc->activeRecord->isotope_product_type != null && $dc->activeRecord->isotope_product_type_variant != null) {
@@ -87,6 +152,16 @@ class SalsifyAttributeBackend extends Backend
     		            
     		            // Flag for saving
     		            $save = true;
+    		        }
+    		        
+    		        // CATEGORY
+    		        if($dc->activeRecord->is_cat) {
+    		            $attribute->is_cat = 1;
+    		            $save = true;
+    		            
+    		            // Write to log
+	                    fwrite($myfile, "Category applied to SalsifyAttribute ID: " . $attribute->id . "\n");
+    		            
     		        }
     		        
     		        
@@ -132,14 +207,13 @@ class SalsifyAttributeBackend extends Backend
                 }
                 
             }
+            
+            // Close our log file
+	        fclose($myfile);
 
             // Redirect back to the list view
 		    $this->redirect($this->getReferer());
 		}
-	    
-	    
-	    // Close our log file
-	    fclose($myfile);
 	    
 	    // Create and add our button
 	    $arrButtons['link_similar'] = '<input type="submit" name="link_similar" id="link_similar" class="tl_submit" accesskey="a" value="'.$GLOBALS['TL_LANG']['tl_salsify_attribute']['link_similar'].'"> ';
