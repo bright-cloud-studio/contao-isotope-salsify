@@ -25,6 +25,10 @@ class SalsifyAttributeBackend extends Backend
     
     public function addLinkMatchingAttributes($arrButtons, DataContainer $dc)
 	{
+	    
+	    // Create log file
+	    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/link_matching_attributes_'.strtolower(date('m_d_y_H:m:s')).".txt", "w") or die("Unable to open file!");
+		    
 	    // If we have submiited the page
 		if (Input::post('link_similar') !== null && Input::post('FORM_SUBMIT') == 'tl_salsify_attribute')
 		{
@@ -32,9 +36,6 @@ class SalsifyAttributeBackend extends Backend
             $group_counter = array();
             $isotope_product_type = '';
             $isotope_product_type_variant = '';
-            
-		    // Create log file
-		    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/link_matching_attributes_'.strtolower(date('m_d_y_H:m:s')).".txt", "w") or die("Unable to open file!");
 		    
 		    // Find  all SalsifyAttributes where the the 'KEY' is the same
 		    $matching_attributes = SalsifyAttribute::findBy(['attribute_key = ?'], [$dc->activeRecord->attribute_key]);
