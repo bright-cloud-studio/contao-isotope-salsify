@@ -37,7 +37,7 @@ class SalsifyAttributeBackend extends Backend
 		    if($matching_attributes) {
 		        
 		        // Write to log
-	            fwrite($myfile, "Kickoff SalsifyAttribute ID: " . $dc->activeRecord->id . "\n");
+	            fwrite($myfile, "Kickoff SalsifyAttribute ID: " . $dc->activeRecord->id . "\n\n");
 		        
 		        foreach($matching_attributes as $attribute) {
 		            $save = false;
@@ -45,9 +45,13 @@ class SalsifyAttributeBackend extends Backend
 		            // Write to log
 	                fwrite($myfile, "Matching SalsifyAttribute ID: " . $attribute->id . "\n");
 		        
+		        
+		        
     		        // If 'attribute_value' matches, link Isotope Attribute
     		        
-    		        // If 'is_grouping'
+    		        
+    		        
+    		        // GROUPING - Spread to matching 'attribute_key'
     		        if($dc->activeRecord->is_grouping && $dc->activeRecord->isotope_product_type != null && $dc->activeRecord->isotope_product_type_variant != null) {
     		            
     		            // Apply the same settings to this matching SalsifyAttribute
@@ -58,7 +62,6 @@ class SalsifyAttributeBackend extends Backend
     		            // Write to log
 	                    fwrite($myfile, "Grouping applied to SalsifyAttribute ID: " . $attribute->id . "\n");
     		            
-    		            
     		            // Update the SalsifyProduct parent
                         $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attribute->pid]);
                         if($salsify_product != null) {
@@ -67,23 +70,25 @@ class SalsifyAttributeBackend extends Backend
                             
                             // Write to log
 	                        fwrite($myfile, "Updating Parent SalsifyProduct ID: " . $salsify_product->id . "\n");
-                            
                         }
     		            
     		            // Flag for saving
     		            $save = true;
-    		            
+    		        }
+    		        
+    		        
+    		        
+		            
+		            // SAVE IF UPDATED
+    		        if($save) {
+    		            $attribute->save();
+    		            // Write to log
+    	               fwrite($myfile, "Saving SalsifyAttribute ID: " . $attribute->id . "\n\n");
     		        }
 		        
-		        
 		        }
 		        
-		        // Save if flagged for it
-		        if($save) {
-		            $attribute->save();
-		            // Write to log
-	               fwrite($myfile, "Saving SalsifyAttribute ID: " . $attribute->id . "\n\n");
-		        }
+		        
 
 		    }
 
