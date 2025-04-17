@@ -28,7 +28,11 @@ class SalsifyAttributeBackend extends Backend
 	    // If we have submiited the page
 		if (Input::post('link_similar') !== null && Input::post('FORM_SUBMIT') == 'tl_salsify_attribute')
 		{
-		    
+            // Stores counts of the uses of the grouping value
+            $group_counter = array();
+            $isotope_product_type = '';
+            $isotope_product_type_variant = '';
+            
 		    // Create log file
 		    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/link_matching_attributes_'.strtolower(date('m_d_y_H:m:s')).".txt", "w") or die("Unable to open file!");
 		    
@@ -53,11 +57,19 @@ class SalsifyAttributeBackend extends Backend
     		        
     		        // GROUPING - Spread to matching 'attribute_key'
     		        if($dc->activeRecord->is_grouping && $dc->activeRecord->isotope_product_type != null && $dc->activeRecord->isotope_product_type_variant != null) {
-    		            
+
+                        if($isotope_product_type == '') {
+                            $isotope_product_type = $dc->activeRecord->isotope_product_type;
+                            $isotope_product_type_variant = $dc->activeRecord->isotope_product_type_variant;
+                        }
+                        
     		            // Apply the same settings to this matching SalsifyAttribute
     		            $attribute->is_grouping = 1;
     		            $attribute->isotope_product_type = $dc->activeRecord->isotope_product_type;
     		            $attribute->isotope_product_type_variant = $dc->activeRecord->isotope_product_type_variant;
+
+                        // Add a +1 count to the value stored
+                        $group_counter[$attribute->attribute_value] = $group_counter[$attribute->attribute_value] + 1;
     		            
     		            // Write to log
 	                    fwrite($myfile, "Grouping applied to SalsifyAttribute ID: " . $attribute->id . "\n");
@@ -91,6 +103,26 @@ class SalsifyAttributeBackend extends Backend
 		        
 
 		    }
+
+
+            // Update Grouping values once all other updates have processed
+            if($group_counter != null) {
+                
+                $salsify_products = SalsifyProduct::findAll();
+                foreach($salsify_products as $prod) {
+                    
+                    if($group_counter[$prod->variant_group] == 1) {
+                        $prod->isotope_product_variant_type = 'single';
+                        $prod->isotope_product_type = $isotope_product_type;
+                    } else {
+                        $prod->isotope_product_variant_type = 'variant';
+                        $prod->isotope_product_type = $isotope_product_type_variant;
+                    }
+                    $prod->isotope_product_type_linked = 'linked';
+                    $prod->save();
+                }
+                
+            }
 
             // Redirect back to the list view
 		    $this->redirect($this->getReferer());
