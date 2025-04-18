@@ -53,8 +53,7 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
         'label' => array
         (
             'fields'                  => array('product_name', 'product_sku'),
-			'format'                  => 'NAME: %s | SKU: %s',
-			'label_callback'          => array('tl_salsify_product', 'addIcon')
+			'format'                  => 'NAME: %s | SKU: %s'
         ),
         'global_operations' => array
         (
