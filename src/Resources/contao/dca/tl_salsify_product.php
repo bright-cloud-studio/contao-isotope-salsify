@@ -53,7 +53,8 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
         'label' => array
         (
             'fields'                  => array('product_name', 'product_sku'),
-			'format'                  => 'NAME: %s | SKU: %s'
+			'format'                  => 'NAME: %s | SKU: %s',
+            'label_callback'          => array('tl_salsify_product', 'addIcon')
         ),
         'global_operations' => array
         (
@@ -297,6 +298,8 @@ class tl_salsify_product extends Backend
 
 		$href = System::getContainer()->get('router')->generate('contao_backend_preview', array('page'=>$row['pid'], 'article'=>($row['id'])));
 
+        return $label;
+        
 		return '<a href="' . StringUtil::specialcharsUrl($href) . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['view']) . '" target="_blank">' . Image::getHtml($image, '', $attributes) . '</a> ' . $label;
 	}
   
