@@ -154,6 +154,8 @@ class SalsifyAttributeBackend extends Backend
     		            $save = true;
     		        }
     		        
+    		        
+    		        
     		        // CATEGORY
     		        if($dc->activeRecord->is_cat) {
     		            $attribute->is_cat = 1;
@@ -164,6 +166,16 @@ class SalsifyAttributeBackend extends Backend
     		            
     		        }
     		        
+    		        
+    		        // CATEGORY
+    		        if($dc->activeRecord->controls_published) {
+    		            $attribute->controls_published = 1;
+    		            $save = true;
+    		            
+    		            // Write to log
+	                    fwrite($myfile, "Controls Published applied to SalsifyAttribute ID: " . $attribute->id . "\n");
+    		            
+    		        }
     		        
     		        
 		            
@@ -203,6 +215,18 @@ class SalsifyAttributeBackend extends Backend
                         
                     }
                     $prod->isotope_product_type_linked = 'linked';
+                    
+                    
+                    // Find our child "controls_published" attribute
+                    $publish_controller = SalsifyAttribute::findOneBy(['tl_salsify_attribute.pid=?', 'tl_salsify_attribute.controls_published=?'],[$prod->id, '1']);
+                    if($publish_controller) {
+                        
+                        if($publish_controller->attribute_value == 'false') {
+                            $prod->published = 0;
+                            fwrite($myfile, "SalsifyProduct unpublished: " . $prod->id . "\n");
+                        }
+                    }
+                    
                     $prod->save();
                 }
                 
