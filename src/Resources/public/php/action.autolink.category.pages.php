@@ -3,6 +3,9 @@
     use Bcs\Model\SalsifyAttribute;
     use Bcs\Model\SalsifyProduct;
     use Bcs\Model\SalsifyRequest;
+    
+    use Contao\PageModel;
+    
     use Isotope\Model\Attribute;
     
     // LOG - Create log file
@@ -17,6 +20,8 @@
     if ($dbh->connect_error) {
         die("Connection failed: " . $dbh->connect_error);
     }
+
+    
     
     ////////////////////////////////////////////////////////////////////////////////////////
     // AUTO-LINK Category Pages to Salsify Products //
@@ -52,20 +57,43 @@
                             echo "Page Title: " . $page['title'] . "<br>";
                             echo "Reader Page ID: " . $page['iso_readerJumpTo'] . "<br><br>";
                             
-                            // Validate that this page belongs to this root
+                            // Validate that this page belongs to the selected root
+                            $page_type = $page['type'];
+                            $pid = $page['pid'];
+                            $id = $page['id'];
                             
-                            // Save category page id to Salsify Product
-                            //$update =  "update tl_salsify_product set category_page='".$page['id']."', reader_page='".$page['iso_readerJumpTo']."' WHERE id='".$attribute['id']."'";
+                            // while we dont have the root page
+                            while ($page_type != 'root') {
+                                
+                                // get the pid page, see if that gets us there
+                                $parent = PageModel::findPublishedByIdOrAlias($pid);
+                                
+                                $page_type = $parent->type;
+                                $pid = $parent->pid;
+                                $id = $parent->id;
+                            }
                             
-                            $update =  "update tl_salsify_attribute set category_page='".$page['id']."' WHERE id='".$attribute['id']."'";
-                            $result_update = $dbh->query($update);
+                            // Now, get the Request and make sure they match!
+                            $request = SalsifyRequest::findBy(['id = ?'], [$product['pid']]);
                             
-                            echo "SalsifyAttribute Linked!<br>";
+                            $root = unserialize($request->website_root)[0];
+                            echo "Selected Root: " . $root . "<br>";
+                            echo "Our Root: " . $id . "<br>";
                             
-                            $update =  "update tl_salsify_product set category_page='".$page['id']."' WHERE id='".$product['id']."'";
-                            $result_update = $dbh->query($update);
+                            if($root == $id) {
+                                
+                                fwrite($myfile, "Root page validated!\n");
                             
-                            echo "SalsifyProduct Linked!<br>";
+                                $update =  "update tl_salsify_attribute set category_page='".$page['id']."' WHERE id='".$attribute['id']."'";
+                                $result_update = $dbh->query($update);
+                                
+                                echo "SalsifyAttribute Linked!<br>";
+                                
+                                $update =  "update tl_salsify_product set category_page='".$page['id']."' WHERE id='".$product['id']."'";
+                                $result_update = $dbh->query($update);
+                                
+                                echo "SalsifyProduct Linked!<br>";
+                            }
                             
                             
                         }
