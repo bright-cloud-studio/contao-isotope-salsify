@@ -96,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, linked_isotope_attribute_option, attribute_option_sorting;{grouping_legend}, is_grouping, isotope_product_type, isotope_product_type_variant;{options_legend}, is_cat, category_page;{status_legend}, status; {error_log_legend}, error_log;'
+        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, linked_isotope_attribute_option, attribute_option_sorting;{grouping_legend}, is_grouping, isotope_product_type, isotope_product_type_variant;{options_legend}, is_cat, category_page; {controls_published_legend}, controls_published; {status_legend}, status; {error_log_legend}, error_log;'
         //'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, linked_isotope_attribute_option, attribute_option_sorting;{grouping_legend}, is_grouping, isotope_product_type, isotope_product_type_variant;{isotope_config_legend},is_sku, is_name;{options_legend}, category_parent_page, category_reader_page, category_page;{error_log_legend}, error_log;'
     ),
  
@@ -279,6 +279,15 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'inputType'               => 'text',
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
 			'sql'                     => "varchar(255) default ''"
+        ),
+
+        'controls_published' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['controls_publoshed'],
+            'inputType'               => 'checkbox',
+            'default'				  => '',
+            'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "char(1) NOT NULL default ''"
         ),
 
 
