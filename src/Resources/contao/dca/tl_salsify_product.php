@@ -74,6 +74,13 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
                 'href'                => 'act=edit',
                 'icon'                => 'edit.gif'
             ),
+            'toggle' => array
+			(
+				'label'               => &$GLOBALS['TL_LANG']['tl_salsify_product']['toggle'],
+				'icon'                => 'visible.gif',
+				'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
+				'button_callback'     => array('Bcs\Backend\SalsifyProductBackend', 'toggleIcon')
+			),
             'show' => array
             (
                 'label'               => &$GLOBALS['TL_LANG']['tl_salsify_product']['show'],
@@ -91,7 +98,7 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_product_legend}, product_name, product_sku, email, category_page;{grouping_legend}, variant_group, isotope_product_variant_type, isotope_product_type;{internal_details_legend},isotope_product_type_linked, import_status, last_update;'
+        'default'                     => '{salsify_product_legend}, product_name, product_sku, email, category_page;{grouping_legend}, variant_group, isotope_product_variant_type, isotope_product_type;{internal_details_legend},isotope_product_type_linked, import_status, last_update;{publish_legend},published;'
     ),
  
     // Fields
@@ -219,6 +226,15 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
             'sql'                     => "varchar(20) NOT NULL default ''",
             'default'                 => date("m/d/y")
         ),
+
+        'published' => array
+        (
+            'exclude'                 => true,
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_product']['published'],
+            'inputType'               => 'checkbox',
+            'eval'                    => array('submitOnChange'=>false, 'doNotCopy'=>true),
+            'sql'                     => "char(1) NOT NULL default ''"
+        )
         
         
     )
