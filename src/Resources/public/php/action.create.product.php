@@ -18,7 +18,7 @@
     // STAGE DATA
     
     // Loop through the Salsify Products
-    $prod_query =  "SELECT * FROM tl_salsify_product ORDER BY id ASC";
+    $prod_query =  "SELECT * FROM tl_salsify_product WHERE published='1' ORDER BY id ASC";
     $prod_result = $dbh->query($prod_query);
     if($prod_result) {
         while($prod = $prod_result->fetch_assoc()) {
