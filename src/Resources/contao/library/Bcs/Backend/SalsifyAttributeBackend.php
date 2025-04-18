@@ -34,8 +34,16 @@ class SalsifyAttributeBackend extends Backend
 	    
             // Stores counts of the uses of the grouping value
             $group_counter = array();
+            $publish_tracker = array();
             $isotope_product_type = '';
             $isotope_product_type_variant = '';
+            
+            // If our kickoff has 'controls_published' ticked, add to our publish tracker
+            if($dc->activeRecord->controls_published) {
+                $publish_tracker[$dc->activeRecord->pid] = $dc->activeRecord->attribute_value;
+                echo "Added activeRecord to Publish Tracker";
+            }
+            
 		    
 		    // Find  all SalsifyAttributes where the the 'KEY' is the same
 		    $matching_attributes = SalsifyAttribute::findBy(['attribute_key = ?'], [$dc->activeRecord->attribute_key]);
@@ -167,9 +175,12 @@ class SalsifyAttributeBackend extends Backend
     		        }
     		        
     		        
-    		        // CATEGORY
+    		        // CONTROL PUBLISHED
     		        if($dc->activeRecord->controls_published) {
     		            $attribute->controls_published = 1;
+    		            $publish_tracker[$attribute->pid] = $attribute->attribute_value;
+    		            
+    		            
     		            $save = true;
     		            
     		            // Write to log
@@ -191,8 +202,9 @@ class SalsifyAttributeBackend extends Backend
 		        
 
 		    }
-
-
+		    
+		   
+		   
             // Update Grouping values once all other updates have processed
             if($group_counter != null) {
                 
@@ -215,21 +227,25 @@ class SalsifyAttributeBackend extends Backend
                         
                     }
                     $prod->isotope_product_type_linked = 'linked';
-                    
-                    
-                    // Find our child "controls_published" attribute
-                    $publish_controller = SalsifyAttribute::findOneBy(['tl_salsify_attribute.pid=?', 'tl_salsify_attribute.controls_published=?'],[$prod->id, '1']);
-                    if($publish_controller) {
-                        
-                        if($publish_controller->attribute_value == 'false') {
-                            $prod->published = 0;
-                            fwrite($myfile, "SalsifyProduct unpublished: " . $prod->id . "\n");
-                        }
-                    }
-                    
                     $prod->save();
                 }
                 
+            }
+            
+            
+            
+            // Update SalsifyProducts, unpublish when necessary
+            foreach($publish_tracker as $key => $val) {
+                if($val == 'false') {
+                    $prod_to_unpublish = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$key]);
+                    if($prod_to_unpublish != null) {
+                        $prod_to_unpublish->published = '';
+                        $prod_to_unpublish->save();
+                        
+                        fwrite($myfile, "SalsifyProduct Un-Published ID: " . $prod_to_unpublish->id . "\n");
+                        
+                    }
+                }
             }
             
             // Close our log file
@@ -559,6 +575,11 @@ class SalsifyAttributeBackend extends Backend
         if($row['is_grouping'] == 1) {
             $site_category_field = "GROUP: <span style='color: green;'>TRUE</span> - ";
         }
+        
+        if($row['controls_published'] == 1) {
+            $site_category_field = "CONTROL PUBLISH: <span style='color: green;'>TRUE</span> - ";
+        }
+        
         if($row['is_cat'] != '') {
             if(!$row['category_page'])
                 $cat = "CAT: <span style='color: red;'>UNSET</span> - ";
