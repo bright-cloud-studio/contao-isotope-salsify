@@ -63,15 +63,24 @@
                             $id = $page['id'];
                             
                             // while we dont have the root page
+                            fwrite($myfile, "Entering Loop! \n");
                             while ($page_type != 'root') {
                                 
                                 // get the pid page, see if that gets us there
-                                $parent = PageModel::findPublishedByIdOrAlias($pid);
+                                //$parent = PageModel::findPublishedByIdOrAlias($pid);
+                                $parent = PageModel::findBy(['id = ?'], [$pid]);
                                 
                                 $page_type = $parent->type;
                                 $pid = $parent->pid;
                                 $id = $parent->id;
+                                
+                                fwrite($myfile, "Page Type: ". $page_type ."\n");
+                                fwrite($myfile, "PID: ". $pid ."\n");
+                                fwrite($myfile, "ID: ". $id ."\n");
+                                
+                                
                             }
+                            fwrite($myfile, "Leaving Loop! \n");
                             
                             // Now, get the Request and make sure they match!
                             $request = SalsifyRequest::findBy(['id = ?'], [$product['pid']]);
