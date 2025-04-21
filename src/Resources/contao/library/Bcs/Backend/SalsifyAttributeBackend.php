@@ -41,7 +41,7 @@ class SalsifyAttributeBackend extends Backend
             // If our kickoff has 'controls_published' ticked, add to our publish tracker
             if($dc->activeRecord->controls_published) {
                 $publish_tracker[$dc->activeRecord->pid] = $dc->activeRecord->attribute_value;
-                echo "Added activeRecord to Publish Tracker";
+                //echo "Added activeRecord to Publish Tracker";
             }
             
 		    
