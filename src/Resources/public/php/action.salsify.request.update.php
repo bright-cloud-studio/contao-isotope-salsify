@@ -19,8 +19,6 @@
     if ($dbh->connect_error) {
         die("Connection failed: " . $dbh->connect_error);
     }
-    
-    
 
     // Loop through all Salsify Requests
     $sr_query =  "SELECT * FROM tl_salsify_request ORDER BY id ASC";
