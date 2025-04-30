@@ -75,6 +75,13 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
                 'href'                => 'act=edit',
                 'icon'                => 'edit.gif'
             ),
+            'toggle' => array
+			(
+				'label'               => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['toggle'],
+				'icon'                => 'visible.gif',
+				'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
+				'button_callback'     => array('Bcs\Backend\SalsifyAttributeBackend', 'toggleIcon')
+			),
             'show' => array
             (
                 'label'               => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['show'],
@@ -96,8 +103,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, linked_isotope_attribute_option, attribute_option_sorting;{grouping_legend}, is_grouping, isotope_product_type, isotope_product_type_variant;{options_legend}, is_cat, category_page; {controls_published_legend}, controls_published; {status_legend}, status; {error_log_legend}, error_log;'
-        //'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, linked_isotope_attribute_option, attribute_option_sorting;{grouping_legend}, is_grouping, isotope_product_type, isotope_product_type_variant;{isotope_config_legend},is_sku, is_name;{options_legend}, category_parent_page, category_reader_page, category_page;{error_log_legend}, error_log;'
+        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, linked_isotope_attribute_option, attribute_option_sorting;{grouping_legend}, is_grouping, isotope_product_type, isotope_product_type_variant;{options_legend}, is_cat, category_page; {controls_published_legend}, controls_published; {status_legend}, status; {publish_legend},published; {error_log_legend}, error_log;'
     ),
  
     // Fields
@@ -291,7 +297,17 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         ),
 
 
-        
+        'published' => array
+        (
+            'exclude'                 => true,
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['published'],
+            'inputType'               => 'checkbox',
+            'default'                 => '1',
+            'eval'                    => array('submitOnChange'=>false, 'doNotCopy'=>true),
+            'sql'                     => "char(1) NOT NULL default '1'"
+        )
+
+
         // Salsify Attribute Fields
         'error_log' => array
         (
