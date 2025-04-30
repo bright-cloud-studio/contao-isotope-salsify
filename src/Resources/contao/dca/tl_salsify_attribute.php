@@ -305,7 +305,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'default'                 => '1',
             'eval'                    => array('submitOnChange'=>false, 'doNotCopy'=>true),
             'sql'                     => "char(1) NOT NULL default '1'"
-        )
+        ),
 
 
         // Salsify Attribute Fields
