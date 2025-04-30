@@ -8,7 +8,7 @@
     
     // Stores log messages until the end
     $log_messages = '';
-    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_request_update_'.strtolower(date('m_d_y_H:m:s')).".txt", "w") or die("Unable to open file!");
+    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_request_update_'.strtolower(date('m_d_y')).".txt", "w") or die("Unable to open file!");
     
     // INITS
     session_start();
@@ -20,11 +20,15 @@
         die("Connection failed: " . $dbh->connect_error);
     }
     
+    fwrite($myfile, "Processing Salsify Requests\n");
+    
     // Loop through all Salsify Requests
     $sr_query =  "SELECT * FROM tl_salsify_request ORDER BY id ASC";
     $sr_result = $dbh->query($sr_query);
     if($sr_result) {
         while($request = $sr_result->fetch_assoc()) {
+            
+            fwrite($myfile, "Processing SalsifyRequest: ".$request['id']."\n");
 
             ///////////////////////////////////////////////////
             // STEP ONE - Determine which file is the latest //
@@ -64,7 +68,7 @@
                 
                 $run_update = true;
                 $request['file_url'] = $latest_file_url;
-                $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', flag_update='1' WHERE id='".$request['id']."'")->execute();
+                $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "' WHERE id='".$request['id']."'")->execute();
             }
 
             /////////////////////////////////////////////////////////////////////////
@@ -74,9 +78,14 @@
             // If we found a file that is newer than our saved one, we need to process this file
             if($run_update) {
                 
-                fwrite($myfile, "Processing latest file\n");
+                fwrite($myfile, "Generating/Updating Salsify Products and Salsify Attributes\n");
                 
                 // First, turn off all Salsify Products
+                fwrite($myfile, "Unpublishing all Salsify Products and Salsify Attributes\n");
+                $dbh->prepare("UPDATE tl_salsify_product SET published=''")->execute();
+                $dbh->prepare("UPDATE tl_salsify_attribute SET published=''")->execute();
+                
+                //die();
             
                 // Open and process file
                 $reader = new JsonReader();
@@ -116,6 +125,7 @@
                         		$update_sp->tstamp = time();
                         		$update_sp->product_sku = $array_child[$request['isotope_sku_key']][0];
                         		$update_sp->product_name = $array_child[$request['isotope_name_key']][0];
+                        		$update_sp->published = 1;
                         		$update_sp->save();
                         		$salsify_product = $update_sp;
                                 
@@ -126,6 +136,7 @@
                         		$salsify_product->tstamp = time();
                         		$salsify_product->product_sku = $array_child[$request['isotope_sku_key']][0];
                         		$salsify_product->product_name = $array_child[$request['isotope_name_key']][0];
+                        		$salsify_product->published = 1;
                         		$salsify_product->save();
                             }
                     		
@@ -139,17 +150,19 @@
                                 $salsify_attribute;
                                 $update_sa = SalsifyAttribute::findOneBy(['tl_salsify_attribute.pid=?', 'tl_salsify_attribute.attribute_key=?'],[$salsify_product->id, $key]);
                                 if($update_sa != null) {
-                                    echo "SalsifyAttribute Found and Updated!<br>";
+                                    
+                                    fwrite($myfile, "Updating Salsify Attribute ID: ".$update_sa->id."\n");
+                                    
                                     $update_sa->attribute_value = $val[0];
                                     
                                     // AUTOLINK REMOVED, just go straight to null
                                     $update_sa->linked_isotope_attribute = null;
                                     
                                     $update_sa->tstamp = time();
+                                    $update_sa->published = 1;
                                     $update_sa->save();
         
                                 } else {
-                                    echo "SalsifyAttribute Created!<br>";
                                     $salsify_attribute = new SalsifyAttribute();
                                     $salsify_attribute->pid = $salsify_product->id;
                                     $salsify_attribute->attribute_key = $key;
@@ -159,7 +172,10 @@
                                     $salsify_attribute->linked_isotope_attribute = null;
                                     
                                     $salsify_attribute->tstamp = time();
+                                    $salsify_attribute->published = 1;
                                     $salsify_attribute->save();
+                                    
+                                    fwrite($myfile, "NEW Salsify Attribute ID: ".$salsify_attribute->id."\n");
         
                                 }
                                 
@@ -176,6 +192,8 @@
                 
                 $reader->close();
             
+            } else {
+                fwrite($myfile, "No new file found, skipping generation/update \n");
             }
             
         }
