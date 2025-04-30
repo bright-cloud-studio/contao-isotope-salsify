@@ -35,3 +35,6 @@ $GLOBALS['TL_LANG']['tl_salsify_product']['isotope_product_type_linked']    = ar
 $GLOBALS['TL_LANG']['tl_salsify_product']['internal_details_legend']        = 'INTERNAL DETAILS';
 $GLOBALS['TL_LANG']['tl_salsify_product']['import_status']                  = array('Import Status', 'Tracks the Impot Status of this product');
 $GLOBALS['TL_LANG']['tl_salsify_product']['last_update']                    = array('Last Update', 'A timestamp of when the last update was processed');
+
+$GLOBALS['TL_LANG']['tl_salsify_product']['publish_legend']                 = 'Publish Details';
+$GLOBALS['TL_LANG']['tl_salsify_product']['published']                      = array('Published', 'A Salsify Product will only generate into an Isotope Product if it is published.');
