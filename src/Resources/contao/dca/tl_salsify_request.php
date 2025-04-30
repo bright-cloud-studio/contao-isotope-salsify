@@ -95,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default' => '{salsify_request_legend}, request_name, source_folder, isotope_name_key, isotope_sku_key; {latest_file_legend}, file_url, file_date; {website_root_legend}, website_root; {internal_information:hide}, flag_update;'
+        'default' => '{salsify_request_legend}, request_name, source_folder, isotope_name_key, isotope_sku_key; {latest_file_legend}, file_url, file_date; {website_root_legend}, website_root;'
     ),
  
     // Fields
@@ -180,17 +180,6 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
 			'sql'                     => "blob NULL",
             'relation'                => array('table'=>'tl_page', 'type'=>'hasMany', 'load'=>'lazy')
         ),
-
-
-        'flag_update' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['flag_update'],
-            'inputType'               => 'checkbox',
-            'default'				  => '',
-            'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "char(1) NOT NULL default ''"
-        ),
-
         
     )
 );
