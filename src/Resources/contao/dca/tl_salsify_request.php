@@ -95,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_request_legend}, request_name, source_folder, isotope_name_key, isotope_sku_key; {latest_file_legend}, file_url, file_date; {website_root_legend}, website_root; {customization_legend}, autolink_isotope_attributes; {internal_information:hide}, flag_update;'
+        'default' => '{salsify_request_legend}, request_name, source_folder, isotope_name_key, isotope_sku_key; {latest_file_legend}, file_url, file_date; {website_root_legend}, website_root; {internal_information:hide}, flag_update;'
     ),
  
     // Fields
@@ -151,7 +151,6 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50'),
             'sql'                     => "varchar(255) default ''"
         ),
-
         
         
         'file_url' => array
@@ -180,17 +179,6 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'w50'),
 			'sql'                     => "blob NULL",
             'relation'                => array('table'=>'tl_page', 'type'=>'hasMany', 'load'=>'lazy')
-        ),
-        
-
-        // Customization Options
-        'autolink_isotope_attributes' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['autolink_isotope_attributes'],
-            'inputType'               => 'checkbox',
-            'default'				  => '',
-            'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "char(1) NOT NULL default ''"
         ),
 
 
