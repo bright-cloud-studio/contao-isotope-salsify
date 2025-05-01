@@ -155,8 +155,12 @@
                                     
                                     $update_sa->attribute_value = $val[0];
                                     
-                                    // AUTOLINK REMOVED, just go straight to null
-                                    $update_sa->linked_isotope_attribute = null;
+                                    // If there is an Isotope Option we need to break this link so we can re-link and generate the option the right way.
+                                    // If there is no Isotope Option during an update then we can safely assume this is plain text and just push the new value in
+                                    if($update_sa->linked_isotope_attribute_option != null) {
+                                        $update_sa->linked_isotope_attribute = null;
+                                        $update_sa->linked_isotope_attribute_option = null;
+                                    }
                                     
                                     $update_sa->tstamp = time();
                                     $update_sa->published = 1;
@@ -169,7 +173,7 @@
                                     $salsify_attribute->attribute_value = $val[0];
                                     
                                     // AUTOLINK REMOVED, just go straight to null
-                                    $salsify_attribute->linked_isotope_attribute = null;
+                                    //$salsify_attribute->linked_isotope_attribute = null;
                                     
                                     $salsify_attribute->tstamp = time();
                                     $salsify_attribute->published = 1;
