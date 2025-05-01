@@ -158,6 +158,7 @@
                                     // If there is an Isotope Option we need to break this link so we can re-link and generate the option the right way.
                                     // If there is no Isotope Option during an update then we can safely assume this is plain text and just push the new value in
                                     if($update_sa->linked_isotope_attribute_option != null) {
+                                        fwrite($myfile, "Isotope Option found during update, breaking link \n");
                                         $update_sa->linked_isotope_attribute = null;
                                         $update_sa->linked_isotope_attribute_option = null;
                                     }
