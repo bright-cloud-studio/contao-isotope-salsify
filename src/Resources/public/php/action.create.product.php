@@ -4,7 +4,6 @@
     session_start();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
     
-    // DATABASE CONNECTION
     $dbh = new mysqli("localhost", "ecomm2_user", '(nNFuy*d8O=aC@BDCh', "ecomm2_contao_413");
     if ($dbh->connect_error) {
         die("Connection failed: " . $dbh->connect_error);
@@ -15,15 +14,17 @@
     
     
     
-    // STAGE DATA
+    ////////////////
+    // STAGE DATA //
+    ////////////////
+    
+    
     
     // Loop through the Salsify Products
     $prod_query =  "SELECT * FROM tl_salsify_product WHERE published='1' ORDER BY id ASC";
     $prod_result = $dbh->query($prod_query);
     if($prod_result) {
         while($prod = $prod_result->fetch_assoc()) {
-            
-            //$products[$prod->variant_group][$prod->product_sku];
             
             $attr_query =  "SELECT * FROM tl_salsify_attribute WHERE pid='".$prod['id']."' ORDER BY id ASC";
             $attr_result = $dbh->query($attr_query);
@@ -38,13 +39,11 @@
                             $products[$prod['variant_group']][$prod['product_sku']]['fallback'] = 1;
                         }
                     }
-                    
 
                     $iso_attr_query =  "SELECT * FROM tl_iso_attribute WHERE id='".$attr['linked_isotope_attribute']."' ORDER BY id ASC";
                     $iso_attr_result = $dbh->query($iso_attr_query);
                     if($iso_attr_result) {
                         while($iso_attr = $iso_attr_result->fetch_assoc()) {
-                            
                             if($attr['linked_isotope_attribute_option'])
                                 $products[$prod['variant_group']][$prod['product_sku']][$iso_attr['field_name']] = $attr['linked_isotope_attribute_option'];
                             else
@@ -52,13 +51,8 @@
                         }
                     }
                     
-                    
-                    
-                    
                 }
             }
-
-            
 
             $products[$prod['variant_group']][$prod['product_sku']]['tstamp'] = time();
             $products[$prod['variant_group']][$prod['product_sku']]['dateAdded'] = time();
@@ -72,37 +66,38 @@
             $products[$prod['variant_group']][$prod['product_sku']]['sku'] = $prod['product_sku'];
             $products[$prod['variant_group']][$prod['product_sku']]['description'] = $prod_values['full_description'];
             $products[$prod['variant_group']][$prod['product_sku']]['published'] = 1;
-            //$products[$prod['variant_group']][$prod['product_sku']]['upc'] = $prod_values['package_upc'];
-
         }
     }
     
     
     
-    // INSERT PRODUCTS INTO DATABASE
+    /////////////////////
+    // CREATE PRODUCTS //
+    /////////////////////
     
-    // Loop through our groups
+    
+    
+    // Tracks counts, displayed in Statistics section
     $count_single = 0;
     $count_variant = 0;
     $count_default_kickup = 0;
     $count_generated_parent = 0;
-    
-    //echo "<pre>";
-    //print_r($products);
-    //die();
-    
+
     foreach($products as $key => $group) {
         
-        // Build either a single product, or a variant
         if(count($group) == 1) {
             
+            // CREATE SINGLE PRODUCT
             $count_single++;
-            
             foreach($group as $key2 => $prod) {
                 
                 // If we have a Product Page selected
                 $cat_id = unserialize($prod['orderPages']);
                 if($cat_id[0]) {
+
+                    //////////////////////
+                    // UPDATE OR INSERT //
+                    //////////////////////
 
                     $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($prod)->execute();
                     
@@ -137,7 +132,7 @@
             
         } else {
             
-            // VARIANT
+            // CREATE VARIANT PRODUCT
 
             // For now, we need to use the first loop to create the parent, track if it is that loop
             $create_parent = true;
@@ -268,6 +263,14 @@
         
         
     }
+    
+    
+    
+    ////////////////
+    // STATISTICS //
+    ////////////////
+
+
 
     echo "Statistics:<br>";
     echo "Single Products: " . $count_single . "<br>";
@@ -278,7 +281,14 @@
 
     
     
+    ///////////////
+    // FUNCTIONS //
+    ///////////////
+    
+    
+    
     function generateAlias($text) {
+        
         // 1. Convert to lowercase:
         $text = strtolower($text);
     
