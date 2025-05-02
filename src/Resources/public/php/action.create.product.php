@@ -1,5 +1,9 @@
 <?php
 
+    use Isotope\Model\Product;
+    
+    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_generate_products_'.strtolower(date('m_d_y')).".txt", "w") or die("Unable to open file!");
+
     // INITIALIZE STUFFS
     session_start();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
@@ -75,7 +79,7 @@
     // CREATE PRODUCTS //
     /////////////////////
     
-    
+    fwrite($myfile, "Generating Products \n");
     
     // Tracks counts, displayed in Statistics section
     $count_single = 0;
@@ -99,33 +103,65 @@
                     // UPDATE OR INSERT //
                     //////////////////////
 
-                    $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($prod)->execute();
+                    // Check if this product already exists
+                    $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$prod['sku']]);
+                    if($update_ip != null) {
+                        
+                        fwrite($myfile, "UPDATING single product: ". $update_ip->id ."\n");
+                        
+                        // Update the product
+                        $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($prod)->execute($update_ip->id);
+                        
+                        // Delete all our entries in tl_iso_product_category
+                        $result_delete_cats = $dbh->query("delete from tl_iso_product_category WHERE pid='".$update_ip->id."'");
+                        fwrite($myfile, "DELETING existing category links \n");
+                        
+                        // re-add them
+                        $prod_cat = array();
+                        $prod_cat['pid'] = $prod_values_result->insertId;
+                        $prod_cat['tstamp'] = time();
+                        foreach($cat_id as $cat) {
+                            
+                            fwrite($myfile, "ADDING to category: ". $cat ."\n");
+                            
+                            $prod_cat['page_id'] = $cat;
+                            $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                        }
+                        
+                    } else {
+                        
+                        fwrite($myfile, "CREATING new product \n");
+                        
+                        // Else, continue like normal
+                        $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($prod)->execute();
                     
-                    $prod_cat = array();
-                    $prod_cat['pid'] = $prod_values_result->insertId;
-                    $prod_cat['tstamp'] = time();
-                    foreach($cat_id as $cat) {
-                        $prod_cat['page_id'] = $cat;
-                        $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                        $prod_cat = array();
+                        $prod_cat['pid'] = $prod_values_result->insertId;
+                        $prod_cat['tstamp'] = time();
+                        foreach($cat_id as $cat) {
+                            $prod_cat['page_id'] = $cat;
+                            $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                        }
+                        
+                        // Second, create entry in the 'tl_product_price' table                    
+                        $price = array();
+                        $price['pid'] = $prod_values_result->insertId;
+                        $price['tstamp'] = time();
+                        $price['tax_class'] = 1;
+                        $price['config_id'] = 0;
+                        $price['member_group'] = 0;
+                        $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();
+                        
+                        // First, create entry in the 'tl_product_pricetier" table
+                        $priceTier = array();
+                        $priceTier['pid'] = $priceResult->insertId;
+                        $priceTier['tstamp'] = time();
+                        $priceTier['min'] = 1;
+                        $priceTier['price'] = '1.00';
+                        $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
+                        
                     }
-                    
-                    // Second, create entry in the 'tl_product_price' table                    
-                    $price = array();
-                    $price['pid'] = $prod_values_result->insertId;
-                    $price['tstamp'] = time();
-                    $price['tax_class'] = 1;
-                    $price['config_id'] = 0;
-                    $price['member_group'] = 0;
-                    $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();
-                    
-                    // First, create entry in the 'tl_product_pricetier" table
-                    $priceTier = array();
-                    $priceTier['pid'] = $priceResult->insertId;
-                    $priceTier['tstamp'] = time();
-                    $priceTier['min'] = 1;
-                    $priceTier['price'] = '1.00';
-                    $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
-                    
+
                 }
                 
             }
@@ -155,36 +191,63 @@
                         //$parent['name'] = "DEFAULT PRODUCT VARIANT: " . $key;
                         $parent['alias'] = generateAlias($key);
                         $parent['sku'] = $parent['sku'] . "_parent";
- 
-                        $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
-                        $parent_id = $prod_values_result->insertId;
-
                         
-                         // First, create entry in the 'tl_product_pricetier" table
-                        $prod_cat = array();
-                        $prod_cat['pid'] = $prod_values_result->insertId;
-                        $prod_cat['tstamp'] = time();
-                        foreach($cat_id as $cat) {
-                            $prod_cat['page_id'] = $cat;
-                            $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                        // Check if this product already exists
+                        $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$parent['sku']]);
+                        if($update_ip != null) {
+                            
+                            fwrite($myfile, "UPDATING variant parent product: ". $update_ip->id ."\n");
+                            
+                            $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($parent)->execute($update_ip->id);
+                            $parent_id = $update_ip->id;
+                            
+                            // Delete all our entries in tl_iso_product_category
+                            $result_delete_cats = $dbh->query("delete from tl_iso_product_category WHERE pid='".$update_ip->id."'");
+                            fwrite($myfile, "DELETING existing category links \n");
+                            
+                            // First, create entry in the 'tl_product_pricetier" table
+                            $prod_cat = array();
+                            $prod_cat['pid'] = $parent_id;
+                            $prod_cat['tstamp'] = time();
+                            foreach($cat_id as $cat) {
+                                $prod_cat['page_id'] = $cat;
+                                $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                            }
+                            
+                            
+                        } else {
+                            
+                            $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
+                            $parent_id = $prod_values_result->insertId;
+    
+                             // First, create entry in the 'tl_product_pricetier" table
+                            $prod_cat = array();
+                            $prod_cat['pid'] = $prod_values_result->insertId;
+                            $prod_cat['tstamp'] = time();
+                            foreach($cat_id as $cat) {
+                                $prod_cat['page_id'] = $cat;
+                                $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                            }
+                            
+                            // Second, create entry in the 'tl_product_price' table                    
+                            $price = array();
+                            $price['pid'] = $prod_values_result->insertId;
+                            $price['tstamp'] = time();
+                            $price['tax_class'] = 1;
+                            $price['config_id'] = 0;
+                            $price['member_group'] = 0;
+                            $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();
+                            
+                            // First, create entry in the 'tl_product_pricetier" table
+                            $priceTier = array();
+                            $priceTier['pid'] = $priceResult->insertId;
+                            $priceTier['tstamp'] = time();
+                            $priceTier['min'] = 1;
+                            $priceTier['price'] = '1.00';
+                            $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
+                                
                         }
                         
-                        // Second, create entry in the 'tl_product_price' table                    
-                        $price = array();
-                        $price['pid'] = $prod_values_result->insertId;
-                        $price['tstamp'] = time();
-                        $price['tax_class'] = 1;
-                        $price['config_id'] = 0;
-                        $price['member_group'] = 0;
-                        $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();
-                        
-                        // First, create entry in the 'tl_product_pricetier" table
-                        $priceTier = array();
-                        $priceTier['pid'] = $priceResult->insertId;
-                        $priceTier['tstamp'] = time();
-                        $priceTier['min'] = 1;
-                        $priceTier['price'] = '1.00';
-                        $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
                     }
                 }
             }
@@ -210,36 +273,61 @@
                         //$parent['name'] = "GENERATED PARENT: " . $key;
                         $parent['alias'] = generateAlias($key);
                         $parent['sku'] = $parent['sku'] . "_parent";
- 
-                        $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
-                        $parent_id = $prod_values_result->insertId;
-
                         
-                         // First, create entry in the 'tl_product_pricetier" table
-                        $prod_cat = array();
-                        $prod_cat['pid'] = $prod_values_result->insertId;
-                        $prod_cat['tstamp'] = time();
-                        foreach($cat_id as $cat) {
-                            $prod_cat['page_id'] = $cat;
-                            $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                        // Check if this product already exists
+                        $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$parent['sku']]);
+                        if($update_ip != null) {
+                            fwrite($myfile, "UPDATING variant non-default parent product: ". $update_ip->id ."\n");
+                            
+                            $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($parent)->execute($update_ip->id);
+                            $parent_id = $update_ip->id;
+                            
+                            // Delete all our entries in tl_iso_product_category
+                            $result_delete_cats = $dbh->query("delete from tl_iso_product_category WHERE pid='".$update_ip->id."'");
+                            fwrite($myfile, "DELETING existing category links \n");
+                            
+                            // First, create entry in the 'tl_product_pricetier" table
+                            $prod_cat = array();
+                            $prod_cat['pid'] = $prod_values_result->insertId;
+                            $prod_cat['tstamp'] = time();
+                            foreach($cat_id as $cat) {
+                                $prod_cat['page_id'] = $cat;
+                                $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                            }
+                            
+                        } else {
+                            
+                            $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
+                            $parent_id = $prod_values_result->insertId;
+    
+                            // First, create entry in the 'tl_product_pricetier" table
+                            $prod_cat = array();
+                            $prod_cat['pid'] = $prod_values_result->insertId;
+                            $prod_cat['tstamp'] = time();
+                            foreach($cat_id as $cat) {
+                                $prod_cat['page_id'] = $cat;
+                                $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                            }
+                            
+                            // Second, create entry in the 'tl_product_price' table                    
+                            $price = array();
+                            $price['pid'] = $prod_values_result->insertId;
+                            $price['tstamp'] = time();
+                            $price['tax_class'] = 1;
+                            $price['config_id'] = 0;
+                            $price['member_group'] = 0;
+                            $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();
+                            
+                            // First, create entry in the 'tl_product_pricetier" table
+                            $priceTier = array();
+                            $priceTier['pid'] = $priceResult->insertId;
+                            $priceTier['tstamp'] = time();
+                            $priceTier['min'] = 1;
+                            $priceTier['price'] = '1.00';
+                            $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
+                                
                         }
                         
-                        // Second, create entry in the 'tl_product_price' table                    
-                        $price = array();
-                        $price['pid'] = $prod_values_result->insertId;
-                        $price['tstamp'] = time();
-                        $price['tax_class'] = 1;
-                        $price['config_id'] = 0;
-                        $price['member_group'] = 0;
-                        $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();
-                        
-                        // First, create entry in the 'tl_product_pricetier" table
-                        $priceTier = array();
-                        $priceTier['pid'] = $priceResult->insertId;
-                        $priceTier['tstamp'] = time();
-                        $priceTier['min'] = 1;
-                        $priceTier['price'] = '1.00';
-                        $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
                     }
                 }
                 
@@ -251,7 +339,15 @@
                     $variant['pid'] = $parent_id;
                     $variant['type'] = 0;
                     $variant['orderPages'] = NULL;
-                    $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($variant)->execute();
+                    
+                    // Check if this product already exists
+                    $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$variant['sku']]);
+                    if($update_ip != null) {
+                        fwrite($myfile, "UPDATING variant product: ". $update_ip->id ."\n");
+                        $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($variant)->execute($update_ip->id);
+                    } else {
+                        $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($variant)->execute();
+                    }
                 }
 
             }
@@ -279,7 +375,8 @@
     echo "Default Product Variant used as Parent: " . $count_default_kickup . "<br>";
     echo "Parent generated from first variant: " . $count_generated_parent . "<br>";
 
-    
+    // Close our logfile
+    fclose($myfile);
     
     ///////////////
     // FUNCTIONS //
