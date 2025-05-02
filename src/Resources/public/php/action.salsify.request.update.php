@@ -15,7 +15,7 @@
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
     
     // DATABASE CONNECTION
-    $dbh = new mysqli("localhost", "ecomm2_user", '(nNFuy*d8O=aC@BDCh', "ecomm2_contao_413");
+    $dbh = new mysqli("localhost", "ecom_user", 'I6aX,Ud-EYa^]P9u8g', "ecom_contao_4_13");
     if ($dbh->connect_error) {
         die("Connection failed: " . $dbh->connect_error);
     }
@@ -114,12 +114,13 @@
                 		} else {
                             $prod_count++;
                             
-                            fwrite($myfile, "Creating Salsify Product: " . $array_child[$request['isotope_sku_key']][0] . "\n");
+                            
         
                             // Find and update, else create
                             $salsify_product;
                             $update_sp = SalsifyProduct::findOneBy(['tl_salsify_product.product_sku=?'],[$array_child[$request['isotope_sku_key']][0]]);
                             if($update_sp != null) {
+                                fwrite($myfile, "Updating Salsify Product: " . $array_child[$request['isotope_sku_key']][0] . "\n");
                                 echo "SalsifyProduct Found and Updated!<br>";
                                 $update_sp->pid = $request['id'];
                         		$update_sp->tstamp = time();
@@ -130,6 +131,7 @@
                         		$salsify_product = $update_sp;
                                 
                             } else {
+                                fwrite($myfile, "Creating Salsify Product: " . $array_child[$request['isotope_sku_key']][0] . "\n");
                                 echo "SalsifyProduct Created!<br>";
                         		$salsify_product = new SalsifyProduct();
                         		$salsify_product->pid = $request['id'];
@@ -160,6 +162,7 @@
                                     if($update_sa->linked_isotope_attribute_option != null) {
                                         $update_sa->linked_isotope_attribute = null;
                                         $update_sa->linked_isotope_attribute_option = null;
+                                        $update_sa->status = 'fail';
                                     }
                                     
                                     $update_sa->tstamp = time();
