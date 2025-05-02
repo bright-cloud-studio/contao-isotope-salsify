@@ -16,7 +16,7 @@
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
     
     // DATABASE CONNECTION
-    $dbh = new mysqli("localhost", "ecomm2_user", '(nNFuy*d8O=aC@BDCh', "ecomm2_contao_413");
+    $dbh = new mysqli("localhost", "ecom_user", 'I6aX,Ud-EYa^]P9u8g', "ecom_contao_4_13");
     if ($dbh->connect_error) {
         die("Connection failed: " . $dbh->connect_error);
     }
@@ -46,69 +46,105 @@
                     echo "Attribute Key: " . $attribute['attribute_key'] . "<br>";
                     echo "Attribute Value: " . $attribute['attribute_value'] . "<br><br>";
                     
+                    // Break our value down into CSV stuffs
+                    $page_titles = explode(", ", $attribute['attribute_value']);
                     
-                    // Find a page with this title
-                    $page_query =  "SELECT * FROM tl_page WHERE title='".$attribute['attribute_value']."' AND published='1' ORDER BY id ASC";
-                    $page_result = $dbh->query($page_query);
-                    if($page_result) {
-                        while($page = $page_result->fetch_assoc()) {
-                            
-                            echo "Page ID: " . $page['id'] . "<br>";
-                            echo "Page Title: " . $page['title'] . "<br>";
-                            echo "Reader Page ID: " . $page['iso_readerJumpTo'] . "<br><br>";
-                            
-                            // Validate that this page belongs to the selected root
-                            $page_type = $page['type'];
-                            $pid = $page['pid'];
-                            $id = $page['id'];
-                            
-                            // while we dont have the root page
-                            fwrite($myfile, "Entering Loop! \n");
-                            while ($page_type != 'root') {
+                    $page_ids = array();
+                    
+                    // Loop through all of our titles
+                    foreach($page_titles as $title) {
+                        
+                        echo "Page Title: " . $title . "<br>";
+                        
+                        
+                        // Find a page with this title
+                        $page_query =  "SELECT * FROM tl_page WHERE title='".$title."' AND published='1' ORDER BY id ASC";
+                        $page_result = $dbh->query($page_query);
+                        if($page_result) {
+                            while($page = $page_result->fetch_assoc()) {
                                 
-                                // get the pid page, see if that gets us there
-                                //$parent = PageModel::findPublishedByIdOrAlias($pid);
-                                $parent = PageModel::findBy(['id = ?'], [$pid]);
+                                echo "Page ID: " . $page['id'] . "<br>";
+                                echo "Page Title: " . $page['title'] . "<br>";
+                                echo "Reader Page ID: " . $page['iso_readerJumpTo'] . "<br><br>";
                                 
-                                $page_type = $parent->type;
-                                $pid = $parent->pid;
-                                $id = $parent->id;
+                                // Validate that this page belongs to the selected root
+                                $page_type = $page['type'];
+                                $pid = $page['pid'];
+                                $id = $page['id'];
                                 
-                                fwrite($myfile, "Page Type: ". $page_type ."\n");
-                                fwrite($myfile, "PID: ". $pid ."\n");
-                                fwrite($myfile, "ID: ". $id ."\n");
+                                // while we dont have the root page
+                                fwrite($myfile, "Entering Loop! \n");
+                                while ($page_type != 'root') {
+                                    
+                                    // get the pid page, see if that gets us there
+                                    //$parent = PageModel::findPublishedByIdOrAlias($pid);
+                                    $parent = PageModel::findBy(['id = ?'], [$pid]);
+                                    
+                                    $page_type = $parent->type;
+                                    $pid = $parent->pid;
+                                    $id = $parent->id;
+                                    
+                                    fwrite($myfile, "Page Type: ". $page_type ."\n");
+                                    fwrite($myfile, "PID: ". $pid ."\n");
+                                    fwrite($myfile, "ID: ". $id ."\n");
+                                    
+                                    
+                                }
+                                fwrite($myfile, "Leaving Loop! \n");
+                                
+                                // Now, get the Request and make sure they match!
+                                $request = SalsifyRequest::findBy(['id = ?'], [$product['pid']]);
+                                
+                                $root = unserialize($request->website_root)[0];
+                                echo "Selected Root: " . $root . "<br>";
+                                echo "Our Root: " . $id . "<br>";
+                                
+                                if($root == $id) {
+                                    
+                                    fwrite($myfile, "Root page validated!\n");
+                                    $page_ids[] = $page['id'];
+                                    
+                                    /*
+                                    $update =  "update tl_salsify_attribute set category_page='".$page['id']."' WHERE id='".$attribute['id']."'";
+                                    $result_update = $dbh->query($update);
+                                    
+                                    echo "SalsifyAttribute Linked!<br>";
+                                    
+                                    $update =  "update tl_salsify_product set category_page='".$page['id']."' WHERE id='".$product['id']."'";
+                                    $result_update = $dbh->query($update);
+                                    
+                                    echo "SalsifyProduct Linked!<br>";
+                                    */
+                                }
                                 
                                 
                             }
-                            fwrite($myfile, "Leaving Loop! \n");
-                            
-                            // Now, get the Request and make sure they match!
-                            $request = SalsifyRequest::findBy(['id = ?'], [$product['pid']]);
-                            
-                            $root = unserialize($request->website_root)[0];
-                            echo "Selected Root: " . $root . "<br>";
-                            echo "Our Root: " . $id . "<br>";
-                            
-                            if($root == $id) {
-                                
-                                fwrite($myfile, "Root page validated!\n");
-                            
-                                $update =  "update tl_salsify_attribute set category_page='".$page['id']."' WHERE id='".$attribute['id']."'";
-                                $result_update = $dbh->query($update);
-                                
-                                echo "SalsifyAttribute Linked!<br>";
-                                
-                                $update =  "update tl_salsify_product set category_page='".$page['id']."' WHERE id='".$product['id']."'";
-                                $result_update = $dbh->query($update);
-                                
-                                echo "SalsifyProduct Linked!<br>";
-                            }
-                            
-                            
                         }
+  
                     }
                     
-                    echo "<hr><br>";
+                    if(!$page_ids) {
+                        
+                    } else {
+                        
+                        echo "IDS: " . numbersArrayToCsv($page_ids) . "<br>";
+                        
+                        $update =  "update tl_salsify_attribute set category_page='".numbersArrayToCsv($page_ids)."' WHERE id='".$attribute['id']."'";
+                        $result_update = $dbh->query($update);
+                        
+                        echo "SalsifyAttribute Linked!<br>";
+                        
+                        $update =  "update tl_salsify_product set category_page='".numbersArrayToCsv($page_ids)."' WHERE id='".$product['id']."'";
+                        $result_update = $dbh->query($update);
+                        
+                        echo "SalsifyProduct Linked!<br>";
+                    }
+                    
+                    
+                     echo "<hr><br>";
+                    
+                    
+                    
                     
                 }
             }
@@ -118,3 +154,14 @@
     
     // LOG - Close our log file
     fclose($myfile);
+    
+    
+    function numbersArrayToCsv(array $numbers, string $delimiter = ','): string {
+        // Filter out non-numeric values to ensure only numbers are included
+        $numericValues = array_filter($numbers, 'is_numeric');
+    
+        // Implode the array with the specified delimiter
+        $csvString = implode($delimiter, $numericValues);
+    
+        return $csvString;
+    }
