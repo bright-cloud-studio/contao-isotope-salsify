@@ -28,5 +28,5 @@ $GLOBALS['TL_LANG']['tl_salsify_request']['autolink_isotope_attributes']  = arra
 $GLOBALS['TL_LANG']['tl_salsify_request']['internal_information']         = 'Internal Information';
 $GLOBALS['TL_LANG']['tl_salsify_request']['flag_update']                  = array('Flag - Update', 'When a new file is found, this flag will be checked and it will process during the next update loop.');
 
-$GLOBALS['TL_LANG']['tl_salsify_request']['website_root_legend']          = 'Status Details';
-$GLOBALS['TL_LANG']['tl_salsify_request']['website_root']                 = array('Status', 'Tracks the status of this Salsify Request, tracking which step of the process we are currently in');
+$GLOBALS['TL_LANG']['tl_salsify_request']['status_legend']                = 'Status Details';
+$GLOBALS['TL_LANG']['tl_salsify_request']['status']                       = array('Status', 'Tracks the status of this Salsify Request, tracking which step of the process we are currently in');
