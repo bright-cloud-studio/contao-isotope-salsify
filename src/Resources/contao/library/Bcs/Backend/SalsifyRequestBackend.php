@@ -65,10 +65,15 @@ class SalsifyRequestBackend extends Backend
     }
 
 
-    // Display error until all 'flags' are 
-    public function generateStatusLabel($row, $label, $dc, $args)
+    // Generates a custom label for displaying entries on the Salsify Request section of the Contao Backend
+    public function generateLabel($row, $label, $dc, $args)
     {
-        return $label . "[" . $row['status'] . "]";
+        $new_label = '';
+        $new_label .= " [ID: <span style='font-weight: 600;'>" . $row['id'] . "</span>] ";
+        $new_label .= " [NAME: <span style='font-weight: 600;'>" . $row['request_name'] . "</span>] ";
+        $new_label .= " [STATUS: <span style='font-weight: 600;'>'" . $row['status'] . "'</span>] ";
+        
+        return $new_label;
     }
     
     
