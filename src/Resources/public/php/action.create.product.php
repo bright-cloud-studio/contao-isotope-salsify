@@ -1,5 +1,6 @@
 <?php
 
+    use Bcs\Model\SalsifyRequest;
     use Isotope\Model\Product;
     
     $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_generate_products_'.strtolower(date('m_d_y')).".txt", "w") or die("Unable to open file!");
@@ -22,55 +23,73 @@
     // STAGE DATA //
     ////////////////
     
+    fwrite($myfile, "Staging Data \n");
     
+    // Get Salsify Requests that are in the 'awaiting_cat_linking' state
+    $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_iso_generation']);
+    if(!$salsify_requests) {
+        foreach ($salsify_requests as $sr)
+		{
+		    
+		    fwrite($myfile, "Getting Products in SalsifyRequest: ". $sr->id ." \n");
     
-    // Loop through the Salsify Products
-    $prod_query =  "SELECT * FROM tl_salsify_product WHERE published='1' ORDER BY id ASC";
-    $prod_result = $dbh->query($prod_query);
-    if($prod_result) {
-        while($prod = $prod_result->fetch_assoc()) {
-            
-            $attr_query =  "SELECT * FROM tl_salsify_attribute WHERE pid='".$prod['id']."' ORDER BY id ASC";
-            $attr_result = $dbh->query($attr_query);
-            if($attr_result) {
-                while($attr = $attr_result->fetch_assoc()) {
-
-                    $prod_values[$attr['attribute_key']] = $attr['attribute_value'];
+            // Loop through the Salsify Products
+            $prod_query =  "SELECT * FROM tl_salsify_product WHERE published='1' AND pid='".$sr->id."' ORDER BY id ASC";
+            $prod_result = $dbh->query($prod_query);
+            if($prod_result) {
+                while($prod = $prod_result->fetch_assoc()) {
                     
-                    // If this product has a 'default_product_variant' attribute and it's set to 'true', set the fallback to 1 for this variant
-                    if($attr['attribute_key'] == 'default_product_variant') {
-                        if($attr['attribute_value'] == 'true') {
-                            $products[$prod['variant_group']][$prod['product_sku']]['fallback'] = 1;
+                    fwrite($myfile, "Getting Attributes for SalsifyProduct: ". $prod['id'] ." \n");
+                    
+                    
+                    $attr_query =  "SELECT * FROM tl_salsify_attribute WHERE pid='".$prod['id']."' ORDER BY id ASC";
+                    $attr_result = $dbh->query($attr_query);
+                    if($attr_result) {
+                        while($attr = $attr_result->fetch_assoc()) {
+        
+                            $prod_values[$attr['attribute_key']] = $attr['attribute_value'];
+                            
+                            // If this product has a 'default_product_variant' attribute and it's set to 'true', set the fallback to 1 for this variant
+                            if($attr['attribute_key'] == 'default_product_variant') {
+                                if($attr['attribute_value'] == 'true') {
+                                    $products[$prod['variant_group']][$prod['product_sku']]['fallback'] = 1;
+                                }
+                            }
+        
+                            $iso_attr_query =  "SELECT * FROM tl_iso_attribute WHERE id='".$attr['linked_isotope_attribute']."' ORDER BY id ASC";
+                            $iso_attr_result = $dbh->query($iso_attr_query);
+                            if($iso_attr_result) {
+                                while($iso_attr = $iso_attr_result->fetch_assoc()) {
+                                    if($attr['linked_isotope_attribute_option'])
+                                        $products[$prod['variant_group']][$prod['product_sku']][$iso_attr['field_name']] = $attr['linked_isotope_attribute_option'];
+                                    else
+                                        $products[$prod['variant_group']][$prod['product_sku']][$iso_attr['field_name']] = $attr['attribute_value'];
+                                }
+                            }
+                            
                         }
                     }
-
-                    $iso_attr_query =  "SELECT * FROM tl_iso_attribute WHERE id='".$attr['linked_isotope_attribute']."' ORDER BY id ASC";
-                    $iso_attr_result = $dbh->query($iso_attr_query);
-                    if($iso_attr_result) {
-                        while($iso_attr = $iso_attr_result->fetch_assoc()) {
-                            if($attr['linked_isotope_attribute_option'])
-                                $products[$prod['variant_group']][$prod['product_sku']][$iso_attr['field_name']] = $attr['linked_isotope_attribute_option'];
-                            else
-                                $products[$prod['variant_group']][$prod['product_sku']][$iso_attr['field_name']] = $attr['attribute_value'];
-                        }
-                    }
+        
+                    $products[$prod['variant_group']][$prod['product_sku']]['tstamp'] = time();
+                    $products[$prod['variant_group']][$prod['product_sku']]['dateAdded'] = time();
+                    $products[$prod['variant_group']][$prod['product_sku']]['type'] = $prod['isotope_product_type'];
                     
+                    $cat_array = explode(",", $prod['category_page']);
+                    $products[$prod['variant_group']][$prod['product_sku']]['orderPages'] = serialize($cat_array);
+                    
+                    $products[$prod['variant_group']][$prod['product_sku']]['name'] = $prod['product_name'];
+                    $products[$prod['variant_group']][$prod['product_sku']]['alias'] = generateAlias($prod['product_name']);
+                    $products[$prod['variant_group']][$prod['product_sku']]['sku'] = $prod['product_sku'];
+                    $products[$prod['variant_group']][$prod['product_sku']]['description'] = $prod_values['full_description'];
+                    $products[$prod['variant_group']][$prod['product_sku']]['published'] = 1;
                 }
             }
-
-            $products[$prod['variant_group']][$prod['product_sku']]['tstamp'] = time();
-            $products[$prod['variant_group']][$prod['product_sku']]['dateAdded'] = time();
-            $products[$prod['variant_group']][$prod['product_sku']]['type'] = $prod['isotope_product_type'];
             
-            $cat_array = explode(",", $prod['category_page']);
-            $products[$prod['variant_group']][$prod['product_sku']]['orderPages'] = serialize($cat_array);
-            
-            $products[$prod['variant_group']][$prod['product_sku']]['name'] = $prod['product_name'];
-            $products[$prod['variant_group']][$prod['product_sku']]['alias'] = generateAlias($prod['product_name']);
-            $products[$prod['variant_group']][$prod['product_sku']]['sku'] = $prod['product_sku'];
-            $products[$prod['variant_group']][$prod['product_sku']]['description'] = $prod_values['full_description'];
-            $products[$prod['variant_group']][$prod['product_sku']]['published'] = 1;
-        }
+            // Update the status of our Salsify Request and save it
+            $sr->status = 'awaiting_related_linking';
+            $sr->save();
+    
+		}
     }
     
     
