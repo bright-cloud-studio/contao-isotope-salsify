@@ -20,10 +20,13 @@ $GLOBALS['TL_LANG']['tl_salsify_request']['file_url']                     = arra
 $GLOBALS['TL_LANG']['tl_salsify_request']['file_date']                    = array('File Date', 'The \'Last Modified\' date of the latest file we\'ve found');
 
 $GLOBALS['TL_LANG']['tl_salsify_request']['website_root_legend']          = 'Website Root Details';
-$GLOBALS['TL_LANG']['tl_salsify_request']['website_root']                 = array('Website Root', 'Sekect the Website Root, in which we will search for Product Pages.');
+$GLOBALS['TL_LANG']['tl_salsify_request']['website_root']                 = array('Website Root', 'Select the Website Root, in which we will search for Product Pages.');
 
 $GLOBALS['TL_LANG']['tl_salsify_request']['customization_legend']         = 'Customization Options';
 $GLOBALS['TL_LANG']['tl_salsify_request']['autolink_isotope_attributes']  = array('Autolink Isotope Attributes', 'By checking this box, when generating Salsify Attributes an attempt will be made to autolink these to Isotope Attributes where the field name matches the Attribute Key');
 
 $GLOBALS['TL_LANG']['tl_salsify_request']['internal_information']         = 'Internal Information';
 $GLOBALS['TL_LANG']['tl_salsify_request']['flag_update']                  = array('Flag - Update', 'When a new file is found, this flag will be checked and it will process during the next update loop.');
+
+$GLOBALS['TL_LANG']['tl_salsify_request']['website_root_legend']          = 'Status Details';
+$GLOBALS['TL_LANG']['tl_salsify_request']['website_root']                 = array('Status', 'Tracks the status of this Salsify Request, tracking which step of the process we are currently in');
