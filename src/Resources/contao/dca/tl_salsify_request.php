@@ -56,7 +56,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         (
             'fields'                  => array('id', 'request_name'),
 			'format'                  => 'ID: %s | %s',
-			'label_callback'          => array('tl_salsify_request', 'addIcon')
+			'label_callback' 		  => array('Bcs\Backend\SalsifyRequestBackend', 'generateLabel')
         ),
         'global_operations' => array
         (
