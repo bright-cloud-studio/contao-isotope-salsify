@@ -22,8 +22,8 @@
     
     fwrite($myfile, "Processing Salsify Requests\n");
     
-    // Loop through all Salsify Requests
-    $sr_query =  "SELECT * FROM tl_salsify_request ORDER BY id ASC";
+    // Loop through all Salsify Requests that are in the 'awaiting_new_file' state
+    $sr_query =  "SELECT * FROM tl_salsify_request WHERE status='awaiting_new_file' ORDER BY id ASC";
     $sr_result = $dbh->query($sr_query);
     if($sr_result) {
         while($request = $sr_result->fetch_assoc()) {
@@ -68,7 +68,7 @@
                 
                 $run_update = true;
                 $request['file_url'] = $latest_file_url;
-                $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "' WHERE id='".$request['id']."'")->execute();
+                $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', status='awaiting_cat_linking' WHERE id='".$request['id']."'")->execute();
             }
 
             /////////////////////////////////////////////////////////////////////////
