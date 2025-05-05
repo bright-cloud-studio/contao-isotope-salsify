@@ -63,8 +63,13 @@ class SalsifyRequestBackend extends Backend
 
         //die();
     }
-    
-    
+
+
+    // Display error until all 'flags' are 
+    public function generateStatusLabel($row, $label, $dc, $args)
+    {
+        return $label . "[" . $row['status'] . "]";
+    }
     
     
 	public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
