@@ -95,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default' => '{salsify_request_legend}, request_name, source_folder, isotope_name_key, isotope_sku_key; {website_root_legend}, website_root; {latest_file_legend}, file_url, file_date;'
+        'default' => '{salsify_request_legend}, request_name, source_folder, isotope_name_key, isotope_sku_key; {website_root_legend}, website_root; {latest_file_legend}, file_url, file_date; {status_legend}, status;'
     ),
  
     // Fields
@@ -174,12 +174,28 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
 
         'website_root' => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['website_root'],
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['website_root'],
             'inputType'               => 'pageTree',
             'eval'                    => array('files'=>false, 'fieldType'=>'radio', 'multiple'=>true, 'tl_class'=>'w50'),
 			'sql'                     => "blob NULL",
             'relation'                => array('table'=>'tl_page', 'type'=>'hasMany', 'load'=>'lazy')
         ),
+        
+        
+        'status' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['status'],
+            'inputType'               => 'select',
+            'default'                 => 'awaiting_new_file',
+            'options'                 => array(
+                'awaiting_new_file'           => 'Awaiting New File',
+                'awaiting_cat_linking'        => 'Awaiting Category Linking',
+                'awaiting_iso_generation'     => 'Awaiting Isotope Generation',
+                'awaiting_related_linking'    => 'Awaiting Related Product Linking'
+            ),
+            'eval'                     => array('mandatory'=>true, 'tl_class'=>'w50'),
+            'sql'                      => "varchar(30) NOT NULL default 'awaiting_new_file'"
+        )
         
     )
 );
