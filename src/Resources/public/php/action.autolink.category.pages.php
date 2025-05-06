@@ -29,10 +29,13 @@
 
 
     // Get Salsify Requests that are in the 'awaiting_cat_linking' state
-    $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_cat_linkinging']);
-    if(!$salsify_requests) {
+    $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_cat_linking']);
+    
+    if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
+		    
+		    fwrite($myfile, "Getting Salsify Products for Salsify Request: ". $sr->id ."\n");
             
             // Loop through all Salsify Products that belong to this Salsify Request
             $sp_query =  "SELECT * FROM tl_salsify_product WHERE pid='".$sr->id."' ORDER BY id ASC";
