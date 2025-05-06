@@ -122,15 +122,17 @@
                             if(!$page_ids) {
                                 
                             } else {
+
+                                $id_csv = numbersArrayToCsv($page_ids);
                                 
-                                echo "IDS: " . numbersArrayToCsv($page_ids) . "<br>";
+                                echo "IDS: ".$id_csv."<br>";
                                 
-                                $update =  "update tl_salsify_attribute set category_page='".numbersArrayToCsv($page_ids)."' WHERE id='".$attribute['id']."'";
+                                $update =  "update tl_salsify_attribute set category_page='".$id_csv."' WHERE id='".$attribute['id']."'";
                                 $result_update = $dbh->query($update);
                                 
                                 echo "SalsifyAttribute Linked!<br>";
                                 
-                                $update =  "update tl_salsify_product set category_page='".numbersArrayToCsv($page_ids)."' WHERE id='".$product['id']."'";
+                                $update =  "update tl_salsify_product set category_page='".$id_csv."' WHERE id='".$product['id']."'";
                                 $result_update = $dbh->query($update);
                                 
                                 echo "SalsifyProduct Linked!<br>";
@@ -150,14 +152,13 @@
     }
     
     
-    
-    
-    
+
     // LOG - Close our log file
     fclose($myfile);
     
-    
+    // Converts a PHP array of IDs into a CSV string
     function numbersArrayToCsv(array $numbers, string $delimiter = ','): string {
+        
         // Filter out non-numeric values to ensure only numbers are included
         $numericValues = array_filter($numbers, 'is_numeric');
     
