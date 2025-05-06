@@ -15,16 +15,21 @@
     $linked = array();
     
     // Get Salsify Requests that are in the 'awaiting_cat_linking' state
-    $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_iso_generation']);
-    if(!$salsify_requests) {
+    $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_related_linking']);
+    if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
 
+            echo "Searching for Products in Salsify Request: " . $sr->id . "<br>";
+
             // LOOP THROUGH PRODUCTS
-            $prod_query =  "SELECT * FROM tl_iso_product WHERE pid='".$sr->id."' ORDER BY id ASC";
+            $prod_query =  "SELECT * FROM tl_iso_product ORDER BY id ASC";
             $prod_result = $dbh->query($prod_query);
             if($prod_result) {
                 while($prod = $prod_result->fetch_assoc()) {
+                    
+                    
+                    echo "Staging data for Product: " . $prod[''] . "<br>";
                     
                     $found = false;
                     
