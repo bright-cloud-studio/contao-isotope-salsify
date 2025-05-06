@@ -27,7 +27,7 @@
     
     // Get Salsify Requests that are in the 'awaiting_cat_linking' state
     $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_iso_generation']);
-    if(!$salsify_requests) {
+    if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
 		    
