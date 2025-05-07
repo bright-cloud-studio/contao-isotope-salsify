@@ -236,7 +236,7 @@ class SalsifyAttributeBackend extends Backend
             
             // Update SalsifyProducts, unpublish when necessary
             foreach($publish_tracker as $key => $val) {
-                if($val == 'false') {
+                if($val == 'false' || $val == '') {
                     $prod_to_unpublish = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$key]);
                     if($prod_to_unpublish != null) {
                         $prod_to_unpublish->published = '';
