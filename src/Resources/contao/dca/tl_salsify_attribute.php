@@ -25,10 +25,6 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         'switchToEdit'                => false,
         'enableVersioning'            => true,
         'markAsCopy'                  => 'title',
-        'onsubmit_callback' => array
-		(
-			array('Bcs\Backend\SalsifyAttributeBackend', 'linkSimilarAttributes')
-		),
         'sql' => array
         (
             'keys' => array
