@@ -73,53 +73,75 @@ class SalsifyAttributeBackend extends Backend
 		                    $attribute->status = 'pass';
 		                    fwrite($myfile, "New Attribute Linked ID: " . $attribute->id . "\n");
 		                    
+		                    
+		                    
 		                    // Link or Create Option
 		                    $iso_attr = Attribute::findBy(['id = ?'], [$attribute->linked_isotope_attribute]);
 		                    if($iso_attr->type == 'select' || $iso_attr->type == 'radio') {
+		                        fwrite($myfile, "Linked Isotope Attribute detected as SELECT or RADIO \n");
 		                        
-		                        fwrite($myfile, "Option Required \n");
-
-		                        // Find all Options for this Attribute
-                				$existing_options = AttributeOption::findByPid($attribute->linked_isotope_attribute);
-                				$opt_found = false;
-                				foreach($existing_options as $option) {
-                					// If an Option's label matches our Attribute Value, it already exists
-                					if($option->label == $attribute->attribute_value) {
-                						$opt_found = true;
-                						$attribute->linked_isotope_attribute_option = $option->id;
-                						fwrite($myfile, "Existing Option Linked \n");
-                					}
-                				}
-                				// If no Attribute Option is found, create it
-                				if($opt_found != true) {
-                					$new_option = new AttributeOption();
-                					$new_option->pid = $attribute->linked_isotope_attribute;
-                					$new_option->label = $attribute->attribute_value;
-                					$new_option->tstamp = time();
-                					$new_option->published = 1;
-                					$new_option->ptable = 'tl_iso_attribute';
-                					$new_option->type = 'option';
-                					
-                					// Sorting
-                					if($attribute->attribute_option_sorting == 'sort_numerical') {
-                						// Strip everything but numbers from label, use that as sorting number
-                						$only_number = preg_replace("/[^0-9]/","", $attr->attribute_value);
-                						$new_option->sorting = $only_number;
-                						
-                					} else if($attribute->attribute_option_sorting == 'sort_alphabetical') {
-                						// Get just the first letter of the label, convert to number in alphabet, use as sorting number
-                						$alphabet = range('A', 'Z');
-                						$only_letter = substr($attr->attribute_value, 0);
-                						
-                						$new_option->sorting = $alphabet[$only_letter];
-                					}
-
-                					$new_option->save();
-                					$attribute->linked_isotope_attribute_option = $new_option->id;
-                					fwrite($myfile, "New Option Created and Linked \n");
-                				}
 		                        
+		                        
+		                        // Covert 'attribute_value' into array, loop through
+		                        $option_ids = array();
+		                        $attribute_values = explode(", ", $attribute->attribute_value);
+		                        foreach($attribute_values as $val) {
+		                            
+		                            // Find all Options for this Attribute
+                    				$existing_options = AttributeOption::findByPid($attribute->linked_isotope_attribute);
+                    				$opt_found = false;
+                    				foreach($existing_options as $option) {
+                    					// If an Option's label matches our Attribute Value, it already exists
+                    					if($option->label == $val) {
+                    						$opt_found = true;
+                    						//$attribute->linked_isotope_attribute_option = $option->id;
+                    						$option_ids[] = $option->id;
+                    						fwrite($myfile, "Option Found: ".$option->id.", adding to option_ids array \n");
+                    					}
+                    				}
+                    				// If no Attribute Option is found, create it
+                    				if($opt_found != true) {
+                    					$new_option = new AttributeOption();
+                    					$new_option->pid = $attribute->linked_isotope_attribute;
+                    					$new_option->label = $val;
+                    					$new_option->tstamp = time();
+                    					$new_option->published = 1;
+                    					$new_option->ptable = 'tl_iso_attribute';
+                    					$new_option->type = 'option';
+                    					
+                    					// Sorting
+                    					if($attribute->attribute_option_sorting == 'sort_numerical') {
+                    						// Strip everything but numbers from label, use that as sorting number
+                    						$only_number = preg_replace("/[^0-9]/","", $attr->attribute_value);
+                    						$new_option->sorting = $only_number;
+                    						
+                    					} else if($attribute->attribute_option_sorting == 'sort_alphabetical') {
+                    						// Get just the first letter of the label, convert to number in alphabet, use as sorting number
+                    						$alphabet = range('A', 'Z');
+                    						$only_letter = substr($attr->attribute_value, 0);
+                    						
+                    						$new_option->sorting = $alphabet[$only_letter];
+                    					}
+    
+                    					$new_option->save();
+                    					
+                    					$option_ids[] = $new_option->id;
+                						fwrite($myfile, "New Option Created: ".$new_option->id.", adding to option_ids array \n");
+                    					
+                    					//$attribute->linked_isotope_attribute_option = $new_option->id;
+                    					//fwrite($myfile, "New Option Created and Linked \n");
+                    				}
+		                            
+		                        }
+		                        
+		                        
+                                $attribute->linked_isotope_attribute_option = serialize($option_ids);
+            					fwrite($myfile, "Saving Linked Attribute Option serialized array \n");
+
+ 
 		                    }
+		                    
+		                    
 		                    
                             $save = true;
 		                }
@@ -452,13 +474,19 @@ class SalsifyAttributeBackend extends Backend
 		return $varValue;
 	}
 	
-	public function csvStringToArray(string $csvString): array {
-        if (empty($csvString)) { return []; }
-
-        $csvString = str_replace(' ', '', $csvString);
-        $result = str_getcsv($csvString);
-
-        return array_filter($result, function($value) { return $value !== ""; });
+	function csvStringToArray(string $csvString, string $delimiter = ',', string $enclosure = '"', string $escape = '\\'): array
+    {
+        $rows = [];
+        $lines = explode("\n", trim($csvString));
+    
+        foreach ($lines as $line) {
+            $row = str_getcsv($line, $delimiter, $enclosure, $escape);
+            if ($row !== false) {
+                $rows[] = $row;
+            }
+        }
+    
+        return $rows;
     }
 	
 	
