@@ -60,9 +60,11 @@
                             $iso_attr_result = $dbh->query($iso_attr_query);
                             if($iso_attr_result) {
                                 while($iso_attr = $iso_attr_result->fetch_assoc()) {
-                                    if($attr['linked_isotope_attribute_option'])
-                                        $products[$prod['variant_group']][$prod['product_sku']][$iso_attr['field_name']] = $attr['linked_isotope_attribute_option'];
-                                    else
+                                    if($attr['linked_isotope_attribute_option']) {
+                                        $asArray = unserialize($attr['linked_isotope_attribute_option']);
+                                        $asCSV = implode(',', $asArray);
+                                        $products[$prod['variant_group']][$prod['product_sku']][$iso_attr['field_name']] = $asCSV;
+                                    } else
                                         $products[$prod['variant_group']][$prod['product_sku']][$iso_attr['field_name']] = $attr['attribute_value'];
                                 }
                             }
@@ -127,6 +129,7 @@
                     if($update_ip != null) {
                         
                         fwrite($myfile, "UPDATING single product: ". $update_ip->id ."\n");
+                        fwrite($myfile, print_r($prod, true));
                         
                         // Update the product
                         $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($prod)->execute($update_ip->id);
@@ -137,14 +140,15 @@
                         
                         // re-add them
                         $prod_cat = array();
-                        $prod_cat['pid'] = $prod_values_result->insertId;
+                        $prod_cat['pid'] = $update_ip->id;
                         $prod_cat['tstamp'] = time();
                         foreach($cat_id as $cat) {
-                            
-                            fwrite($myfile, "ADDING to category: ". $cat ."\n");
-                            
+   
                             $prod_cat['page_id'] = $cat;
                             $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                            
+                            fwrite($myfile, "ADDING to category: ". $cat ."\n");
+                            //fwrite($myfile, print_r($prod_cat, true));
                         }
                         
                     } else {
@@ -400,8 +404,6 @@
     ///////////////
     // FUNCTIONS //
     ///////////////
-    
-    
     
     function generateAlias($text) {
         
