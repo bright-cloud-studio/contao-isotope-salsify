@@ -104,6 +104,10 @@
                     $products[$prod['variant_group']][$prod['product_sku']]['orderPages'] = serialize($cat_array);
                     
                     $products[$prod['variant_group']][$prod['product_sku']]['name'] = $prod['product_name'];
+                    
+                    // If alias is going to be too long, make note in log file
+                    if(strlen($prod['product_name']) > 125)
+                        fwrite($myfile, "TRUNCATING alias \n");
                     $products[$prod['variant_group']][$prod['product_sku']]['alias'] = generateAlias($prod['product_name']);
                     $products[$prod['variant_group']][$prod['product_sku']]['sku'] = $prod['product_sku'];
                     $products[$prod['variant_group']][$prod['product_sku']]['description'] = $prod_values['full_description'];
@@ -234,7 +238,11 @@
                         
                         $parent = $prod;
                         $parent['name'] = $key;
-                        //$parent['name'] = "DEFAULT PRODUCT VARIANT: " . $key;
+                        
+                        // If alias is going to be too long, make note in log file
+                        if(strlen($key) > 125)
+                            fwrite($myfile, "TRUNCATING alias \n");
+                        
                         $parent['alias'] = generateAlias($key);
                         $parent['sku'] = $parent['sku'] . "_parent";
                         
@@ -316,7 +324,10 @@
                         
                         $parent = $prod;
                         $parent['name'] = $key;
-                        //$parent['name'] = "GENERATED PARENT: " . $key;
+                        
+                        // If the alias is too long, make note in log file
+                        if(strlen($key) > 125)
+                            fwrite($myfile, "TRUNCATING alias \n");
                         $parent['alias'] = generateAlias($key);
                         $parent['sku'] = $parent['sku'] . "_parent";
                         
@@ -433,14 +444,12 @@
         // 1. Convert to lowercase:
         $text = strtolower($text);
     
-        // 2. Replace all non-alphanumeric characters with underscores:
-        $text = preg_replace('/[^a-z0-9_]/', '_', $text);
-    
-        // 3. Remove multiple consecutive underscores:
-        $text = preg_replace('/_+/', '_', $text);
+        $arrSearch = array('/[^\pN\pL \.\&\/_-]+/u', '/[ \.\&\/-]+/');
+		$arrReplace = array('', '-');
+		$text = preg_replace($arrSearch, $arrReplace, $text);
     
         // 4. Remove leading and trailing underscores:
-        $text = trim($text, '_');
+        $text = trim($text, '-');
     
         // 5.  Handle empty strings:
         if (empty($text)) {
