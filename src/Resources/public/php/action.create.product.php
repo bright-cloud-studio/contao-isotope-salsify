@@ -17,7 +17,28 @@
     // Store all of our products in data
     $products = array();
     
-    
+    // Get all the columns for the 'tl_iso_product' database, add to array with the default values
+    $defaults = array();
+    $default_query =  "DESCRIBE tl_iso_product";
+    $default_result = $dbh->query($default_query);
+    if($default_result) {
+        while($default = $default_result->fetch_assoc()) {
+            
+            if($default['Extra'] == 'auto_increment') {
+                // Skip auto_increment value, as we cant and shouldn't update this
+            }
+            else if($default['Null'] == 'YES') {
+                // Set string 'NULL' value
+                //$defaults[$default['Field']] = 'NULL';
+                // Set actual NULL as value
+                $defaults[$default['Field']] = NULL;
+            }
+            else
+                $defaults[$default['Field']] = $default['Default'];
+        }
+    }
+
+
     
     ////////////////
     // STAGE DATA //
@@ -41,12 +62,15 @@
                     
                     fwrite($myfile, "Getting Attributes for SalsifyProduct: ". $prod['id'] ." \n");
                     
+                    // Apply our "default" database values to the product data. This starts us out as "default", then we plug in the SalsifyAttribute values to replace the defaults
+                    $products[$prod['variant_group']][$prod['product_sku']] = $defaults;
                     
                     $attr_query =  "SELECT * FROM tl_salsify_attribute WHERE pid='".$prod['id']."' ORDER BY id ASC";
                     $attr_result = $dbh->query($attr_query);
                     if($attr_result) {
                         while($attr = $attr_result->fetch_assoc()) {
-        
+                            
+                            // Apply our SalsifyAttribute values to our product's data
                             $prod_values[$attr['attribute_key']] = $attr['attribute_value'];
                             
                             // If this product has a 'default_product_variant' attribute and it's set to 'true', set the fallback to 1 for this variant
@@ -93,8 +117,7 @@
     
 		}
     }
-    
-    
+
     
     /////////////////////
     // CREATE PRODUCTS //
