@@ -84,8 +84,6 @@
                 fwrite($myfile, "Unpublishing all Salsify Products and Salsify Attributes\n");
                 $dbh->prepare("UPDATE tl_salsify_product SET published=''")->execute();
                 $dbh->prepare("UPDATE tl_salsify_attribute SET published=''")->execute();
-                
-                //die();
             
                 // Open and process file
                 $reader = new JsonReader();
@@ -106,22 +104,26 @@
                 	// Loop through children arrays, these are what store the actual values here
                 	foreach($array_parent as $array_child) {
                 		
+                		// Get the data for the two Isotope required fields for an Isotope Product, only continue if we have them
                 		$required_sku = $array_child[$request['isotope_sku_key']][0];
                 		$required_name = $array_child[$request['isotope_name_key']][0];
-                		
                 		if($required_sku == '' || $required_name == '') {
+                		    // Skip generating this SalsifyProduct as we don't have our reqiuired 
                 		    fwrite($myfile, "Skipping Salsify Product: " . $required_sku . " | " . $required_name . "\n");
                 		} else {
+                		    
+                		    // Tick up our SalsifyProduct counter
                             $prod_count++;
                             
-                            
-        
-                            // Find and update, else create
+                            // Try to find an existing SalsifyProduct with these values
                             $salsify_product;
                             $update_sp = SalsifyProduct::findOneBy(['tl_salsify_product.product_sku=?'],[$array_child[$request['isotope_sku_key']][0]]);
                             if($update_sp != null) {
+                                
+                                // We found an existing SalsifyProduct
                                 fwrite($myfile, "Updating Salsify Product: " . $array_child[$request['isotope_sku_key']][0] . "\n");
                                 echo "SalsifyProduct Found and Updated!<br>";
+                                
                                 $update_sp->pid = $request['id'];
                         		$update_sp->tstamp = time();
                         		$update_sp->product_sku = $array_child[$request['isotope_sku_key']][0];
@@ -131,8 +133,11 @@
                         		$salsify_product = $update_sp;
                                 
                             } else {
+                                
+                                // We need to make a new SalsifyProduct
                                 fwrite($myfile, "Creating Salsify Product: " . $array_child[$request['isotope_sku_key']][0] . "\n");
                                 echo "SalsifyProduct Created!<br>";
+                                
                         		$salsify_product = new SalsifyProduct();
                         		$salsify_product->pid = $request['id'];
                         		$salsify_product->tstamp = time();
@@ -142,27 +147,35 @@
                         		$salsify_product->save();
                             }
                     		
-        
+                            
+                            // Process SalsifyAttributes for this SalsifyProduct
                             $attributes = array();
                             $prod_values = array();
                             foreach($array_child as $key => $val) {
+                                
                                 $prod_values[$key] = $val[0];
                                 
-                                // Find and update, else create
+                                // Try and find a SalsifyAttribute
                                 $salsify_attribute;
                                 $update_sa = SalsifyAttribute::findOneBy(['tl_salsify_attribute.pid=?', 'tl_salsify_attribute.attribute_key=?'],[$salsify_product->id, $key]);
                                 if($update_sa != null) {
                                     
+                                    // Existing SalsifyAttribute found
                                     fwrite($myfile, "Updating Salsify Attribute ID: ".$update_sa->id."\n");
                                     
+                                    // Update the attribute_value to this latest version
                                     $update_sa->attribute_value = $val[0];
                                     
-                                    // If there is an Isotope Option we need to break this link so we can re-link and generate the option the right way.
-                                    // If there is no Isotope Option during an update then we can safely assume this is plain text and just push the new value in
+                                    
                                     if($update_sa->linked_isotope_attribute_option != null) {
                                         $update_sa->linked_isotope_attribute = null;
                                         $update_sa->linked_isotope_attribute_option = null;
                                         $update_sa->status = 'fail';
+                                        
+                                        // UPDATE HERE
+                                        
+                                        // CREATE OPTIOn OF NEEDED
+                                        
                                     }
                                     
                                     $update_sa->tstamp = time();
@@ -170,6 +183,9 @@
                                     $update_sa->save();
         
                                 } else {
+                                    
+                                    // CREATE NEW SalsifyAttribute
+                                    
                                     $salsify_attribute = new SalsifyAttribute();
                                     $salsify_attribute->pid = $salsify_product->id;
                                     $salsify_attribute->attribute_key = $key;
@@ -189,7 +205,15 @@
                                 $attributes[$salsify_attribute->id]['key'] = $key;
                                 $attributes[$salsify_attribute->id]['value'] = $val[0];
                                 $log[$salsify_product->id]['attributes'] = $attributes;
-                            }
+                            }  
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
     
                 		}
                         
