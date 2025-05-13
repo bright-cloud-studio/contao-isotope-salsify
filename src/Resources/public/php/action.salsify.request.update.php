@@ -8,7 +8,8 @@
     use Isotope\Model\AttributeOption;
     use pcrov\JsonReader\JsonReader;
     
-    
+    // Tracks who to turn off at the end for Product Release to site
+    $publish_tracker = array();
     
     // Stores log messages until the end
     $log_messages = '';
@@ -74,6 +75,9 @@
                 $request['file_url'] = $latest_file_url;
                 $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', status='awaiting_cat_linking' WHERE id='".$request['id']."'")->execute();
             }
+
+
+
 
             /////////////////////////////////////////////////////////////////////////
             // STEP TWO - Create or update Salsify Products and Salsify Attributes //
@@ -164,11 +168,21 @@
                                 $update_sa = SalsifyAttribute::findOneBy(['tl_salsify_attribute.pid=?', 'tl_salsify_attribute.attribute_key=?'],[$salsify_product->id, $key]);
                                 if($update_sa != null) {
                                     
+                                    
+                                    ///////////////////////////////////////
+                                    // UPDATE EXISTING SALSIFY ATTRIBUTE //
+                                    ///////////////////////////////////////
+                                    
+                                    
                                     // Existing SalsifyAttribute found
                                     fwrite($myfile, "Updating Salsify Attribute ID: ".$update_sa->id."\n");
                                     
                                     // Update the attribute_value to this latest version
                                     $update_sa->attribute_value = $val[0];
+                                    
+                                    if($update_sa->controls_published) {
+                                        $publish_tracker[$update_sa->pid] = $update_sa->attribute_value;
+                                    }
                                     
                                     // if we have an isotope attribute linked
                                     if($update_sa->linked_isotope_attribute_option != null) {
@@ -251,46 +265,81 @@
                                     $salsify_attribute->attribute_key = $key;
                                     $salsify_attribute->attribute_value = $val[0];
                                     
-                                    // AUTOLINK REMOVED, just go straight to null
-                                    //$salsify_attribute->linked_isotope_attribute = null;
+                                    // Auto-linking
                                     
+                                    // First, start off with out linked attribute being null
+                                    $salsify_attribute->linked_isotope_attribute = null;
                                     
-                                    // Create AttributeOptions
-                                    $option_ids = array();
-		                            $attribute_values = explode(", ", $salsify_attribute->attribute_value);
-		                            foreach($attribute_values as $val) {
-    		                            
-                    					$new_option = new AttributeOption();
-                    					$new_option->pid = $salsify_attribute->linked_isotope_attribute;
-                    					$new_option->label = $val;
-                    					$new_option->tstamp = time();
-                    					$new_option->published = 1;
-                    					$new_option->ptable = 'tl_iso_attribute';
-                    					$new_option->type = 'option';
-                    					
-                    					// Sorting
-                    					if($salsify_attribute->attribute_option_sorting == 'sort_numerical') {
-                    						// Strip everything but numbers from label, use that as sorting number
-                    						$only_number = preg_replace("/[^0-9]/","", $val->attribute_value);
-                    						$new_option->sorting = $only_number;
-                    						
-                    					} else if($salsify_attribute->attribute_option_sorting == 'sort_alphabetical') {
-                    						// Get just the first letter of the label, convert to number in alphabet, use as sorting number
-                    						$alphabet = range('A', 'Z');
-                    						$only_letter = substr($val->attribute_value, 0);
-                    						
-                    						$new_option->sorting = $alphabet[$only_letter];
-                    					}
-    
-                    					$new_option->save();
-                    					
-                    					$option_ids[] = $new_option->id;
-                						fwrite($myfile, "New Option Created: ".$new_option->id.", adding to option_ids array \n");
-    		                            
-    		                        }
-    		                        
-    		                        $salsify_attribute->linked_isotope_attribute_option = serialize($option_ids);
-            					    fwrite($myfile, "Saving Linked Attribute Option serialized array \n");
+                                    fwrite($myfile, "Attempting auto-link for new SalsifyAttribute \n");
+                                    
+                                    // Now, try and find another SalsifyAttribute with the same key that has a linked attribute
+                                    $autolink_sa = SalsifyAttribute::findOneBy(['tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.linked_isotope_attribute!=?'],[$key, null]);
+                                    if($autolink_sa) {
+                                        fwrite($myfile, "Found similar KEY with linked Isotope Attribute \n");
+                                        
+                                        // If we find one, apply it to our attribute
+                                        $salsify_attribute->linked_isotope_attribute = $autolink_sa->linked_isotope_attribute;
+                                        
+                                    
+                                        // If our found SalsifyAttribute has a linked option, we can infur we need one here too
+                                        if($autolink_sa->linked_isotope_attribute_option != null) {
+                                            
+                                            fwrite($myfile, "Autolink helper SalsifyAttribute found to have Attribute Option, attempting to link or generate one \n");
+                                            
+                                            // Store our option IDs until the end
+    		                                $option_ids = array();
+    		                                $attribute_values = explode(", ", $salsify_attribute->attribute_value);
+                                            // Loop through each CSV value
+                                            foreach($attribute_values as $val) {
+            		                            
+            		                            // Find all Options for this Attribute
+                                				$existing_options = AttributeOption::findByPid($salsify_attribute->linked_isotope_attribute);
+                                				$opt_found = false;
+                                				foreach($existing_options as $option) {
+                                					// If an Option's label matches our Attribute Value, it already exists
+                                					if($option->label == $val) {
+                                						$opt_found = true;
+                                						//$attribute->linked_isotope_attribute_option = $option->id;
+                                						$option_ids[] = $option->id;
+                                						fwrite($myfile, "Option Found: ".$option->id.", adding to option_ids array \n");
+                                					}
+                                				}
+                                				// If no Attribute Option is found, create it
+                                				if($opt_found != true) {
+                                					$new_option = new AttributeOption();
+                                					$new_option->pid = $salsify_attribute->linked_isotope_attribute;
+                                					$new_option->label = $val;
+                                					$new_option->tstamp = time();
+                                					$new_option->published = 1;
+                                					$new_option->ptable = 'tl_iso_attribute';
+                                					$new_option->type = 'option';
+                                					
+                                					// Sorting
+                                					if($salsify_attribute->attribute_option_sorting == 'sort_numerical') {
+                                						// Strip everything but numbers from label, use that as sorting number
+                                						$only_number = preg_replace("/[^0-9]/","", $val);
+                                						$new_option->sorting = $only_number;
+                                						
+                                					} else if($salsify_attribute->attribute_option_sorting == 'sort_alphabetical') {
+                                						// Get just the first letter of the label, convert to number in alphabet, use as sorting number
+                                						$alphabet = range('A', 'Z');
+                                						$only_letter = substr($val, 0);
+                                						
+                                						$new_option->sorting = $alphabet[$only_letter];
+                                					}
+                
+                                					$new_option->save();
+                                					
+                                					$option_ids[] = $new_option->id;
+                            						fwrite($myfile, "New Option Created: ".$new_option->id.", adding to option_ids array \n");
+                                				}
+            		                            
+            		                        }
+                                            
+                                            $update_sa->linked_isotope_attribute_option = serialize($option_ids);
+                					        fwrite($myfile, "Saving Linked Attribute Option serialized array \n");
+                                        }
+                                    }
                                     
                                     
                                     // Try and apply settings matching other similar SalsifyAttributes
@@ -298,6 +347,15 @@
                                     
                                     $salsify_attribute->tstamp = time();
                                     $salsify_attribute->published = 1;
+                                    
+                                    // NEW PRODUCT //
+                                    
+                                    // Attempt to apply grouping
+                                    
+                                    // Attempt to apply is_cat
+                                    
+                                    // Attempt to apply controls_publish
+                                    
                                     $salsify_attribute->save();
                                     
                                     fwrite($myfile, "NEW Salsify Attribute ID: ".$salsify_attribute->id."\n");
@@ -328,6 +386,24 @@
             } else {
                 fwrite($myfile, "No new file found, skipping generation/update \n");
             }
+            
+            
+            
+            // At the end of the Salsify Request, we want to turn off things with $publish_tracker
+            // Update SalsifyProducts, unpublish when necessary
+            foreach($publish_tracker as $key => $val) {
+                if($val == 'false' || $val == '') {
+                    $prod_to_unpublish = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$key]);
+                    if($prod_to_unpublish != null) {
+                        $prod_to_unpublish->published = '';
+                        $prod_to_unpublish->save();
+                        
+                        fwrite($myfile, "SalsifyProduct Un-Published ID: " . $prod_to_unpublish->id . "\n");
+                        
+                    }
+                }
+            }
+            
             
         }
     }
