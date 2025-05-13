@@ -65,7 +65,7 @@
                     // Apply our "default" database values to the product data. This starts us out as "default", then we plug in the SalsifyAttribute values to replace the defaults
                     $products[$prod['variant_group']][$prod['product_sku']] = $defaults;
                     
-                    $attr_query =  "SELECT * FROM tl_salsify_attribute WHERE pid='".$prod['id']."' ORDER BY id ASC";
+                    $attr_query =  "SELECT * FROM tl_salsify_attribute WHERE pid='".$prod['id']."' AND published='1' ORDER BY id ASC";
                     $attr_result = $dbh->query($attr_query);
                     if($attr_result) {
                         while($attr = $attr_result->fetch_assoc()) {
@@ -121,6 +121,12 @@
     
 		}
     }
+    
+    
+    
+    // Unpublish all Isotope Products to remove phantom products when things change
+    //fwrite($myfile, "Unpublishing all Isotope Products\n");
+    //$dbh->prepare("UPDATE tl_iso_products SET published=''")->execute();
 
     
     /////////////////////
