@@ -75,7 +75,24 @@ class SalsifyRequestBackend extends Backend
         
         return $new_label;
     }
+
+
+
+    // Get Isotope Products as Checkbox array
+    public function getIsotopeProducts(DataContainer $dc) { 
+        $chekbox_options = array();
+
+        $isotope_products = Product::findAll();
+        if($isotope_products){
+            foreach($isotope_products as $product) {
+                $chekbox_options = $chekbox_options + array($product->id => $product->name);
+            }     
+        }
+        
+		return $chekbox_options;
+	}
     
+
     
 	public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
 	{
