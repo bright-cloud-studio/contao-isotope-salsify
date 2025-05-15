@@ -31,3 +31,6 @@ $GLOBALS['TL_LANG']['tl_salsify_request']['flag_update']                  = arra
 $GLOBALS['TL_LANG']['tl_salsify_request']['status_legend']                = 'Status Details';
 $GLOBALS['TL_LANG']['tl_salsify_request']['status']                       = array('Status', 'Tracks the status of this Salsify Request, tracking which step of the process we are currently in');
 $GLOBALS['TL_LANG']['tl_salsify_request']['initial_linking_completed']    = array('Initial Linking Completed', 'When this is checked, we will enter the \'stay alive\' loop where we look for new json files and process them as they are detected');
+
+$GLOBALS['TL_LANG']['tl_salsify_request']['generated_products_legend']    = 'Generated Isotope Product Details';
+$GLOBALS['TL_LANG']['tl_salsify_request']['generated_isotope_products']   = array('Generated Isotope Products', 'Checked Isotope Products were generated from a SalsifyProduct belonging to this SalsifyRequest');
