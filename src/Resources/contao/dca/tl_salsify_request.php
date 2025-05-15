@@ -95,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default' => '{salsify_request_legend}, request_name, source_folder, isotope_name_key, isotope_sku_key; {website_root_legend}, website_root; {latest_file_legend}, file_url, file_date; {status_legend}, status, initial_linking_completed;'
+        'default' => '{salsify_request_legend}, request_name, source_folder, isotope_name_key, isotope_sku_key; {website_root_legend}, website_root; {latest_file_legend}, file_url, file_date; {status_legend}, status, initial_linking_completed; {generated_products_legend}, generated_isotope_products;'
     ),
  
     // Fields
@@ -206,6 +206,19 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
             'sql'                     => "char(1) NOT NULL default ''"
         ),
+
+
+        'generated_isotope_products' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['generated_isotope_products'],
+            'inputType'               => 'checkbox',
+            'filter'                  => false,
+            'search'                  => false,
+            'flag'                    => DataContainer::SORT_ASC,
+            'eval'                    => array('multiple'=> true, 'mandatory'=>false, 'tl_class'=>'w50'),
+            'options_callback'	      => array('Bcs\Backend\SalsifyRequestBackend', 'getIsotopeProducts')
+            'sql' => "blob NULL"
+        )
         
     )
 );
