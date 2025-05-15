@@ -216,7 +216,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'search'                  => false,
             'flag'                    => DataContainer::SORT_ASC,
             'eval'                    => array('multiple'=> true, 'mandatory'=>false, 'tl_class'=>'w50'),
-            'options_callback'	      => array('Bcs\Backend\SalsifyRequestBackend', 'getIsotopeProducts')
+            'options_callback'	      => array('Bcs\Backend\SalsifyRequestBackend', 'getIsotopeProducts'),
             'sql' => "blob NULL"
         )
         
