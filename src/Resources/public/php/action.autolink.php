@@ -141,12 +141,22 @@
 
                     }
                     
+                    
                     $unlinked_sa->save();
                 }
                 
             }
 		}
     }
-
+    
+    
+    
+    
+    
+    
+    //echo "<pre>";
+    //print_r($mapping);
+    
+    
     // Close our logfile
     fclose($myfile);
