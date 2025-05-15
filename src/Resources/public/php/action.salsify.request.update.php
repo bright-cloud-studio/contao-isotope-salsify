@@ -77,7 +77,11 @@
                 
                 $run_update = true;
                 $request['file_url'] = $latest_file_url;
-                $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', status='awaiting_auto_linking' WHERE id='".$request['id']."'")->execute();
+                
+                if($request['initial_linking_completed'] == '')
+                    $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', status='awaiting_initial_linking' WHERE id='".$request['id']."'")->execute();
+                else
+                    $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', status='awaiting_auto_linking' WHERE id='".$request['id']."'")->execute();
             }
 
 
@@ -378,17 +382,45 @@
                 $salsify_products = SalsifyProduct::findAll();
                 foreach($salsify_products as $prod) {
                     
+                    $change_detected = false;
+
                     if($group_counter[$prod->variant_group] == 1) {
+                        
+                        if($prod->isotope_product_variant_type == 'variant')
+                            $change_detected = true;
+                        
                         $prod->isotope_product_variant_type = 'single';
                         $prod->isotope_product_type = $isotope_product_type;
                         fwrite($myfile, "SalsifyProduct ID: " . $prod->id . " set as 'single' using Isotope Product Type ID: " . $isotope_product_type . "\n\n");
                     } else {
+                        
+                        if($prod->isotope_product_variant_type == 'single')
+                            $change_detected = true;
+                        
                         $prod->isotope_product_variant_type = 'variant';
                         $prod->isotope_product_type = $isotope_product_type_variant;
                         fwrite($myfile, "SalsifyProduct ID: " . $prod->id . " set as 'variant' using Isotope Product Type ID: " . $isotope_product_type_variant . "\n\n");
                     }
                     $prod->isotope_product_type_linked = 'linked';
                     $prod->save();
+                    
+                    // If type change detected, unlink all attributes
+                    if($change_detected) {
+                        fwrite($myfile, "SalsifyProduct ID:" .$prod->id ." Single/Variant change detected, unlinking all SalsifyAttributes \n");
+        		        $child_attributes = SalsifyAttribute::findBy('pid', $prod->id);
+                		if($child_attributes)
+                		{
+                			foreach ($child_attributes as $child_attribute)
+                		    {
+                		        $child_attribute->linked_isotope_attribute = null;
+                		        $child_attribute->linked_isotope_attribute_option = null;
+                		        $child_attribute->status = "fail";
+                		        $child_attribute->save();
+                		    }
+                		}
+                    }
+                    
+                    
                 }
             }
             
