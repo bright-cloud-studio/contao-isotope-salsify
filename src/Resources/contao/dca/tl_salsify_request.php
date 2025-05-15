@@ -95,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default' => '{salsify_request_legend}, request_name, source_folder, isotope_name_key, isotope_sku_key; {website_root_legend}, website_root; {latest_file_legend}, file_url, file_date; {status_legend}, status;'
+        'default' => '{salsify_request_legend}, request_name, source_folder, isotope_name_key, isotope_sku_key; {website_root_legend}, website_root; {latest_file_legend}, file_url, file_date; {status_legend}, status, initial_linking_completed;'
     ),
  
     // Fields
@@ -192,11 +192,20 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
                 'awaiting_auto_linking'       => 'Awaiting Auto-Linking',
                 'awaiting_cat_linking'        => 'Awaiting Category Linking',
                 'awaiting_iso_generation'     => 'Awaiting Isotope Generation',
-                'awaiting_related_linking'    => 'Awaiting Related Product Linking'
+                'awaiting_related_linking'    => 'Awaiting Related Product Linking',
+                'awaiting_initial_linking'    => 'Awaiting Initial Linking'
             ),
             'eval'                     => array('mandatory'=>true, 'tl_class'=>'w50'),
             'sql'                      => "varchar(30) NOT NULL default 'awaiting_new_file'"
-        )
+        ),
+        'initial_linking_completed' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['initial_linking_completed'],
+            'inputType'               => 'checkbox',
+            'default'				  => '',
+            'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "char(1) NOT NULL default ''"
+        ),
         
     )
 );
