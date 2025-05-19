@@ -24,7 +24,7 @@
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
     
     // DATABASE CONNECTION
-    $dbh = new mysqli("localhost", "ecom_user", 'I6aX,Ud-EYa^]P9u8g', "ecom_contao_4_13");
+    $dbh = new mysqli("localhost", "ecomm2_user", '(nNFuy*d8O=aC@BDCh', "ecomm2_contao_413");
     if ($dbh->connect_error) {
         die("Connection failed: " . $dbh->connect_error);
     }
