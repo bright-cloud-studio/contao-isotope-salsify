@@ -17,7 +17,7 @@
     
     // Stores log messages until the end
     $log_messages = '';
-    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_request_update_'.strtolower(date('m_d_y')).".txt", "w") or die("Unable to open file!");
+    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_request_update_'.strtolower(date('m_d_y')).".txt", "a+") or die("Unable to open file!");
     
     // INITS
     session_start();
