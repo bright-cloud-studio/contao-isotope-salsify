@@ -10,7 +10,7 @@
     
 
     // Stores log messages until the end
-    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/autolink_isotope_attributes'.strtolower(date('m_d_y')).".txt", "w") or die("Unable to open file!");
+    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/autolink_isotope_attributes'.strtolower(date('m_d_y')).".txt", "a+") or die("Unable to open file!");
     
     // INITS
     session_start();
