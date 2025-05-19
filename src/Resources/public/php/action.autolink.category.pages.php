@@ -9,7 +9,7 @@
     use Isotope\Model\Attribute;
     
     // LOG - Create log file
-    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_autolink_category_pages_'.strtolower(date('m_d_y_H:m:s')).".txt", "w") or die("Unable to open file!");
+    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_autolink_category_pages_'.strtolower(date('m_d_y')).".txt", "a+") or die("Unable to open file!");
     
     // INITS
     session_start();
