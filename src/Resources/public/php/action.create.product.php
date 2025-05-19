@@ -3,7 +3,7 @@
     use Bcs\Model\SalsifyRequest;
     use Isotope\Model\Product;
     
-    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_generate_products_'.strtolower(date('m_d_y')).".txt", "w") or die("Unable to open file!");
+    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_generate_products_'.strtolower(date('m_d_y')).".txt", "a+") or die("Unable to open file!");
 
     // INITIALIZE STUFFS
     session_start();
