@@ -150,6 +150,14 @@
     }
     
     
+    // Loop through SalsifyRequests
+    if($salsify_requests) {
+        foreach ($salsify_requests as $sr)
+		{
+		    $sr->status = 'awaiting_cat_linking';
+            $sr->save();
+		}
+    }
     
     
     
