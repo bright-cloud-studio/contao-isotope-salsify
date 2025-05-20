@@ -29,7 +29,7 @@
         die("Connection failed: " . $dbh->connect_error);
     }
     
-    fwrite($myfile, "Processing Salsify Requests\n");
+
     
     // Loop through all Salsify Requests that are in the 'awaiting_new_file' state
     $sr_query =  "SELECT * FROM tl_salsify_request WHERE status='awaiting_new_file' ORDER BY id ASC";
@@ -38,6 +38,8 @@
         while($request = $sr_result->fetch_assoc()) {
             
             fwrite($myfile, "Processing SalsifyRequest: ".$request['id']."\n");
+            
+            echo "SalsifyRequest ID: " . $request['id'] . "<br>";
 
             ///////////////////////////////////////////////////
             // STEP ONE - Determine which file is the latest //
@@ -66,12 +68,21 @@
                 if($file_date > $latest_file_date) {
                     $latest_file_url = $file;
                     $latest_file_date = $file_date;
+                    $latest_file_date -= $latest_file_date % 60;
                 }
                 // When leaving this loop, we will have whatever the latest file's date and url is
             }
             
+            echo "Latest File Date: " . $latest_file_date . "<br>";
+            echo "Converted: " . date('m/d/Y H:i:s', $latest_file_date) . "<br>";
+            echo "File Date: " . $request['file_date'] . "<br>";
+            echo "Converted: " . date('m/d/Y H:i:s', (int)$request['file_date']) . "<br>";
+            
+            
             // If our found file's date is newer, update
             if($latest_file_date > (int)$request['file_date']) {
+                
+                echo "Latest Found, updating!<br>";
                 
                 fwrite($myfile, "Newer Salsify data found\n");
                 
@@ -83,12 +94,6 @@
                 else
                     $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', status='awaiting_auto_linking' WHERE id='".$request['id']."'")->execute();
             }
-
-
-
-
-
-
 
 
 
@@ -369,75 +374,77 @@
                 
                 $reader->close();
             
+            
+            
+            
+                fwrite($myfile, print_r($group_counter, true));
+                
+                // GROUPING
+                if($group_counter != null) {
+                    fwrite($myfile, "Grouping SalsifyProducts \n\n");
+                    $salsify_products = SalsifyProduct::findAll();
+                    foreach($salsify_products as $prod) {
+                        
+                        $change_detected = false;
+    
+                        if($group_counter[$prod->variant_group] == 1) {
+                            
+                            if($prod->isotope_product_variant_type == 'variant')
+                                $change_detected = true;
+                            
+                            $prod->isotope_product_variant_type = 'single';
+                            $prod->isotope_product_type = $isotope_product_type;
+                            fwrite($myfile, "SalsifyProduct ID: " . $prod->id . " set as 'single' using Isotope Product Type ID: " . $isotope_product_type . "\n\n");
+                        } else {
+                            
+                            if($prod->isotope_product_variant_type == 'single')
+                                $change_detected = true;
+                            
+                            $prod->isotope_product_variant_type = 'variant';
+                            $prod->isotope_product_type = $isotope_product_type_variant;
+                            fwrite($myfile, "SalsifyProduct ID: " . $prod->id . " set as 'variant' using Isotope Product Type ID: " . $isotope_product_type_variant . "\n\n");
+                        }
+                        $prod->isotope_product_type_linked = 'linked';
+                        $prod->save();
+                        
+                        // If type change detected, unlink all attributes
+                        if($change_detected) {
+                            fwrite($myfile, "SalsifyProduct ID:" .$prod->id ." Single/Variant change detected, unlinking all SalsifyAttributes \n");
+            		        $child_attributes = SalsifyAttribute::findBy('pid', $prod->id);
+                    		if($child_attributes)
+                    		{
+                    			foreach ($child_attributes as $child_attribute)
+                    		    {
+                    		        $child_attribute->linked_isotope_attribute = null;
+                    		        $child_attribute->linked_isotope_attribute_option = null;
+                    		        $child_attribute->status = "fail";
+                    		        $child_attribute->save();
+                    		    }
+                    		}
+                        }
+                        
+                        
+                    }
+                }
+                
+                
+                // At the end of the Salsify Request, we want to turn off things with $publish_tracker
+                // Update SalsifyProducts, unpublish when necessary
+                foreach($publish_tracker as $key => $val) {
+                    if($val == 'false' || $val == '') {
+                        $prod_to_unpublish = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$key]);
+                        if($prod_to_unpublish != null) {
+                            $prod_to_unpublish->published = '';
+                            $prod_to_unpublish->save();
+                            
+                            fwrite($myfile, "SalsifyProduct Un-Published ID: " . $prod_to_unpublish->id . "\n");
+                            
+                        }
+                    }
+                }
+            
             } else {
                 fwrite($myfile, "No new file found, skipping generation/update \n");
-            }
-            
-            
-            fwrite($myfile, print_r($group_counter, true));
-            
-            // GROUPING
-            if($group_counter != null) {
-                fwrite($myfile, "Grouping SalsifyProducts \n\n");
-                $salsify_products = SalsifyProduct::findAll();
-                foreach($salsify_products as $prod) {
-                    
-                    $change_detected = false;
-
-                    if($group_counter[$prod->variant_group] == 1) {
-                        
-                        if($prod->isotope_product_variant_type == 'variant')
-                            $change_detected = true;
-                        
-                        $prod->isotope_product_variant_type = 'single';
-                        $prod->isotope_product_type = $isotope_product_type;
-                        fwrite($myfile, "SalsifyProduct ID: " . $prod->id . " set as 'single' using Isotope Product Type ID: " . $isotope_product_type . "\n\n");
-                    } else {
-                        
-                        if($prod->isotope_product_variant_type == 'single')
-                            $change_detected = true;
-                        
-                        $prod->isotope_product_variant_type = 'variant';
-                        $prod->isotope_product_type = $isotope_product_type_variant;
-                        fwrite($myfile, "SalsifyProduct ID: " . $prod->id . " set as 'variant' using Isotope Product Type ID: " . $isotope_product_type_variant . "\n\n");
-                    }
-                    $prod->isotope_product_type_linked = 'linked';
-                    $prod->save();
-                    
-                    // If type change detected, unlink all attributes
-                    if($change_detected) {
-                        fwrite($myfile, "SalsifyProduct ID:" .$prod->id ." Single/Variant change detected, unlinking all SalsifyAttributes \n");
-        		        $child_attributes = SalsifyAttribute::findBy('pid', $prod->id);
-                		if($child_attributes)
-                		{
-                			foreach ($child_attributes as $child_attribute)
-                		    {
-                		        $child_attribute->linked_isotope_attribute = null;
-                		        $child_attribute->linked_isotope_attribute_option = null;
-                		        $child_attribute->status = "fail";
-                		        $child_attribute->save();
-                		    }
-                		}
-                    }
-                    
-                    
-                }
-            }
-            
-            
-            // At the end of the Salsify Request, we want to turn off things with $publish_tracker
-            // Update SalsifyProducts, unpublish when necessary
-            foreach($publish_tracker as $key => $val) {
-                if($val == 'false' || $val == '') {
-                    $prod_to_unpublish = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$key]);
-                    if($prod_to_unpublish != null) {
-                        $prod_to_unpublish->published = '';
-                        $prod_to_unpublish->save();
-                        
-                        fwrite($myfile, "SalsifyProduct Un-Published ID: " . $prod_to_unpublish->id . "\n");
-                        
-                    }
-                }
             }
             
             
@@ -446,3 +453,12 @@
     
     // Close our logfile
     fclose($myfile);
+    
+    
+    function toNumber($dest)
+    {
+        if ($dest)
+            return ord(strtolower($dest)) - 96;
+        else
+            return 0;
+    }
