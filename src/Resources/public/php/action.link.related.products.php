@@ -1,6 +1,11 @@
 <?php
 
     use Bcs\Model\SalsifyRequest;
+    
+    // Debug mode and log file
+    $debug_mode = true;
+    if($debug_mode)
+        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/'.date('m_d_y').'_link_related_products.txt', "a+") or die("Unable to open file!");
 
     // INITIALIZE STUFFS
     session_start();
@@ -19,8 +24,8 @@
     if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
-
-            echo "Searching for Products in Salsify Request: " . $sr->id . "<br>";
+            if($debug_mode)
+		        fwrite($log, "Searching for Products generated from SalsifyRequest: ". $sr->id ."\n");
 
             // LOOP THROUGH PRODUCTS
             $prod_query =  "SELECT * FROM tl_iso_product ORDER BY id ASC";
@@ -28,8 +33,8 @@
             if($prod_result) {
                 while($prod = $prod_result->fetch_assoc()) {
                     
-                    
-                    echo "Staging data for Product: " . $prod[''] . "<br>";
+                    if($debug_mode)
+		                fwrite($log, "Staging data for Product: ". $prod['id'] ."\n");
                     
                     $found = false;
                     
@@ -78,10 +83,9 @@
                 }
             }
         }
-        
-        echo "IDS: <br><pre>";
-        print_r($ids);
-        echo "</pre><br><hr><br>";
+
+        if($debug_mode)
+		        fwrite($log, print_r($ids, true));
         
         $rp = array();
         $rp['pid'] = $key;
