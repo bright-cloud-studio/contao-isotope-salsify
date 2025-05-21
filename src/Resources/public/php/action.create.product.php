@@ -3,7 +3,10 @@
     use Bcs\Model\SalsifyRequest;
     use Isotope\Model\Product;
     
-    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_generate_products_'.strtolower(date('m_d_y')).".txt", "a+") or die("Unable to open file!");
+    // Debug mode and log file
+    $debug_mode = true;
+    if($debug_mode)
+        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/'.date('m_d_y').'_generate_products_.txt', "a+") or die("Unable to open file!");
 
     // INITIALIZE STUFFS
     session_start();
@@ -44,15 +47,16 @@
     // STAGE DATA //
     ////////////////
     
-    fwrite($myfile, "Staging Data \n");
+    if($debug_mode)
+        fwrite($log, "Staging Data \n");
     
     // Get Salsify Requests that are in the 'awaiting_cat_linking' state
     $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_iso_generation']);
     if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
-		    
-		    fwrite($myfile, "Getting Products in SalsifyRequest: ". $sr->id ." \n");
+		    if($debug_mode)
+		        fwrite($log, "Getting Products in SalsifyRequest: ". $sr->id ." \n");
     
             // Loop through the Salsify Products
             $prod_query =  "SELECT * FROM tl_salsify_product WHERE published='1' AND pid='".$sr->id."' ORDER BY id ASC";
@@ -60,7 +64,8 @@
             if($prod_result) {
                 while($prod = $prod_result->fetch_assoc()) {
                     
-                    fwrite($myfile, "Getting Attributes for SalsifyProduct: ". $prod['id'] ." \n");
+                    if($debug_mode)
+                        fwrite($log, "Getting Attributes for SalsifyProduct: ". $prod['id'] ." \n");
                     
                     // Apply our "default" database values to the product data. This starts us out as "default", then we plug in the SalsifyAttribute values to replace the defaults
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']] = $defaults;
@@ -106,8 +111,12 @@
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']]['name'] = $prod['product_name'];
                     
                     // If alias is going to be too long, make note in log file
-                    if(strlen($prod['product_name']) > 125)
-                        fwrite($myfile, "TRUNCATING alias \n");
+                    if(strlen($prod['product_name']) > 125) {
+                        if($debug_mode)
+                            fwrite($log, "TRUNCATING alias \n");
+                    }
+                        
+                        
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']]['alias'] = generateAlias($prod['product_name']);
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']]['sku'] = $prod['product_sku'];
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']]['description'] = $prod_values['full_description'];
@@ -127,7 +136,8 @@
     // CREATE PRODUCTS //
     /////////////////////
     
-    fwrite($myfile, "Generating Products \n");
+    if($debug_mode)
+        fwrite($log, "Generating Products \n");
     
     // Tracks counts, displayed in Statistics section
     $count_single = 0;
@@ -140,7 +150,8 @@
     foreach($products as $request_id => $request) {
         
         // Unpublish Isotope Products that belong to this SalsifyRequest
-        fwrite($myfile, "Unpublishing Isotope Product created from SalsifyRequest: ".$request_id."\n");
+        if($debug_mode)
+            fwrite($log, "Unpublishing Isotope Product created from SalsifyRequest: ".$request_id."\n");
         
         $our_request = SalsifyRequest::findBy(['id = ?'], [$request_id]);
         
@@ -178,14 +189,17 @@
                         $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$prod['sku']]);
                         if($update_ip != null) {
                             
-                            fwrite($myfile, "UPDATING single product: ". $update_ip->id ."\n");
+                            if($debug_mode)
+                                fwrite($log, "UPDATING single product: ". $update_ip->id ."\n");
                             
                             // Update the product
                             $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($prod)->execute($update_ip->id);
                             
                             // Delete all our entries in tl_iso_product_category
                             $result_delete_cats = $dbh->query("delete from tl_iso_product_category WHERE pid='".$update_ip->id."'");
-                            fwrite($myfile, "DELETING existing category links \n");
+                            
+                            if($debug_mode)
+                                fwrite($log, "DELETING existing category links \n");
                             
                             // re-add them
                             $prod_cat = array();
@@ -194,7 +208,8 @@
                             foreach($cat_id as $cat) {
                                 $prod_cat['page_id'] = $cat;
                                 $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
-                                fwrite($myfile, "ADDING to category: ". $cat ."\n");
+                                if($debug_mode)
+                                    fwrite($log, "ADDING to category: ". $cat ."\n");
                             }
                             
                             // Save our Isotope Product ID for linking to our SalsifyRequest
@@ -203,7 +218,8 @@
                             
                         } else {
                             
-                            fwrite($myfile, "CREATING new product \n");
+                            if($debug_mode)
+                                fwrite($log, "CREATING new product \n");
                             
                             // Else, continue like normal
                             $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($prod)->execute();
@@ -266,8 +282,10 @@
                             $parent['name'] = $key;
                             
                             // If alias is going to be too long, make note in log file
-                            if(strlen($key) > 125)
-                                fwrite($myfile, "TRUNCATING alias \n");
+                            if(strlen($key) > 125) {
+                                if($debug_mode)
+                                    fwrite($log, "TRUNCATING alias \n");
+                            }
                             
                             $parent['alias'] = generateAlias($key);
                             $parent['sku'] = $parent['sku'] . "_parent";
@@ -276,14 +294,16 @@
                             $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$parent['sku']]);
                             if($update_ip != null) {
                                 
-                                fwrite($myfile, "UPDATING variant parent product: ". $update_ip->id ."\n");
+                                if($debug_mode)
+                                    fwrite($log, "UPDATING variant parent product: ". $update_ip->id ."\n");
                                 
                                 $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($parent)->execute($update_ip->id);
                                 $parent_id = $update_ip->id;
                                 
                                 // Delete all our entries in tl_iso_product_category
                                 $result_delete_cats = $dbh->query("delete from tl_iso_product_category WHERE pid='".$update_ip->id."'");
-                                fwrite($myfile, "DELETING existing category links \n");
+                                if($debug_mode)
+                                    fwrite($log, "DELETING existing category links \n");
                                 
                                 // First, create entry in the 'tl_product_pricetier" table
                                 $prod_cat = array();
@@ -357,22 +377,27 @@
                             $parent['name'] = $key;
                             
                             // If the alias is too long, make note in log file
-                            if(strlen($key) > 125)
-                                fwrite($myfile, "TRUNCATING alias \n");
+                            if(strlen($key) > 125) {
+                                if($debug_mode)
+                                    fwrite($log, "TRUNCATING alias \n");
+                            }
                             $parent['alias'] = generateAlias($key);
                             $parent['sku'] = $parent['sku'] . "_parent";
                             
                             // Check if this product already exists
                             $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$parent['sku']]);
                             if($update_ip != null) {
-                                fwrite($myfile, "UPDATING variant non-default parent product: ". $update_ip->id ."\n");
+                                if($debug_mode)
+                                    fwrite($log, "UPDATING variant non-default parent product: ". $update_ip->id ."\n");
                                 
                                 $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($parent)->execute($update_ip->id);
                                 $parent_id = $update_ip->id;
                                 
                                 // Delete all our entries in tl_iso_product_category
                                 $result_delete_cats = $dbh->query("delete from tl_iso_product_category WHERE pid='".$update_ip->id."'");
-                                fwrite($myfile, "DELETING existing category links \n");
+                                
+                                if($debug_mode)
+                                    fwrite($log, "DELETING existing category links \n");
                                 
                                 // First, create entry in the 'tl_product_pricetier" table
                                 $prod_cat = array();
@@ -436,7 +461,8 @@
                         // Check if this product already exists
                         $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$variant['sku']]);
                         if($update_ip != null) {
-                            fwrite($myfile, "UPDATING variant product: ". $update_ip->id ."\n");
+                            if($debug_mode)
+                                fwrite($log, "UPDATING variant product: ". $update_ip->id ."\n");
                             $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($variant)->execute($update_ip->id);
                             // Save our Isotope Product ID for linking to our SalsifyRequest
                             $generated_isotope_product_ids[] = $update_ip->id;
@@ -481,7 +507,8 @@
     echo "Parent generated from first variant: " . $count_generated_parent . "<br>";
 
     // Close our logfile
-    fclose($myfile);
+    if($debug_mode)
+        fclose($log);
     
     ///////////////
     // FUNCTIONS //
