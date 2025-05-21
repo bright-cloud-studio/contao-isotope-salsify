@@ -3,13 +3,13 @@
     use Bcs\Model\SalsifyAttribute;
     use Bcs\Model\SalsifyProduct;
     use Bcs\Model\SalsifyRequest;
-    
     use Contao\PageModel;
-    
     use Isotope\Model\Attribute;
     
-    // LOG - Create log file
-    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_autolink_category_pages_'.strtolower(date('m_d_y')).".txt", "a+") or die("Unable to open file!");
+    // Debug mode and log file
+    $debug_mode = true;
+    if($debug_mode)
+        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/'.date('m_d_y').'_autolink_category_pages.txt', "a+") or die("Unable to open file!");
     
     // INITS
     session_start();
@@ -34,8 +34,8 @@
     if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
-		    
-		    fwrite($myfile, "Getting Salsify Products for Salsify Request: ". $sr->id ."\n");
+		    if($debug_mode)
+		        fwrite($log, "Getting Salsify Products for Salsify Request: ". $sr->id ."\n");
             
             // Loop through all Salsify Products that belong to this Salsify Request
             $sp_query =  "SELECT * FROM tl_salsify_product WHERE pid='".$sr->id."' ORDER BY id ASC";
@@ -43,7 +43,8 @@
             if($sp_result) {
                 while($product = $sp_result->fetch_assoc()) {
                     
-                    fwrite($myfile, "Processing Salsify Product ID: ". $product['id'] ."\n");
+                    if($debug_mode)
+                        fwrite($log, "Processing Salsify Product ID: ". $product['id'] ."\n");
                     
                     
                     // loop through each attribute
@@ -52,7 +53,8 @@
                     if($sa_result) {
                         while($attribute = $sa_result->fetch_assoc()) {
                             
-                            fwrite($myfile, "Processing Salsify Attribute ID: ". $attribute['id'] ."\n");
+                            if($debug_mode)
+                                fwrite($log, "Processing Salsify Attribute ID: ". $attribute['id'] ."\n");
                             
                             // Break our value down into CSV stuffs
                             $page_titles = explode(", ", $attribute['attribute_value']);
@@ -62,7 +64,8 @@
                             // Loop through all of our titles
                             foreach($page_titles as $title) {
                                 
-                                fwrite($myfile, "Attempting to find Page titled: ". $title ."\n");
+                                if($debug_mode)
+                                    fwrite($log, "Attempting to find Page titled: ". $title ."\n");
                                 
                                 // Find a page with this title
                                 $page_query =  "SELECT * FROM tl_page WHERE title='".$title."' AND published='1' ORDER BY id ASC";
@@ -70,15 +73,18 @@
                                 if($page_result) {
                                     while($page = $page_result->fetch_assoc()) {
                                         
-                                        fwrite($myfile, "Page FOUND titled: ". $page['title'] ."\n");
+                                        if($debug_mode)
+                                            fwrite($log, "Page FOUND titled: ". $page['title'] ."\n");
                                         
                                         // Validate that this page belongs to the selected root
                                         $page_type = $page['type'];
                                         $pid = $page['pid'];
                                         $id = $page['id'];
                                         
+                                        if($debug_mode)
+                                            fwrite($log, "Validating this page belongs to selected root! \n");
+                                        
                                         // while we dont have the root page
-                                        fwrite($myfile, "Validating this page belongs to selected root! \n");
                                         while ($page_type != 'root') {
                                             
                                             // get the pid page, see if that gets us there
@@ -99,10 +105,14 @@
                                         echo "Our Root: " . $id . "<br>";
                                         
                                         if($root == $id) {
-                                            fwrite($myfile, "Validation success, belongs to our selected Root \n");
+                                            
+                                            if($debug_mode)
+                                                fwrite($log, "Validation success, belongs to our selected Root \n");
+                                                
                                             $page_ids[] = $page['id'];
                                         } else {
-                                            fwrite($myfile, "Validation failed... \n");
+                                            if($debug_mode)
+                                                fwrite($log, "Validation failed... \n");
                                         }
                                         
                                     }
@@ -115,7 +125,8 @@
                                 
                                 $page_csv = numbersArrayToCsv($page_ids);
                                 
-                                fwrite($myfile, "Adding SalsifyProduct to the following pages: ". $page_csv ."\n");
+                                if($debug_mode)
+                                    fwrite($log, "Adding SalsifyProduct to the following pages: ". $page_csv ."\n");
                                 
                                 $update =  "update tl_salsify_attribute set category_page='".$page_csv."' WHERE id='".$attribute['id']."'";
                                 $result_update = $dbh->query($update);
@@ -139,7 +150,8 @@
     
     
     // LOG - Close our log file
-    fclose($myfile);
+    if($debug_mode)
+        fclose($log);
     
     
     function numbersArrayToCsv(array $numbers, string $delimiter = ','): string {
