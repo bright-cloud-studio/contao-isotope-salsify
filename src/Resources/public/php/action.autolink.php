@@ -3,14 +3,14 @@
     use Bcs\Model\SalsifyAttribute;
     use Bcs\Model\SalsifyProduct;
     use Bcs\Model\SalsifyRequest;
-    
     use Isotope\Model\Attribute;
     use Isotope\Model\AttributeOption;
     use pcrov\JsonReader\JsonReader;
-    
 
-    // Stores log messages until the end
-    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/autolink_isotope_attributes'.strtolower(date('m_d_y')).".txt", "a+") or die("Unable to open file!");
+    // Debug mode and log file
+    $debug_mode = true;
+    if($debug_mode)
+        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/'.date('m_d_y').'_isotope_attributes.txt', "a+") or die("Unable to open file!");
     
     // INITS
     session_start();
@@ -21,8 +21,6 @@
     if ($dbh->connect_error) {
         die("Connection failed: " . $dbh->connect_error);
     }
-    
-    fwrite($myfile, "Processing Salsify Requests\n");
     
     $mapping = array();
     
@@ -99,9 +97,10 @@
             					// If an Option's label matches our Attribute Value, it already exists
             					if($option->label == $val) {
             						$opt_found = true;
-            						//$attribute->linked_isotope_attribute_option = $option->id;
             						$option_ids[] = $option->id;
-            						fwrite($myfile, "Option Found: ".$option->id.", adding to option_ids array \n");
+            						
+            						if($debug_mode)
+            						    fwrite($log, "Option Found: ".$option->id.", adding to option_ids array \n");
             					}
             				}
             				// If no Attribute Option is found, create it
@@ -131,13 +130,16 @@
             					$new_option->save();
             					
             					$option_ids[] = $new_option->id;
-        						fwrite($myfile, "New Option Created: ".$new_option->id.", adding to option_ids array \n");
+            					if($debug_mode)
+        						    fwrite($log, "New Option Created: ".$new_option->id.", adding to option_ids array \n");
             				}
                             
                         }
                         
                         $unlinked_sa->linked_isotope_attribute_option = serialize($option_ids);
-				        fwrite($myfile, "Saving Linked Attribute Option serialized array \n");
+                        
+                        if($debug_mode)
+				            fwrite($log, "Saving Linked Attribute Option serialized array \n");
 
                     }
                     
@@ -158,13 +160,8 @@
             $sr->save();
 		}
     }
-    
-    
-    
-    
-    //echo "<pre>";
-    //print_r($mapping);
-    
+
     
     // Close our logfile
-    fclose($myfile);
+    if($debug_mode)
+        fclose($log);
