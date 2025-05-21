@@ -15,9 +15,9 @@
     $isotope_product_type = '';
     $isotope_product_type_variant = '';
     
-    // Stores log messages until the end
-    $log_messages = '';
-    $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/salsify_request_update_'.strtolower(date('m_d_y')).".txt", "a+") or die("Unable to open file!");
+    $debug_mode = true;
+    if($debug_mode)
+        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/'.date('m_d_y').'_request_update.txt', "a+") or die("Unable to open file!");
     
     // INITS
     session_start();
@@ -37,7 +37,8 @@
     if($sr_result) {
         while($request = $sr_result->fetch_assoc()) {
             
-            fwrite($myfile, "Processing SalsifyRequest: ".$request['id']."\n");
+            if($debug_mode)
+                fwrite($log, "Processing SalsifyRequest: ".$request['id']."\n");
             
             echo "SalsifyRequest ID: " . $request['id'] . "<br>";
 
@@ -84,7 +85,8 @@
                 
                 echo "Latest Found, updating!<br>";
                 
-                fwrite($myfile, "Newer Salsify data found\n");
+                if($debug_mode)
+                    fwrite($log, "Newer Salsify data found\n");
                 
                 $run_update = true;
                 $request['file_url'] = $latest_file_url;
@@ -104,10 +106,12 @@
             // If we found a file that is newer than our saved one, we need to process this file
             if($run_update) {
                 
-                fwrite($myfile, "Generating/Updating Salsify Products and Salsify Attributes\n");
+                if($debug_mode)
+                    fwrite($log, "Generating/Updating Salsify Products and Salsify Attributes\n");
                 
                 // First, turn off all Salsify Products
-                fwrite($myfile, "Unpublishing all Salsify Products and Salsify Attributes\n");
+                if($debug_mode)
+                    fwrite($log, "Unpublishing all Salsify Products and Salsify Attributes\n");
                 $dbh->prepare("UPDATE tl_salsify_product SET published=''")->execute();
                 $dbh->prepare("UPDATE tl_salsify_attribute SET published=''")->execute();
             
@@ -135,7 +139,8 @@
                 		$required_name = $array_child[$request['isotope_name_key']][0];
                 		if($required_sku == '' || $required_name == '') {
                 		    // Skip generating this SalsifyProduct as we don't have our reqiuired 
-                		    fwrite($myfile, "Skipping Salsify Product: " . $required_sku . " | " . $required_name . "\n");
+                		    if($debug_mode)
+                		        fwrite($log, "Skipping Salsify Product: " . $required_sku . " | " . $required_name . "\n");
                 		} else {
                 		    
                 		    // Tick up our SalsifyProduct counter
@@ -147,7 +152,8 @@
                             if($update_sp != null) {
                                 
                                 // We found an existing SalsifyProduct
-                                fwrite($myfile, "Updating Salsify Product: " . $array_child[$request['isotope_sku_key']][0] . "\n");
+                                if($debug_mode)
+                                    fwrite($log, "Updating Salsify Product: " . $array_child[$request['isotope_sku_key']][0] . "\n");
                                 echo "SalsifyProduct Found and Updated!<br>";
                                 
                                 $update_sp->pid = $request['id'];
@@ -161,7 +167,8 @@
                             } else {
                                 
                                 // We need to make a new SalsifyProduct
-                                fwrite($myfile, "Creating Salsify Product: " . $array_child[$request['isotope_sku_key']][0] . "\n");
+                                if($debug_mode)
+                                    fwrite($log, "Creating Salsify Product: " . $array_child[$request['isotope_sku_key']][0] . "\n");
                                 echo "SalsifyProduct Created!<br>";
                                 
                         		$salsify_product = new SalsifyProduct();
@@ -191,9 +198,9 @@
                                     // UPDATE EXISTING SALSIFY ATTRIBUTE //
                                     ///////////////////////////////////////
                                     
-                                    
                                     // Existing SalsifyAttribute found
-                                    fwrite($myfile, "Updating Salsify Attribute ID: ".$update_sa->id."\n");
+                                    if($debug_mode)
+                                        fwrite($log, "Updating Salsify Attribute ID: ".$update_sa->id."\n");
                                     
                                     // Update the attribute_value to this latest version
                                     $update_sa->attribute_value = $val[0];
@@ -239,7 +246,8 @@
                             						$opt_found = true;
                             						//$attribute->linked_isotope_attribute_option = $option->id;
                             						$option_ids[] = $option->id;
-                            						fwrite($myfile, "Option Found: ".$option->id.", adding to option_ids array \n");
+                            						if($debug_mode)
+                            						    fwrite($log, "Option Found: ".$option->id.", adding to option_ids array \n");
                             					}
                             				}
                             				// If no Attribute Option is found, create it
@@ -269,20 +277,16 @@
                             					$new_option->save();
                             					
                             					$option_ids[] = $new_option->id;
-                        						fwrite($myfile, "New Option Created: ".$new_option->id.", adding to option_ids array \n");
+                            					if($debug_mode)
+                        						    fwrite($log, "New Option Created: ".$new_option->id.", adding to option_ids array \n");
                             				}
         		                            
         		                        }
                                         
                                         $update_sa->linked_isotope_attribute_option = serialize($option_ids);
-            					        fwrite($myfile, "Saving Linked Attribute Option serialized array \n");
+                                        if($debug_mode)
+            					            fwrite($log, "Saving Linked Attribute Option serialized array \n");
                                         $update_sa->status = 'pass';
-                                        
-                                        
-                                        //$update_sa->linked_isotope_attribute = null;
-                                        //$update_sa->linked_isotope_attribute_option = null;
-                                        //$update_sa->status = 'fail';
-                                        
                                     }
                                     
                                     $update_sa->tstamp = time();
@@ -300,14 +304,6 @@
                                     
                                     // First, start off with out linked attribute being null
                                     $salsify_attribute->linked_isotope_attribute = null;
-                                    
-                                    
-                                    
-                                    
-                                    
-                                    
-                                    
-                                    // TRY TO APPLY OUR SPECIALIZED SETTINGS FROM OTHER ATTRIBUTES
                                     
                                     // CONTROLS PUBLISHING
                                     $sa_controls_published = SalsifyAttribute::findOneBy(['tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.controls_published=?'],[$key, 1]);
@@ -340,16 +336,12 @@
                                         $salsify_attribute->is_cat = 1;
                                     }
 
-
-
-
-
-
                                     $salsify_attribute->tstamp = time();
                                     $salsify_attribute->published = 1;
                                     $salsify_attribute->save();
                                     
-                                    fwrite($myfile, "NEW Salsify Attribute ID: ".$salsify_attribute->id."\n");
+                                    if($debug_mode)
+                                        fwrite($log, "NEW Salsify Attribute ID: ".$salsify_attribute->id."\n");
         
                                 }
                                 
@@ -357,14 +349,6 @@
                                 $attributes[$salsify_attribute->id]['value'] = $val[0];
                                 $log[$salsify_product->id]['attributes'] = $attributes;
                             }  
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
     
                 		}
                         
@@ -376,12 +360,15 @@
             
             
             
-            
-                fwrite($myfile, print_r($group_counter, true));
+                if($debug_mode)
+                    fwrite($log, print_r($group_counter, true));
                 
                 // GROUPING
                 if($group_counter != null) {
-                    fwrite($myfile, "Grouping SalsifyProducts \n\n");
+                    
+                    if($debug_mode)
+                        fwrite($log, "Grouping SalsifyProducts \n\n");
+                    
                     $salsify_products = SalsifyProduct::findAll();
                     foreach($salsify_products as $prod) {
                         
@@ -394,7 +381,8 @@
                             
                             $prod->isotope_product_variant_type = 'single';
                             $prod->isotope_product_type = $isotope_product_type;
-                            fwrite($myfile, "SalsifyProduct ID: " . $prod->id . " set as 'single' using Isotope Product Type ID: " . $isotope_product_type . "\n\n");
+                            if($debug_mode)
+                                fwrite($log, "SalsifyProduct ID: " . $prod->id . " set as 'single' using Isotope Product Type ID: " . $isotope_product_type . "\n\n");
                         } else {
                             
                             if($prod->isotope_product_variant_type == 'single')
@@ -402,14 +390,16 @@
                             
                             $prod->isotope_product_variant_type = 'variant';
                             $prod->isotope_product_type = $isotope_product_type_variant;
-                            fwrite($myfile, "SalsifyProduct ID: " . $prod->id . " set as 'variant' using Isotope Product Type ID: " . $isotope_product_type_variant . "\n\n");
+                            if($debug_mode)
+                                fwrite($log, "SalsifyProduct ID: " . $prod->id . " set as 'variant' using Isotope Product Type ID: " . $isotope_product_type_variant . "\n\n");
                         }
                         $prod->isotope_product_type_linked = 'linked';
                         $prod->save();
                         
                         // If type change detected, unlink all attributes
                         if($change_detected) {
-                            fwrite($myfile, "SalsifyProduct ID:" .$prod->id ." Single/Variant change detected, unlinking all SalsifyAttributes \n");
+                            if($debug_mode)
+                                fwrite($log, "SalsifyProduct ID:" .$prod->id ." Single/Variant change detected, unlinking all SalsifyAttributes \n");
             		        $child_attributes = SalsifyAttribute::findBy('pid', $prod->id);
                     		if($child_attributes)
                     		{
@@ -437,14 +427,16 @@
                             $prod_to_unpublish->published = '';
                             $prod_to_unpublish->save();
                             
-                            fwrite($myfile, "SalsifyProduct Un-Published ID: " . $prod_to_unpublish->id . "\n");
+                            if($debug_mode)
+                                fwrite($log, "SalsifyProduct Un-Published ID: " . $prod_to_unpublish->id . "\n");
                             
                         }
                     }
                 }
             
             } else {
-                fwrite($myfile, "No new file found, skipping generation/update \n");
+                if($debug_mode)
+                    fwrite($log, "No new file found, skipping generation/update \n");
             }
             
             
@@ -452,7 +444,8 @@
     }
     
     // Close our logfile
-    fclose($myfile);
+    if($debug_mode)
+        fclose($log);
     
     
     function toNumber($dest)
