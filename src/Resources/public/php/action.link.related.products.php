@@ -97,3 +97,14 @@
         $rp['productsOrder'] = serialize($ids);
         $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_related_product %s")->set($rp)->execute();
     }
+    
+    
+    
+    // Empty out and reset (aka. TRUNCATE) the tl_iso_productcache table
+    $reset_productcache_query =  "TRUNCATE TABLE tl_iso_productcache;";
+    $reset_productcache_result = $dbh->query($reset_productcache_query);
+    
+    
+    
+    
+    
