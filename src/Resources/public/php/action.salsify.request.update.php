@@ -111,9 +111,49 @@
                 
                 // First, turn off all Salsify Products
                 if($debug_mode)
-                    fwrite($log, "Unpublishing all Salsify Products and Salsify Attributes\n");
-                $dbh->prepare("UPDATE tl_salsify_product SET published=''")->execute();
-                $dbh->prepare("UPDATE tl_salsify_attribute SET published=''")->execute();
+                    fwrite($log, "Unpublishing SalsifyProducts and SalsifyAttributes that belong to this SalsifyRequest\n");
+                
+                
+                
+                
+                
+                /* UPDATED TO BE MORE SPECIFIC TO SALSIFYREQUESTS */
+                
+                // Unpublished any existing SalsifyProducts and SalsifyAttributes that stem from this SalsifyRequest
+                $existing_salsify_products = SalsifyProduct::findBy('pid', $request['id']);
+                if($existing_salsify_products) {
+                    foreach($existing_salsify_products as $existing_salsify_product) {
+                        
+                        if($debug_mode)
+                            fwrite($log, "Finding Attributes for SalsifyProduct: ". $existing_salsify_product->id ."\n");
+                        
+                        // Get all SalsifyAttributes that belong to this SalsifyProduct    
+                        $existing_salsify_attributes = SalsifyAttribute::findBy('pid', $existing_salsify_product->id);
+                        if($existing_salsify_attributes) {
+                            foreach($existing_salsify_attributes as $existing_salsify_attribute) {
+                                
+                                if($debug_mode)
+                                    fwrite($log, "Unpublishing SalsifyAttribute: ". $existing_salsify_attribute->id ."\n");
+                                
+                                // Unpublish and save this SalsifyAttribute
+                                $existing_salsify_attribute->published = '';
+                                $existing_salsify_attribute->save();
+                            }
+                        }
+                        
+                        if($debug_mode)
+                            fwrite($log, "Unpublishing SalsifyProduct: ". $existing_salsify_product->id ."\n");
+                        
+                        // Unpublish and save this SalsifyProduct
+                        $existing_salsify_product->published = '';
+                        $existing_salsify_product->save();
+                    }
+                }
+            
+            
+            
+            
+            
             
                 // Open and process file
                 $reader = new JsonReader();
@@ -312,23 +352,60 @@
                                         $salsify_attribute->controls_published = 1;
                                     }
                                     
+                                    
+                                    
+                                    
+                                    
                                     // GROUPING
-                                    $sa_grouping = SalsifyAttribute::findOneBy(['tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.is_grouping=?'],[$key, 1]);
-                                    if($sa_grouping) {
-                                        if($isotope_product_type == '') {
-                                            $isotope_product_type = $sa_grouping->isotope_product_type;
-                                            $isotope_product_type_variant = $sa_grouping->isotope_product_type_variant;
+                                    
+                                    // get ALL SalsifyAttributes where the key matches and is checked as a grouping attribute
+                                    
+                                    if($debug_mode)
+                                        fwrite($log, "Checking grouping \n");
+                                    
+                                    $sa_groupings = SalsifyAttribute::findBy(['tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.is_grouping=?'],[$key, 1]);
+                                    if($sa_groupings) {
+                                        
+                                        if($debug_mode)
+                                            fwrite($log, "Groupings Found \n");
+                                        
+                                        foreach($sa_groupings as $as_grouping) {
+                                            
+                                            // Check if the SalsifyProduct belongs to the same SalsifyRequest
+                                            $check_parent = SalsifyProduct::findOneBy('id', $sa_grouping->pid);
+                                            if($check_parent->pid == $request['id']) {
+                                                
+                                                if($debug_mode)
+                                                    fwrite($log, "Grouping SalsifyAttribute belings to SalsifyRequest \n");
+                                                
+                                                
+                                                if($isotope_product_type == '') {
+                                                    $isotope_product_type = $sa_grouping->isotope_product_type;
+                                                    $isotope_product_type_variant = $sa_grouping->isotope_product_type_variant;
+                                                }
+                                                
+                                                $group_counter[$salsify_attribute->attribute_value] = $group_counter[$salsify_attribute->attribute_value] + 1;
+                                                $salsify_attribute->is_grouping = true;
+                                                $salsify_attribute->isotope_product_type = $sa_grouping->isotope_product_type;
+                                                $salsify_attribute->isotope_product_type_variant = $sa_grouping->isotope_product_type_variant;
+                                                
+                                                $salsify_product->variant_group = $salsify_attribute->attribute_value;
+                                                $salsify_product->save();
+                                                
+                                                if($debug_mode)
+                                                    fwrite($log, "Leaving Grouping loop! \n");
+                                                
+                                                break;
+                                            }
+                                            
                                         }
-                                        
-                                        $group_counter[$salsify_attribute->attribute_value] = $group_counter[$salsify_attribute->attribute_value] + 1;
-                                        $salsify_attribute->is_grouping = true;
-                                        $salsify_attribute->isotope_product_type = $sa_grouping->isotope_product_type;
-                                        $salsify_attribute->isotope_product_type_variant = $sa_grouping->isotope_product_type_variant;
-                                        
-                                        $salsify_product->variant_group = $salsify_attribute->attribute_value;
-                                        $salsify_product->save();
-                                        
+ 
                                     }
+                                    
+                                    
+                                    
+                                    
+                                    
                                     
                                     // IS CAT
                                     $sa_is_cat = SalsifyAttribute::findOneBy(['tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.is_cat=?'],[$key, 1]);
@@ -347,7 +424,7 @@
                                 
                                 $attributes[$salsify_attribute->id]['key'] = $key;
                                 $attributes[$salsify_attribute->id]['value'] = $val[0];
-                                $log[$salsify_product->id]['attributes'] = $attributes;
+                                //$log[$salsify_product->id]['attributes'] = $attributes;
                             }  
     
                 		}
