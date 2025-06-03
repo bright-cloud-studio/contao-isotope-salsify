@@ -123,11 +123,12 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['request'],
             'inputType'               => 'text',
-            'default'                 => '',
+            'default'                 => '0',
             'filter'                  => true,
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w100', 'rte'=>'tinyMCE'),
-            'sql'                     => "text default ''",
-            'relation'              => array('type'=>'hasOne', 'load'=>'lazy', 'table'=>'tl_salsify_product', 'field'=>'pid'),
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
+            'sql'                     => "int(10) unsigned NOT NULL default 0",
+            'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
+            'foreignKey'              => 'tl_salsify_request.request_name'
         ),
         
         'tstamp' => array
