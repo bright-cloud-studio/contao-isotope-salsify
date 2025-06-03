@@ -46,7 +46,7 @@ class SalsifyAttributeBackend extends Backend
             
 		    
 		    // Find  all SalsifyAttributes where the the 'KEY' is the same
-		    $matching_attributes = SalsifyAttribute::findBy(['attribute_key = ?'], [$dc->activeRecord->attribute_key]);
+		    $matching_attributes = SalsifyAttribute::findBy(['attribute_key = ?', 'request = ?'], [$dc->activeRecord->attribute_key, $dc->activeRecord->request]);
 		    if($matching_attributes) {
 		        
 		        // Write to log
