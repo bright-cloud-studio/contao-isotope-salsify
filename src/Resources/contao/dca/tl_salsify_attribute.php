@@ -127,7 +127,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
             'filter'                  => true,
             'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
             'sql'                     => "int(10) unsigned NOT NULL default 0",
-            'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
+            'relation'                => array('type'=>'belongsTo', 'load'=>'lazy'),
             'foreignKey'              => 'tl_salsify_request.request_name'
         ),
         
