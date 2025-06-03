@@ -114,47 +114,33 @@
                     fwrite($log, "Unpublishing SalsifyProducts and SalsifyAttributes that belong to this SalsifyRequest\n");
                 
                 
-                
-                
-                
                 /* UPDATED TO BE MORE SPECIFIC TO SALSIFYREQUESTS */
                 
-                // Unpublished any existing SalsifyProducts and SalsifyAttributes that stem from this SalsifyRequest
+                // Unpublish all SalsifyProducts that belong to this request
                 $existing_salsify_products = SalsifyProduct::findBy('pid', $request['id']);
                 if($existing_salsify_products) {
                     foreach($existing_salsify_products as $existing_salsify_product) {
-                        
-                        if($debug_mode)
-                            fwrite($log, "Finding Attributes for SalsifyProduct: ". $existing_salsify_product->id ."\n");
-                        
-                        // Get all SalsifyAttributes that belong to this SalsifyProduct    
-                        $existing_salsify_attributes = SalsifyAttribute::findBy('pid', $existing_salsify_product->id);
-                        if($existing_salsify_attributes) {
-                            foreach($existing_salsify_attributes as $existing_salsify_attribute) {
-                                
-                                if($debug_mode)
-                                    fwrite($log, "Unpublishing SalsifyAttribute: ". $existing_salsify_attribute->id ."\n");
-                                
-                                // Unpublish and save this SalsifyAttribute
-                                $existing_salsify_attribute->published = '';
-                                $existing_salsify_attribute->save();
-                            }
-                        }
-                        
                         if($debug_mode)
                             fwrite($log, "Unpublishing SalsifyProduct: ". $existing_salsify_product->id ."\n");
-                        
-                        // Unpublish and save this SalsifyProduct
                         $existing_salsify_product->published = '';
                         $existing_salsify_product->save();
                     }
                 }
-            
-            
-            
-            
-            
-            
+                
+                
+                // Unpublish all SalsifyProducts that belong to this request
+                $existing_salsify_attributes = SalsifyAttribute::findBy('request', $request['id']);
+                if($existing_salsify_attributes) {
+                    foreach($existing_salsify_attributes as $existing_salsify_attribute) {
+                        if($debug_mode)
+                            fwrite($log, "Unpublishing SalsifyAttribute: ". $existing_salsify_attribute->id ."\n");
+                        $existing_salsify_attribute->published = '';
+                        $existing_salsify_attribute->save();
+                    }
+                }
+                
+                
+
                 // Open and process file
                 $reader = new JsonReader();
                 $reader->open("../files/" . $request['source_folder'] . "/" . $request['file_url']);
@@ -339,6 +325,7 @@
                                     
                                     $salsify_attribute = new SalsifyAttribute();
                                     $salsify_attribute->pid = $salsify_product->id;
+                                    $salsify_attribute->request = $request['id'];
                                     $salsify_attribute->attribute_key = $key;
                                     $salsify_attribute->attribute_value = $val[0];
                                     
