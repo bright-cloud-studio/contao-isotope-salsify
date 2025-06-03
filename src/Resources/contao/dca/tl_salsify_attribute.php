@@ -99,7 +99,7 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
     // Palettes
     'palettes' => array
     (
-        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value; {options_legend}, linked_isotope_attribute, linked_isotope_attribute_option, attribute_option_sorting;{grouping_legend}, is_grouping, isotope_product_type, isotope_product_type_variant;{options_legend}, is_cat, category_page; {controls_published_legend}, controls_published; {status_legend}, status; {publish_legend},published; {error_log_legend}, error_log;'
+        'default'                     => '{salsify_attribute_legend}, attribute_key, attribute_value, request; {options_legend}, linked_isotope_attribute, linked_isotope_attribute_option, attribute_option_sorting;{grouping_legend}, is_grouping, isotope_product_type, isotope_product_type_variant;{options_legend}, is_cat, category_page; {controls_published_legend}, controls_published; {status_legend}, status; {publish_legend},published; {error_log_legend}, error_log;'
     ),
  
     // Fields
@@ -117,6 +117,18 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
 		    'sql'                     => "int(10) unsigned NOT NULL default 0",
 		    'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
         ),
+
+        // TESTING PULLING IN SALSIFY REQUEST
+        'request' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['request'],
+            'inputType'               => 'text',
+            'default'                 => '',
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w100', 'rte'=>'tinyMCE'),
+            'sql'                     => "text default ''",
+            'relation'              => array('type'=>'hasOne', 'load'=>'lazy', 'table'=>'tl_salsify_product', 'field'=>'pid'),
+        ),
+        
         'tstamp' => array
         (
 		    'sql'                     	=> "int(10) unsigned NOT NULL default '0'"
