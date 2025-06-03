@@ -112,6 +112,7 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
         'pid' => array
 		(
 			'foreignKey'              => 'tl_salsify_request.request_name',
+            'filter'                  => true,
 			'sql'                     => "int(10) unsigned NOT NULL default 0",
 			'relation'                => array('type'=>'belongsTo', 'load'=>'lazy')
 		),
