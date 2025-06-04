@@ -225,7 +225,7 @@
                                 
                                 // Try and find a SalsifyAttribute
                                 $salsify_attribute;
-                                $update_sa = SalsifyAttribute::findOneBy(['tl_salsify_attribute.pid=?', 'tl_salsify_attribute.attribute_key=?'],[$salsify_product->id, $key]);
+                                $update_sa = SalsifyAttribute::findOneBy(['tl_salsify_attribute.pid=?', 'tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.request=?'],[$salsify_product->id, $key, $request['id']]);
                                 if($update_sa != null) {
                                     
                                     
@@ -482,6 +482,10 @@
                         
                     }
                 }
+                
+                
+                if($debug_mode)
+                    fwrite($log, print_r($publish_tracker, true) . "\n");
                 
                 
                 // At the end of the Salsify Request, we want to turn off things with $publish_tracker
