@@ -20,6 +20,8 @@ $GLOBALS['TL_LANG']['tl_salsify_product']['toggle']                     = array(
 
 
 /* Fields */
+$GLOBALS['TL_LANG']['tl_salsify_product']['pid']                        = array('Salsify Request', 'The SalsifyRequest this SalsifyProduct stems from');
+
 $GLOBALS['TL_LANG']['tl_salsify_product']['salsify_product_legend']     = 'Salsify Product Details';
 $GLOBALS['TL_LANG']['tl_salsify_product']['product_name']               = array('Product Name', 'The Name that the Isotope Product will use');
 $GLOBALS['TL_LANG']['tl_salsify_product']['product_sku']                = array('Product SKU', 'The unique SKU that the Isotope Product will use');
