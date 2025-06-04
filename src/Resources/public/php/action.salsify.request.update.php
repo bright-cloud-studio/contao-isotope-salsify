@@ -17,7 +17,7 @@
     
     $debug_mode = true;
     if($debug_mode)
-        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/'.date('m_d_y').'_request_update.txt', "a+") or die("Unable to open file!");
+        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/request_update_'.date('m_d_y').'.txt', "a+") or die("Unable to open file!");
     
     // INITS
     session_start();
@@ -114,6 +114,11 @@
                     fwrite($log, "Unpublishing SalsifyProducts and SalsifyAttributes that belong to this SalsifyRequest\n");
                 
                 
+                
+                
+                
+                
+                
                 /* UPDATED TO BE MORE SPECIFIC TO SALSIFYREQUESTS */
                 
                 // Unpublish all SalsifyProducts that belong to this request
@@ -138,6 +143,10 @@
                         $existing_salsify_attribute->save();
                     }
                 }
+                
+                
+                
+                
                 
                 
 
@@ -347,9 +356,6 @@
                                     
                                     // get ALL SalsifyAttributes where the key matches and is checked as a grouping attribute
                                     
-                                    if($debug_mode)
-                                        fwrite($log, "Checking grouping \n");
-                                    
                                     $sa_groupings = SalsifyAttribute::findBy(['tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.is_grouping=?'],[$key, 1]);
                                     if($sa_groupings) {
                                         
@@ -376,9 +382,6 @@
                                                 
                                                 $salsify_product->variant_group = $salsify_attribute->attribute_value;
                                                 $salsify_product->save();
-                                                
-                                                if($debug_mode)
-                                                    fwrite($log, "Leaving Grouping loop! \n");
                                                 
                                                 break;
                                             }
@@ -431,7 +434,8 @@
                     if($debug_mode)
                         fwrite($log, "Grouping SalsifyProducts \n\n");
                     
-                    $salsify_products = SalsifyProduct::findAll();
+                    
+                    $salsify_products = SalsifyProduct::findBy('pid', $request['id']);
                     foreach($salsify_products as $prod) {
                         
                         $change_detected = false;
