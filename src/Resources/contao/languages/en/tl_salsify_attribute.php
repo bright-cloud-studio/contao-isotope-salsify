@@ -12,6 +12,8 @@ $GLOBALS['TL_LANG']['tl_salsify_attribute']['delete']                     = arra
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['toggle']                     = array('Toggle Salsify Attribute', 'Toggle record ID %s');
 
 /* Fields */
+$GLOBALS['TL_LANG']['tl_salsify_attribute']['request']                    = array('Salsify Request', 'The SalsifyRequest this SalsifyAttribute stems from');
+
 $GLOBALS['TL_LANG']['tl_salsify_attrbute']['salsify_attribute_legend']    = 'Salsify Attribute Details';
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['attribute_key']              = array('Attribute Key', 'The Attribute\'s KEY');
 $GLOBALS['TL_LANG']['tl_salsify_attribute']['attribute_value']            = array('Attribute Value', 'The Attribute\'s VALUE');
