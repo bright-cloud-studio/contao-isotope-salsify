@@ -358,9 +358,7 @@
                                         
                                         foreach($sa_groupings as $as_grouping) {
                                             
-                                            // Check if the SalsifyProduct belongs to the same SalsifyRequest
-                                            $check_parent = SalsifyProduct::findOneBy('id', $sa_grouping->pid);
-                                            if($check_parent->pid == $request['id']) {
+                                            if($salsify_attribute->request == $request['id']) {
                                                 
                                                 if($debug_mode)
                                                     fwrite($log, "Grouping SalsifyAttribute belings to SalsifyRequest \n");
@@ -506,6 +504,9 @@
             
         }
     }
+    
+    if($debug_mode)
+        fwrite($log, "Process completed successfully! \n");
     
     // Close our logfile
     if($debug_mode)
