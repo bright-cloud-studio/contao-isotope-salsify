@@ -195,6 +195,10 @@
                             // Update the product
                             $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($prod)->execute($update_ip->id);
                             
+                            fwrite($log, "PRODUCT DATA FOR INSERT - Single - Update \n");
+                            fwrite($log, print_r($prod, true));
+                            
+                            
                             // Delete all our entries in tl_iso_product_category
                             $result_delete_cats = $dbh->query("delete from tl_iso_product_category WHERE pid='".$update_ip->id."'");
                             
@@ -223,7 +227,10 @@
                             
                             // Else, continue like normal
                             $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($prod)->execute();
-                        
+                            
+                            fwrite($log, "PRODUCT DATA FOR INSERT - Single - Createa \n");
+                            fwrite($log, print_r($prod, true));
+                            
                             $prod_cat = array();
                             $prod_cat['pid'] = $prod_values_result->insertId;
                             $prod_cat['tstamp'] = time();
@@ -300,6 +307,9 @@
                                 $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($parent)->execute($update_ip->id);
                                 $parent_id = $update_ip->id;
                                 
+                                fwrite($log, "PRODUCT DATA FOR INSERT - Variant - Update \n");
+                                fwrite($log, print_r($parent, true));
+                                
                                 // Delete all our entries in tl_iso_product_category
                                 $result_delete_cats = $dbh->query("delete from tl_iso_product_category WHERE pid='".$update_ip->id."'");
                                 if($debug_mode)
@@ -321,6 +331,9 @@
                                 
                                 $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
                                 $parent_id = $prod_values_result->insertId;
+                                
+                                fwrite($log, "PRODUCT DATA FOR INSERT - Variant - Create \n");
+                                fwrite($log, print_r($parent, true));
         
                                  // First, create entry in the 'tl_product_pricetier" table
                                 $prod_cat = array();
@@ -393,6 +406,9 @@
                                 $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($parent)->execute($update_ip->id);
                                 $parent_id = $update_ip->id;
                                 
+                                fwrite($log, "PRODUCT DATA FOR INSERT - Variant Parent - Update \n");
+                                fwrite($log, print_r($parent, true));
+                                
                                 // Delete all our entries in tl_iso_product_category
                                 $result_delete_cats = $dbh->query("delete from tl_iso_product_category WHERE pid='".$update_ip->id."'");
                                 
@@ -414,7 +430,10 @@
                                 
                                 $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
                                 $parent_id = $prod_values_result->insertId;
-        
+                                
+                                fwrite($log, "PRODUCT DATA FOR INSERT - Variant Parent - Create \n");
+                                fwrite($log, print_r($parent, true));
+                                
                                 // First, create entry in the 'tl_product_pricetier" table
                                 $prod_cat = array();
                                 $prod_cat['pid'] = $prod_values_result->insertId;
