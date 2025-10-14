@@ -136,6 +136,11 @@
     // CREATE PRODUCTS //
     /////////////////////
     
+    
+    fwrite($log, "Staged Data Below \n");
+    fwrite($log, print_r($products, true) . "\n");
+    
+    
     if($debug_mode)
         fwrite($log, "Generating Products \n");
     
@@ -226,10 +231,11 @@
                                 fwrite($log, "CREATING new product \n");
                             
                             // Else, continue like normal
-                            $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($prod)->execute();
                             
-                            fwrite($log, "PRODUCT DATA FOR INSERT - Single - Createa \n");
+                            fwrite($log, "PRODUCT DATA FOR INSERT - Single - Created \n");
                             fwrite($log, print_r($prod, true));
+                            
+                            $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($prod)->execute();
                             
                             $prod_cat = array();
                             $prod_cat['pid'] = $prod_values_result->insertId;
@@ -304,11 +310,12 @@
                                 if($debug_mode)
                                     fwrite($log, "UPDATING variant parent product: ". $update_ip->id ."\n");
                                 
-                                $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($parent)->execute($update_ip->id);
-                                $parent_id = $update_ip->id;
-                                
+
                                 fwrite($log, "PRODUCT DATA FOR INSERT - Variant - Update \n");
                                 fwrite($log, print_r($parent, true));
+                                
+                                $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($parent)->execute($update_ip->id);
+                                $parent_id = $update_ip->id;
                                 
                                 // Delete all our entries in tl_iso_product_category
                                 $result_delete_cats = $dbh->query("delete from tl_iso_product_category WHERE pid='".$update_ip->id."'");
@@ -329,11 +336,12 @@
                                 
                             } else {
                                 
-                                $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
-                                $parent_id = $prod_values_result->insertId;
-                                
                                 fwrite($log, "PRODUCT DATA FOR INSERT - Variant - Create \n");
                                 fwrite($log, print_r($parent, true));
+                                
+                                $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
+                                $parent_id = $prod_values_result->insertId;
+
         
                                  // First, create entry in the 'tl_product_pricetier" table
                                 $prod_cat = array();
@@ -480,8 +488,11 @@
                         // Check if this product already exists
                         $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$variant['sku']]);
                         if($update_ip != null) {
-                            if($debug_mode)
+                            if($debug_mode) {
                                 fwrite($log, "UPDATING variant product: ". $update_ip->id ."\n");
+                                fwrite($log, "PRODUCT DATA FOR INSERT - Variant - Update \n");
+                                fwrite($log, print_r($variant, true));
+                            }
                             $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($variant)->execute($update_ip->id);
                             // Save our Isotope Product ID for linking to our SalsifyRequest
                             $generated_isotope_product_ids[] = $update_ip->id;
