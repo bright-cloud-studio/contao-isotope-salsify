@@ -221,7 +221,8 @@
                             $prod_values = array();
                             foreach($array_child as $key => $val) {
                                 
-                                $prod_values[$key] = $val[0];
+                                // CONVERT HERE
+                                $prod_values[$key] = encode_non_url_string($val[0]);
                                 
                                 // Try and find a SalsifyAttribute
                                 $salsify_attribute;
@@ -238,7 +239,7 @@
                                         fwrite($log, "Updating Salsify Attribute ID: ".$update_sa->id."\n");
                                     
                                     // Update the attribute_value to this latest version
-                                    $update_sa->attribute_value = $val[0];
+                                    $update_sa->attribute_value = encode_non_url_string($val[0]);
                                     
                                     
                                     // If our found SalsifyAttribute
@@ -336,7 +337,7 @@
                                     $salsify_attribute->pid = $salsify_product->id;
                                     $salsify_attribute->request = $request['id'];
                                     $salsify_attribute->attribute_key = $key;
-                                    $salsify_attribute->attribute_value = $val[0];
+                                    $salsify_attribute->attribute_value = encode_non_url_string($val[0]);
                                     
                                     // First, start off with out linked attribute being null
                                     $salsify_attribute->linked_isotope_attribute = null;
@@ -411,7 +412,7 @@
                                 }
                                 
                                 $attributes[$salsify_attribute->id]['key'] = $key;
-                                $attributes[$salsify_attribute->id]['value'] = $val[0];
+                                $attributes[$salsify_attribute->id]['value'] = encode_non_url_string($val[0]);
                                 //$log[$salsify_product->id]['attributes'] = $attributes;
                             }  
     
@@ -484,8 +485,10 @@
                 }
                 
                 
-                if($debug_mode)
+                if($debug_mode) {
+                    fwrite($log, "Dumping Publish Tracker" . "\n");
                     fwrite($log, print_r($publish_tracker, true) . "\n");
+                }
                 
                 
                 // At the end of the Salsify Request, we want to turn off things with $publish_tracker
@@ -527,4 +530,18 @@
             return ord(strtolower($dest)) - 96;
         else
             return 0;
+    }
+    
+    function encode_non_url_string($string)
+    {
+        // Use FILTER_VALIDATE_URL to check if the string is a valid URL.
+        if (filter_var($string, FILTER_VALIDATE_URL)) {
+            // If it's a URL, return the original string without encoding.
+            return $string;
+        } else {
+            // If it's not a URL, encode it.
+            // htmlentities converts special characters to HTML entities,
+            // making the string safe to display in a web page.
+            return htmlentities($string, ENT_QUOTES, 'UTF-8');
+        }
     }
