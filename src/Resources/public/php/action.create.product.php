@@ -550,7 +550,7 @@
         $text = strtolower($text);
 
         // 2. Strip HTML tags
-        $test = strip_tags($text);
+        $text = strip_tags($text);
     
         $arrSearch = array('/[^\pN\pL \.\&\/_-]+/u', '/[ \.\&\/-]+/');
 		$arrReplace = array('', '-');
