@@ -71,6 +71,10 @@
     // Loop through $linked
     foreach($linked as $key => $skus) {
         
+        fwrite($log, "Key: ". $key ."\n");
+        fwrite($log, "SKU: ". print_r($skus) ."\n");
+        
+        
         $ids = array();
         foreach($skus as $sku) {
             
