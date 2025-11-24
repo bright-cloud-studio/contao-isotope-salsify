@@ -546,12 +546,18 @@
     
     function generateAlias($text) {
         
-        // 1. Convert to lowercase:
-        $text = strtolower($text);
-
+        // 1. Convert back to HTML so we can strip the tags out next
+        $text = html_entity_decode($text);
+        
         // 2. Strip HTML tags
-        $text = strip_tags($text);
-    
+        //$text = strip_tags($text);
+        
+        // 2. Replace tags with dashes
+        $text = preg_replace('/<[^>]*>/', '-', $text);
+        
+        // 3. Convert to lowercase:
+        $text = strtolower($text);
+        
         $arrSearch = array('/[^\pN\pL \.\&\/_-]+/u', '/[ \.\&\/-]+/');
 		$arrReplace = array('', '-');
 		$text = preg_replace($arrSearch, $arrReplace, $text);
