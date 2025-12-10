@@ -112,6 +112,9 @@
                             $existing_salsify_attribute->save();
                         }
                     }
+                    
+                    // Add a blank line to our debug log before moving on to product generation
+                    debug($debug_mode, $log, "");
 
                     // Open and process Salsify File
                     $reader = new JsonReader();
@@ -126,30 +129,24 @@
                     	// Load the first array, which is the overall wrapper of arrays
                     	$array_parent = $reader->value();
                     
-                        // Loop through children arrays, these are what store the actual values here
+                        // Loop through children arrays, these are the Salsify Products
                     	$prod_count = 0;
                     	foreach($array_parent as $array_child) {
-                    		
+                    		$prod_count++;
                     		// Get the data for the two Isotope required fields for an Isotope Product, only continue if we have them
                     		$required_sku = $array_child[$request['isotope_sku_key']][0];
                     		$required_name = $array_child[$request['isotope_name_key']][0];
                     		if($required_sku == '' || $required_name == '') {
-                    		    // Skip generating this SalsifyProduct as we don't have our reqiuired 
-                    		    debug($debug_mode, $log, "Skipping Salsify Product: " . $required_sku . " | " . $required_name);
+                    		    debug($debug_mode, $log, "Required fields in Salsify Request are empty, not processing Salsify File");
                     		} else {
-                    		    
-                                $prod_count++;
                                 
-                                // Try to find an existing SalsifyProduct with these values
+                                
                                 $salsify_product;
                                 $update_sp = SalsifyProduct::findOneBy(['tl_salsify_product.product_sku=?'],[$array_child[$request['isotope_sku_key']][0]]);
                                 if($update_sp != null) {
-                                    
-                                    // We found an existing SalsifyProduct
-                                    if($debug_mode)
-                                        fwrite($log, "Updating Salsify Product: " . $array_child[$request['isotope_sku_key']][0] . "\n");
-                                    echo "SalsifyProduct Found and Updated!<br>";
-                                    
+                                    // Existing Salsify Product Found
+                                    debug($debug_mode, $log, "Update Salsify Product [SKU: " . $array_child[$request['isotope_sku_key']][0] . "]");
+
                                     $update_sp->pid = $request['id'];
                             		$update_sp->tstamp = time();
                             		$update_sp->product_sku = $array_child[$request['isotope_sku_key']][0];
@@ -159,12 +156,9 @@
                             		$salsify_product = $update_sp;
                                     
                                 } else {
-                                    
-                                    // We need to make a new SalsifyProduct
-                                    if($debug_mode)
-                                        fwrite($log, "Creating Salsify Product: " . $array_child[$request['isotope_sku_key']][0] . "\n");
-                                    echo "SalsifyProduct Created!<br>";
-                                    
+                                    // New Salsify Product
+                                    debug($debug_mode, $log, "Create Salsify Product [SKU: " . $array_child[$request['isotope_sku_key']][0] . "]");
+      
                             		$salsify_product = new SalsifyProduct();
                             		$salsify_product->pid = $request['id'];
                             		$salsify_product->tstamp = time();
@@ -175,52 +169,45 @@
                                 }
                         		
                                 
-                                // Process SalsifyAttributes for this SalsifyProduct
+                                // Loop through children arrays, these are the Salsify Attributes
                                 $attributes = array();
                                 $prod_values = array();
                                 foreach($array_child as $key => $val) {
                                     
-                                    // CONVERT HERE
+                                    // FIRST CONVERSION HERE
                                     $prod_values[$key] = encode_non_url_string($val[0]);
                                     
-                                    // Try and find a SalsifyAttribute
                                     $salsify_attribute;
                                     $update_sa = SalsifyAttribute::findOneBy(['tl_salsify_attribute.pid=?', 'tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.request=?'],[$salsify_product->id, $key, $request['id']]);
                                     if($update_sa != null) {
-                                        
-                                        
-                                        ///////////////////////////////////////
-                                        // UPDATE EXISTING SALSIFY ATTRIBUTE //
-                                        ///////////////////////////////////////
-                                        
                                         // Existing SalsifyAttribute found
-                                        if($debug_mode)
-                                            fwrite($log, "Updating Salsify Attribute ID: ".$update_sa->id."\n");
+                                        debug($debug_mode, $log, "Update Salsify Attribute [ID: ".$update_sa->id."] [KEY: " . $key . "]");
                                         
-                                        // Update the attribute_value to this latest version
+                                        // SECOND CONVERSION HERE
                                         $update_sa->attribute_value = encode_non_url_string($val[0]);
                                         
+                                        debug($debug_mode, $log, "     [ID: ".$update_sa->id."] [KEY: " . $key . "] [VAL: " . $update_sa->attribute_value . "]");
                                         
-                                        // If our found SalsifyAttribute
+                                        // Add to Publish Tracker so it gets turned on at the end
                                         if($update_sa->controls_published) {
                                             $publish_tracker[$update_sa->pid] = $update_sa->attribute_value;
                                         }
                                         
-                                        // If our found SalsifyAttribute is grouping
+                                        // If this is a grouping Salsify Attribute
                                         if($update_sa->is_grouping) {
-                                            
                                             if($isotope_product_type == '') {
                                                 $isotope_product_type = $update_sa->isotope_product_type;
                                                 $isotope_product_type_variant = $update_sa->isotope_product_type_variant;
                                             }
-                                            
                                             $group_counter[$update_sa->attribute_value] = $group_counter[$update_sa->attribute_value] + 1;
                                             $salsify_product->variant_group = $update_sa->attribute_value;
                                             $salsify_product->save();
                                         }
                                         
-                                        // if we have an isotope attribute linked
+                                        // if we have an isotope attribute option linked
                                         if($update_sa->linked_isotope_attribute_option != null) {
+                                            
+                                            //debug($debug_mode, $log, "[ID: ".$update_sa->id."] [KEY: " . $key . "] Isotope Attribute Option linked");
                                             
                                             ///////////////////////////////
                                             // UPDATE - ATTRIBUTE OPTION //
@@ -241,8 +228,8 @@
                                 						$opt_found = true;
                                 						//$attribute->linked_isotope_attribute_option = $option->id;
                                 						$option_ids[] = $option->id;
-                                						if($debug_mode)
-                                						    fwrite($log, "Option Found: ".$option->id.", adding to option_ids array \n");
+                                						
+                                						debug($debug_mode, $log, "     [ID: ".$update_sa->id."] [KEY: " . $key . "] Existing Isotope Attribute Option");
                                 					}
                                 				}
                                 				// If no Attribute Option is found, create it
@@ -272,15 +259,12 @@
                                 					$new_option->save();
                                 					
                                 					$option_ids[] = $new_option->id;
-                                					if($debug_mode)
-                            						    fwrite($log, "New Option Created: ".$new_option->id.", adding to option_ids array \n");
+                                					debug($debug_mode, $log, "     [ID: ".$update_sa->id."] [KEY: " . $key . "] New Isotope Attribute Option created with ID: " . $new_option->id);
                                 				}
             		                            
             		                        }
                                             
                                             $update_sa->linked_isotope_attribute_option = serialize($option_ids);
-                                            if($debug_mode)
-                					            fwrite($log, "Saving Linked Attribute Option serialized array \n");
                                             $update_sa->status = 'pass';
                                         }
                                         
@@ -290,15 +274,13 @@
             
                                     } else {
                                         
-                                        // CREATE NEW SalsifyAttribute
-                                        
                                         $salsify_attribute = new SalsifyAttribute();
                                         $salsify_attribute->pid = $salsify_product->id;
                                         $salsify_attribute->request = $request['id'];
                                         $salsify_attribute->attribute_key = $key;
                                         $salsify_attribute->attribute_value = encode_non_url_string($val[0]);
                                         
-                                        // First, start off with out linked attribute being null
+                                        // First, start off with our linked attribute being null
                                         $salsify_attribute->linked_isotope_attribute = null;
                                         
                                         // CONTROLS PUBLISHING
@@ -308,27 +290,16 @@
                                             $salsify_attribute->controls_published = 1;
                                         }
                                         
-                                        
-                                        
-                                        
-                                        
+
                                         // GROUPING
                                         
                                         // get ALL SalsifyAttributes where the key matches and is checked as a grouping attribute
-                                        
                                         $sa_groupings = SalsifyAttribute::findBy(['tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.is_grouping=?'],[$key, 1]);
                                         if($sa_groupings) {
-                                            
-                                            if($debug_mode)
-                                                fwrite($log, "Groupings Found \n");
                                             
                                             foreach($sa_groupings as $as_grouping) {
                                                 
                                                 if($salsify_attribute->request == $request['id']) {
-                                                    
-                                                    if($debug_mode)
-                                                        fwrite($log, "Grouping SalsifyAttribute belings to SalsifyRequest \n");
-                                                    
                                                     
                                                     if($isotope_product_type == '') {
                                                         $isotope_product_type = $sa_grouping->isotope_product_type;
@@ -350,11 +321,6 @@
      
                                         }
                                         
-                                        
-                                        
-                                        
-                                        
-                                        
                                         // IS CAT
                                         $sa_is_cat = SalsifyAttribute::findOneBy(['tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.is_cat=?'],[$key, 1]);
                                         if($sa_is_cat) {
@@ -365,15 +331,17 @@
                                         $salsify_attribute->published = 1;
                                         $salsify_attribute->save();
                                         
-                                        if($debug_mode)
-                                            fwrite($log, "NEW Salsify Attribute ID: ".$salsify_attribute->id."\n");
+                                        // New Salsify Attribute
+                                        debug($debug_mode, $log, "Create Salsify Attribute [ID: ".$salsify_attribute->id."] [KEY: " . $key . "]");
             
                                     }
                                     
                                     $attributes[$salsify_attribute->id]['key'] = $key;
                                     $attributes[$salsify_attribute->id]['value'] = encode_non_url_string($val[0]);
-                                    //$log[$salsify_product->id]['attributes'] = $attributes;
                                 }  
+        
+                                // Add a blank line between products in the debug log
+                                debug($debug_mode, $log, "-------------------------------------------");
         
                     		}
                             
@@ -382,18 +350,11 @@
                     } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
                     
                     $reader->close();
-                
-                
-                
-                    if($debug_mode)
-                        fwrite($log, print_r($group_counter, true));
-                    
+
                     // GROUPING
                     if($group_counter != null) {
                         
-                        if($debug_mode)
-                            fwrite($log, "Grouping SalsifyProducts \n\n");
-                        
+                        debug($debug_mode, $log, "Grouping Salsify Products");
                         
                         $salsify_products = SalsifyProduct::findBy('pid', $request['id']);
                         foreach($salsify_products as $prod) {
@@ -407,8 +368,9 @@
                                 
                                 $prod->isotope_product_variant_type = 'single';
                                 $prod->isotope_product_type = $isotope_product_type;
-                                if($debug_mode)
-                                    fwrite($log, "SalsifyProduct ID: " . $prod->id . " set as 'single' using Isotope Product Type ID: " . $isotope_product_type . "\n\n");
+                                
+                                debug($debug_mode, $log, "SalsifyProduct ID: " . $prod->id . " set as 'single' using Isotope Product Type ID: " . $isotope_product_type);
+
                             } else {
                                 
                                 if($prod->isotope_product_variant_type == 'single')
@@ -416,16 +378,18 @@
                                 
                                 $prod->isotope_product_variant_type = 'variant';
                                 $prod->isotope_product_type = $isotope_product_type_variant;
-                                if($debug_mode)
-                                    fwrite($log, "SalsifyProduct ID: " . $prod->id . " set as 'variant' using Isotope Product Type ID: " . $isotope_product_type_variant . "\n\n");
+                                
+                                debug($debug_mode, $log, "SalsifyProduct ID: " . $prod->id . " set as 'variant' using Isotope Product Type ID: " . $isotope_product_type_variant);
+
                             }
                             $prod->isotope_product_type_linked = 'linked';
                             $prod->save();
                             
                             // If type change detected, unlink all attributes
                             if($change_detected) {
-                                if($debug_mode)
-                                    fwrite($log, "SalsifyProduct ID:" .$prod->id ." Single/Variant change detected, unlinking all SalsifyAttributes \n");
+                                
+                                debug($debug_mode, $log, "SalsifyProduct ID:" .$prod->id ." Single/Variant change detected, unlinking all SalsifyAttributes");
+
                 		        $child_attributes = SalsifyAttribute::findBy('pid', $prod->id);
                         		if($child_attributes)
                         		{
@@ -443,84 +407,52 @@
                         }
                     }
                     
-                    
-                    if($debug_mode) {
-                        fwrite($log, "Dumping Publish Tracker" . "\n");
-                        fwrite($log, print_r($publish_tracker, true) . "\n");
-                    }
-                    
-                    
                     // At the end of the Salsify Request, we want to turn off things with $publish_tracker
                     // Update SalsifyProducts, unpublish when necessary
-                    foreach($publish_tracker as $key => $val) {
-                        if($val == 'false' || $val == '') {
-                            $prod_to_unpublish = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$key]);
-                            if($prod_to_unpublish != null) {
-                                $prod_to_unpublish->published = '';
-                                $prod_to_unpublish->save();
-                                
-                                if($debug_mode)
-                                    fwrite($log, "SalsifyProduct Un-Published ID: " . $prod_to_unpublish->id . "\n");
-                                
+                    
+                    if($publish_tracker) {
+                        debug($debug_mode, $log, "Unpublishing Salsify Products from the Publish Tracker");
+                        foreach($publish_tracker as $key => $val) {
+                            if($val == 'false' || $val == '') {
+                                $prod_to_unpublish = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$key]);
+                                if($prod_to_unpublish != null) {
+                                    $prod_to_unpublish->published = '';
+                                    $prod_to_unpublish->save();
+                                    
+                                    debug($debug_mode, $log, "Salsify Product Unpublished [ID: " . $prod_to_unpublish->id . "]");
+ 
+                                }
                             }
                         }
                     }
                 
                 }
                 
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
             } else {
-                if($debug_mode)
-                    fwrite($log, "No Files found in the Folder \n");
-                echo "No Files found in the Folder<br>";
+                debug($debug_mode, $log, "No Files found in the Folder");
             }
+            
+            
+            debug($debug_mode, $log, "Salsify Products updated: " . $prod_count);
+            
 
             // Add a blank line between our Salsify Requests
-            if($debug_mode)
-                fwrite($log, "\n");
-            echo "<br>";
+            debug($debug_mode, $log, "- - - - - - - - - - - - - - - - - - - - - -\n");
         }
     }
     
-    if($debug_mode)
-        fwrite($log, "Step One Completed \n");
-    echo "Step One Completed";
+    debug($debug_mode, $log, "Step One Completed");
     
     if($debug_mode)
         fclose($log);
     
     
-    /** HELPER FUNCTIONS **/
     
+    
+    
+    
+    
+    /** HELPER FUNCTIONS **/
     function debug($debug_mode, $log, $message) {
         if($debug_mode)
             fwrite($log, $message . "\n");
