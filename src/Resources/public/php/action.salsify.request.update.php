@@ -170,12 +170,8 @@
                         		
                                 
                                 // Loop through children arrays, these are the Salsify Attributes
-                                $attributes = array();
-                                $prod_values = array();
+                                //$attributes = array();
                                 foreach($array_child as $key => $val) {
-                                    
-                                    // FIRST CONVERSION HERE
-                                    $prod_values[$key] = encode_non_url_string($val[0]);
                                     
                                     $salsify_attribute;
                                     $update_sa = SalsifyAttribute::findOneBy(['tl_salsify_attribute.pid=?', 'tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.request=?'],[$salsify_product->id, $key, $request['id']]);
@@ -336,8 +332,8 @@
             
                                     }
                                     
-                                    $attributes[$salsify_attribute->id]['key'] = $key;
-                                    $attributes[$salsify_attribute->id]['value'] = encode_non_url_string($val[0]);
+                                    //$attributes[$salsify_attribute->id]['key'] = $key;
+                                    //$attributes[$salsify_attribute->id]['value'] = encode_non_url_string($val[0]);
                                 }  
         
                                 // Add a blank line between products in the debug log
