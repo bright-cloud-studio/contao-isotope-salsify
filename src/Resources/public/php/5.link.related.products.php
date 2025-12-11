@@ -1,31 +1,33 @@
 <?php
 
+    /** INITS AND INCLUDES - START **/
     use Bcs\Model\SalsifyRequest;
     
-    // Debug mode and log file
     $debug_mode = true;
     if($debug_mode)
-        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/'.date('m_d_y').'_link_related_products.txt', "a+") or die("Unable to open file!");
+        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_five_'.date('m_d_y').'.txt', "a+") or die("Unable to open file!");
 
-    // INITIALIZE STUFFS
     session_start();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
     
-    // DATABASE CONNECTION
-    $dbh = new mysqli("localhost", "ecomm2_user", '(nNFuy*d8O=aC@BDCh', "ecomm2_contao_413");
+    $serializedData = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/../db.txt');
+	$db_info = unserialize($serializedData);
+    $dbh = new mysqli("localhost", $db_info[0], $db_info[1], $db_info[2]);
     if ($dbh->connect_error) {
         die("Connection failed: " . $dbh->connect_error);
     }
 
     $linked = array();
+    /** INITS AND INCLUDES - STOP **/
+    
+    
     
     // Get Salsify Requests that are in the 'awaiting_cat_linking' state
     $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_related_linking']);
     if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
-            if($debug_mode)
-		        fwrite($log, "Searching for Products generated from SalsifyRequest: ". $sr->id ."\n");
+		    debug($debug_mode, $log, "Searching for Products generated from SalsifyRequest: ". $sr->id);
 
             // LOOP THROUGH PRODUCTS
             $prod_query =  "SELECT * FROM tl_iso_product ORDER BY id ASC";
@@ -33,8 +35,7 @@
             if($prod_result) {
                 while($prod = $prod_result->fetch_assoc()) {
                     
-                    if($debug_mode)
-		                fwrite($log, "Staging data for Product: ". $prod['id'] ."\n");
+                    debug($debug_mode, $log, "Staging data for Product: ". $prod['id']);
                     
                     $found = false;
                     
@@ -71,10 +72,6 @@
     // Loop through $linked
     foreach($linked as $key => $skus) {
         
-        fwrite($log, "Key: ". $key ."\n");
-        fwrite($log, "SKU: ". print_r($skus) ."\n");
-        
-        
         $ids = array();
         foreach($skus as $sku) {
             
@@ -87,9 +84,6 @@
                 }
             }
         }
-
-        if($debug_mode)
-		        fwrite($log, print_r($ids, true));
         
         $rp = array();
         $rp['pid'] = $key;
@@ -102,13 +96,14 @@
         $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_related_product %s")->set($rp)->execute();
     }
     
-    
-    
     // Empty out and reset (aka. TRUNCATE) the tl_iso_productcache table
     $reset_productcache_query =  "TRUNCATE TABLE tl_iso_productcache;";
     $reset_productcache_result = $dbh->query($reset_productcache_query);
     
     
-    
-    
-    
+    /** HELPER FUNCTIONS **/
+    function debug($debug_mode, $log, $message) {
+        if($debug_mode)
+            fwrite($log, $message . "\n");
+        echo $message . "<br>";
+    }
