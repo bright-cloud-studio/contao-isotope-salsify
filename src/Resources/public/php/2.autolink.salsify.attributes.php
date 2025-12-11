@@ -1,5 +1,6 @@
 <?php
 
+    /** INITS AND INCLUDES - START **/
     use Bcs\Model\SalsifyAttribute;
     use Bcs\Model\SalsifyProduct;
     use Bcs\Model\SalsifyRequest;
@@ -7,22 +8,24 @@
     use Isotope\Model\AttributeOption;
     use pcrov\JsonReader\JsonReader;
 
-    // Debug mode and log file
     $debug_mode = true;
     if($debug_mode)
-        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/'.date('m_d_y').'_isotope_attributes.txt', "a+") or die("Unable to open file!");
+        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_two_'.date('m_d_y').'.txt', "a+") or die("Unable to open file!");
     
-    // INITS
     session_start();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
     
-    // DATABASE CONNECTION
-    $dbh = new mysqli("localhost", "ecomm2_user", '(nNFuy*d8O=aC@BDCh', "ecomm2_contao_413");
+    $serializedData = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/../db.txt');
+	$db_info = unserialize($serializedData);
+    $dbh = new mysqli("localhost", $db_info[0], $db_info[1], $db_info[2]);
     if ($dbh->connect_error) {
         die("Connection failed: " . $dbh->connect_error);
     }
     
     $mapping = array();
+    /** INITS AND INCLUDES - STOP **/
+    
+    
     
     
     ////////////////
@@ -99,8 +102,7 @@
             						$opt_found = true;
             						$option_ids[] = $option->id;
             						
-            						if($debug_mode)
-            						    fwrite($log, "Option Found: ".$option->id.", adding to option_ids array \n");
+            						debug($debug_mode, $log, "Option Found: ".$option->id.", adding to option_ids array");
             					}
             				}
             				// If no Attribute Option is found, create it
@@ -130,16 +132,15 @@
             					$new_option->save();
             					
             					$option_ids[] = $new_option->id;
-            					if($debug_mode)
-        						    fwrite($log, "New Option Created: ".$new_option->id.", adding to option_ids array \n");
+            					
+            					debug($debug_mode, $log, "New Option Created: ".$new_option->id.", adding to option_ids array");
             				}
                             
                         }
                         
                         $unlinked_sa->linked_isotope_attribute_option = serialize($option_ids);
                         
-                        if($debug_mode)
-				            fwrite($log, "Saving Linked Attribute Option serialized array \n");
+                        debug($debug_mode, $log, "Saving Linked Attribute Option serialized array");
 
                     }
                     
@@ -151,7 +152,6 @@
 		}
     }
     
-    
     // Loop through SalsifyRequests
     if($salsify_requests) {
         foreach ($salsify_requests as $sr)
@@ -161,7 +161,14 @@
 		}
     }
 
-    
     // Close our logfile
     if($debug_mode)
         fclose($log);
+        
+        
+    /** HELPER FUNCTIONS **/
+    function debug($debug_mode, $log, $message) {
+        if($debug_mode)
+            fwrite($log, $message . "\n");
+        echo $message . "<br>";
+    }
