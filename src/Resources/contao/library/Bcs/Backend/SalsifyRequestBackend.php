@@ -80,16 +80,16 @@ class SalsifyRequestBackend extends Backend
 
     // Get Isotope Products as Checkbox array
     public function getIsotopeProducts(DataContainer $dc) { 
+        
         $chekbox_options = array();
         
-        $products = Product::findBy(['tl_iso_product.name IS NOT NULL'], []);
-        if($products) {
-            foreach($products as $product) {
+        // Loop through stored IDs, find their product, add it to the array
+        $selected_products = unserialize($dc->activeRecord->generated_isotope_products);
+        foreach($selected_products as $product_id) {
+            $product = Product::findOneBy(['tl_iso_product.id = ?'], [$product_id]);
+            if($product)
                 $chekbox_options = $chekbox_options + array($product->id => $product->name);
-            }
         }
-        
-
         
 		return $chekbox_options;
 	}
