@@ -1,25 +1,26 @@
 <?php
 
+    /** INITS AND INCLUDES - START **/
     use Bcs\Model\SalsifyAttribute;
     use Bcs\Model\SalsifyProduct;
     use Bcs\Model\SalsifyRequest;
     use Contao\PageModel;
     use Isotope\Model\Attribute;
     
-    // Debug mode and log file
     $debug_mode = true;
     if($debug_mode)
-        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/'.date('m_d_y').'_autolink_category_pages.txt', "a+") or die("Unable to open file!");
+        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_three_'.date('m_d_y').'.txt', "a+") or die("Unable to open file!");
     
-    // INITS
     session_start();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
     
-    // DATABASE CONNECTION
-    $dbh = new mysqli("localhost", "ecomm2_user", '(nNFuy*d8O=aC@BDCh', "ecomm2_contao_413");
+    $serializedData = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/../db.txt');
+	$db_info = unserialize($serializedData);
+    $dbh = new mysqli("localhost", $db_info[0], $db_info[1], $db_info[2]);
     if ($dbh->connect_error) {
         die("Connection failed: " . $dbh->connect_error);
     }
+    /** INITS AND INCLUDES - STOP **/
 
     
     
@@ -34,8 +35,7 @@
     if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
-		    if($debug_mode)
-		        fwrite($log, "Getting Salsify Products for Salsify Request: ". $sr->id ."\n");
+		    debug($debug_mode, $log, "Getting Salsify Products for Salsify Request: ". $sr->id);
             
             // Loop through all Salsify Products that belong to this Salsify Request
             $sp_query =  "SELECT * FROM tl_salsify_product WHERE pid='".$sr->id."' ORDER BY id ASC";
@@ -43,9 +43,7 @@
             if($sp_result) {
                 while($product = $sp_result->fetch_assoc()) {
                     
-                    if($debug_mode)
-                        fwrite($log, "Processing Salsify Product ID: ". $product['id'] ."\n");
-                    
+                    debug($debug_mode, $log, "Processing Salsify Product ID: ". $product['id']);
                     
                     // loop through each attribute
                     $sa_query =  "SELECT * FROM tl_salsify_attribute WHERE pid='".$product['id']."' AND is_cat='1' ORDER BY id ASC";
@@ -53,8 +51,7 @@
                     if($sa_result) {
                         while($attribute = $sa_result->fetch_assoc()) {
                             
-                            if($debug_mode)
-                                fwrite($log, "Processing Salsify Attribute ID: ". $attribute['id'] ."\n");
+                            debug($debug_mode, $log, "Processing Salsify Attribute ID: ". $attribute['id']);
                             
                             // Break our value down into CSV stuffs
                             $page_titles = explode(", ", $attribute['attribute_value']);
@@ -64,8 +61,7 @@
                             // Loop through all of our titles
                             foreach($page_titles as $title) {
                                 
-                                if($debug_mode)
-                                    fwrite($log, "Attempting to find Page titled: ". $title ."\n");
+                                debug($debug_mode, $log, "Attempting to find Page titled: ". $title);
                                 
                                 // Find a page with this title
                                 $page_query =  "SELECT * FROM tl_page WHERE title='".$title."' AND published='1' ORDER BY id ASC";
@@ -73,16 +69,14 @@
                                 if($page_result) {
                                     while($page = $page_result->fetch_assoc()) {
                                         
-                                        if($debug_mode)
-                                            fwrite($log, "Page FOUND titled: ". $page['title'] ."\n");
+                                        debug($debug_mode, $log, "Page FOUND titled: ". $page['title']);
                                         
                                         // Validate that this page belongs to the selected root
                                         $page_type = $page['type'];
                                         $pid = $page['pid'];
                                         $id = $page['id'];
                                         
-                                        if($debug_mode)
-                                            fwrite($log, "Validating this page belongs to selected root! \n");
+                                        debug($debug_mode, $log, "Validating this page belongs to selected root");
                                         
                                         // while we dont have the root page
                                         while ($page_type != 'root') {
@@ -101,18 +95,14 @@
                                         $request = SalsifyRequest::findBy(['id = ?'], [$product['pid']]);
                                         
                                         $root = unserialize($request->website_root)[0];
-                                        echo "Selected Root: " . $root . "<br>";
-                                        echo "Our Root: " . $id . "<br>";
                                         
                                         if($root == $id) {
                                             
-                                            if($debug_mode)
-                                                fwrite($log, "Validation success, belongs to our selected Root \n");
+                                            debug($debug_mode, $log, "Validation success, belongs to our selected Root");
                                                 
                                             $page_ids[] = $page['id'];
                                         } else {
-                                            if($debug_mode)
-                                                fwrite($log, "Validation failed... \n");
+                                            debug($debug_mode, $log, "Validation failed...");
                                         }
                                         
                                     }
@@ -125,8 +115,7 @@
                                 
                                 $page_csv = numbersArrayToCsv($page_ids);
                                 
-                                if($debug_mode)
-                                    fwrite($log, "Adding SalsifyProduct to the following pages: ". $page_csv ."\n");
+                                debug($debug_mode, $log, "Adding SalsifyProduct to the following pages: ". $page_csv);
                                 
                                 $update =  "update tl_salsify_attribute set category_page='".$page_csv."' WHERE id='".$attribute['id']."'";
                                 $result_update = $dbh->query($update);
@@ -153,6 +142,14 @@
     if($debug_mode)
         fclose($log);
     
+    
+    
+    /** HELPER FUNCTIONS **/
+    function debug($debug_mode, $log, $message) {
+        if($debug_mode)
+            fwrite($log, $message . "\n");
+        echo $message . "<br>";
+    }
     
     function numbersArrayToCsv(array $numbers, string $delimiter = ','): string {
         // Filter out non-numeric values to ensure only numbers are included
