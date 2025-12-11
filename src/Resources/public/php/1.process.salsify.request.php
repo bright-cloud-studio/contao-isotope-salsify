@@ -88,7 +88,7 @@
                     }
                 }
 
-                /** PROCESS NEW FILE **/
+                // New file found, process it
                 if($run_update) {
                     
                     debug($debug_mode, $log, "Processing new Salsify File");
@@ -116,7 +116,7 @@
                     // Add a blank line to our debug log before moving on to product generation
                     debug($debug_mode, $log, "");
 
-                    // Open and process Salsify File
+                    /** PROCESS JSON FILE - START **/
                     $reader = new JsonReader();
                     $reader->open("../files/" . $request['source_folder'] . "/" . $request['file_url']);
                     $depth = $reader->depth();
@@ -177,12 +177,12 @@
                                     $update_sa = SalsifyAttribute::findOneBy(['tl_salsify_attribute.pid=?', 'tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.request=?'],[$salsify_product->id, $key, $request['id']]);
                                     if($update_sa != null) {
                                         // Existing SalsifyAttribute found
-                                        debug($debug_mode, $log, "Update Salsify Attribute [ID: ".$update_sa->id."] [KEY: " . $key . "]");
+                                        debug($debug_mode, $log, "\tUpdate Salsify Attribute [ID: ".$update_sa->id."] [KEY: " . $key . "]");
                                         
                                         // SECOND CONVERSION HERE
                                         $update_sa->attribute_value = encode_non_url_string($val[0]);
                                         
-                                        debug($debug_mode, $log, "     [ID: ".$update_sa->id."] [KEY: " . $key . "] [VAL: " . $update_sa->attribute_value . "]");
+                                        debug($debug_mode, $log, "\t\t[ID: ".$update_sa->id."] [KEY: " . $key . "] [VAL: " . $update_sa->attribute_value . "]");
                                         
                                         // Add to Publish Tracker so it gets turned on at the end
                                         if($update_sa->controls_published) {
@@ -225,7 +225,7 @@
                                 						//$attribute->linked_isotope_attribute_option = $option->id;
                                 						$option_ids[] = $option->id;
                                 						
-                                						debug($debug_mode, $log, "     [ID: ".$update_sa->id."] [KEY: " . $key . "] Existing Isotope Attribute Option");
+                                						debug($debug_mode, $log, "\t\t[ID: ".$update_sa->id."] [KEY: " . $key . "] Existing Isotope Attribute Option");
                                 					}
                                 				}
                                 				// If no Attribute Option is found, create it
@@ -255,7 +255,7 @@
                                 					$new_option->save();
                                 					
                                 					$option_ids[] = $new_option->id;
-                                					debug($debug_mode, $log, "     [ID: ".$update_sa->id."] [KEY: " . $key . "] New Isotope Attribute Option created with ID: " . $new_option->id);
+                                					debug($debug_mode, $log, "\t\t[ID: ".$update_sa->id."] [KEY: " . $key . "] New Isotope Attribute Option created with ID: " . $new_option->id);
                                 				}
             		                            
             		                        }
@@ -328,26 +328,25 @@
                                         $salsify_attribute->save();
                                         
                                         // New Salsify Attribute
-                                        debug($debug_mode, $log, "Create Salsify Attribute [ID: ".$salsify_attribute->id."] [KEY: " . $key . "]");
+                                        debug($debug_mode, $log, "\tCreate Salsify Attribute [ID: ".$salsify_attribute->id."] [KEY: " . $key . "]");
             
                                     }
-                                    
-                                    //$attributes[$salsify_attribute->id]['key'] = $key;
-                                    //$attributes[$salsify_attribute->id]['value'] = encode_non_url_string($val[0]);
+
                                 }  
         
                                 // Add a blank line between products in the debug log
                                 debug($debug_mode, $log, "-------------------------------------------");
-        
                     		}
                             
                     	}
                     
                     } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
-                    
                     $reader->close();
-
-                    // GROUPING
+                    /** PROCESS JSON FILE - START **/
+                    
+                    
+                    
+                    // Group Products
                     if($group_counter != null) {
                         
                         debug($debug_mode, $log, "Grouping Salsify Products");
