@@ -61,6 +61,13 @@ $GLOBALS['TL_DCA']['tl_salsify_attribute'] = array
                 'href'                => 'act=select',
                 'class'               => 'header_edit_all',
                 'attributes'          => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+            ),
+            'autolink' => array
+            (
+                'label'               => &$GLOBALS['TL_LANG']['tl_salsify_attribute']['autolink'],
+                'href'                => 'key=export',
+                'icon'                => 'export.svg',
+                'button_callback'     => ['Bcs\Backend\SalsifyAttributeBackend', 'autolinkIsotopeAttributes']
             )
         ),
         'operations' => array
