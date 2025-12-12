@@ -158,12 +158,16 @@
             }
         }
         
+        debug($debug_mode, $log, "After Our Request");
+        
         // Tracks the IDs of the Isotope Products we generate, saving them will link our Isotope Products to our SalsifyRequest
         $generated_isotope_product_ids = array();
         
         foreach($request as $key => $group) {
             
             if(count($group) == 1) {
+                
+                debug($debug_mode, $log, "Single");
                 
                 // CREATE SINGLE PRODUCT
                 $count_single++;
@@ -250,7 +254,12 @@
                 
             } else {
                 
+                debug($debug_mode, $log, "Variant");
+                
                 // CREATE VARIANT PRODUCT
+                
+                
+                
     
                 // For now, we need to use the first loop to create the parent, track if it is that loop
                 $create_parent = true;
