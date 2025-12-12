@@ -21,87 +21,82 @@ use Isotope\Model\ProductType;
 
 class SalsifyAttributeBackend extends Backend
 {
-
     
+    private $debug_mode = true;
+
     public function addLinkMatchingAttributes($arrButtons, DataContainer $dc)
 	{
-	    
+
 	    // If we have submiited the page
 		if (Input::post('link_similar') !== null && Input::post('FORM_SUBMIT') == 'tl_salsify_attribute')
 		{
 		    // Create log file
-	        $myfile = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/link_matching_attributes_'.strtolower(date('m_d_y')).".txt", "a+") or die("Unable to open file!");
+		    if($this->debug_mode)
+	            $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/link_matching_attributes_'.date('m_d_Y').'.txt', "a+") or die("Unable to open file!");
 	    
             // Stores counts of the uses of the grouping value
             $group_counter = array();
             $publish_tracker = array();
+            
             $isotope_product_type = '';
             $isotope_product_type_variant = '';
             
             // If our kickoff has 'controls_published' ticked, add to our publish tracker
             if($dc->activeRecord->controls_published) {
                 $publish_tracker[$dc->activeRecord->pid] = $dc->activeRecord->attribute_value;
-                //echo "Added activeRecord to Publish Tracker";
             }
             
-		    
-		    // Find  all SalsifyAttributes where the the 'KEY' is the same
+            $this->debug($this->debug_mode, $log, "[Kickoff Salsify Attribute ID: " . $dc->activeRecord->id . "] [KEY: " . $dc->activeRecord->attribute_key . "] Kicking off Linking for matching Salsify Attributes");
+            $this->debug($this->debug_mode, $log, "- - - - - - - - - - - - - - - - - -");
+            
+		    // Find all Salsify Attributes from this Salsify Request where they key is the same but has no linked Isotope Attribute
 		    $matching_attributes = SalsifyAttribute::findBy(['attribute_key = ?', 'request = ?'], [$dc->activeRecord->attribute_key, $dc->activeRecord->request]);
 		    if($matching_attributes) {
-		        
-		        // Write to log
-	            fwrite($myfile, "Kickoff SalsifyAttribute ID: " . $dc->activeRecord->id . "\n\n");
-		        
 		        foreach($matching_attributes as $attribute) {
+
 		            $save = false;
 	                
-	                // ISOTOPE ATTRIBUTE LINKING
-	                if($dc->activeRecord->linked_isotope_attribute != null) {
+	                $this->debug($this->debug_mode, $log, "\t[Salsify Attribute ID: " . $attribute->id . "] Salsify Attribute with matching Salsify Request, Key and no Linked Isotope Attribute");
+	                
+	                // Check if the parent Salsify Products for our Kickoff and our Matched are the same Isotope Product Type
+	                $kickoff_parent = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$dc->activeRecord->pid]);
+	                $matching_parent = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attribute->pid]);
+	                if($kickoff_parent->isotope_product_variant_type == $matching_parent->isotope_product_variant_type) {
 	                    
-		                // Get our parents
-		                $kickoff_parent = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$dc->activeRecord->pid]);
-		                $matching_parent = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attribute->pid]);
-		                
-		                // If the variant type matches
-		                if($kickoff_parent->isotope_product_variant_type == $matching_parent->isotope_product_variant_type) {
-		                    
-		                    fwrite($myfile, "Variant Type Match!" . "\n");
-		                    
-		                    // Apply the linked attribute
-		                    $attribute->linked_isotope_attribute = $dc->activeRecord->linked_isotope_attribute;
-		                    $attribute->attribute_option_sorting = $dc->activeRecord->attribute_option_sorting;
-		                    $attribute->status = 'pass';
-		                    fwrite($myfile, "New Attribute Linked ID: " . $attribute->id . "\n");
-		                    
-		                    
-		                    
-		                    // Link or Create Option
-		                    $iso_attr = Attribute::findBy(['id = ?'], [$attribute->linked_isotope_attribute]);
-		                    if($iso_attr->type == 'select' || $iso_attr->type == 'radio') {
-		                        fwrite($myfile, "Linked Isotope Attribute detected as SELECT or RADIO \n");
-		                        
-		                        
-		                        
-		                        // Covert 'attribute_value' into array, loop through
-		                        $option_ids = array();
-		                        $attribute_values = explode(", ", $attribute->attribute_value);
-		                        foreach($attribute_values as $val) {
-		                            
-		                            // Find all Options for this Attribute
-                    				$existing_options = AttributeOption::findByPid($attribute->linked_isotope_attribute);
-                    				$opt_found = false;
-                    				foreach($existing_options as $option) {
-                    					// If an Option's label matches our Attribute Value, it already exists
-                    					if($option->label == $val) {
-                    						$opt_found = true;
-                    						//$attribute->linked_isotope_attribute_option = $option->id;
-                    						$option_ids[] = $option->id;
-                    						fwrite($myfile, "Option Found: ".$option->id.", adding to option_ids array \n");
-                    					}
-                    				}
-                    				// If no Attribute Option is found, create it
-                    				if($opt_found != true) {
-                    					$new_option = new AttributeOption();
+	                    $this->debug($this->debug_mode, $log, "\t[Salsify Attribute ID: " . $attribute->id . "] Isotope Product Type match");
+	                    
+	                    if($dc->activeRecord->linked_isotope_attribute == null) {
+	                        $this->debug($this->debug_mode, $log, "\tKickoff Salsify Attribute has no Linked Isotope Attribute, skipping linking");
+	                    } else {
+    	                    
+    	                    // Apply the linked attribute
+    	                    $attribute->linked_isotope_attribute = $dc->activeRecord->linked_isotope_attribute;
+    	                    $attribute->attribute_option_sorting = $dc->activeRecord->attribute_option_sorting;
+    	                    $attribute->status = 'pass';
+    	                    
+    	                    $this->debug($this->debug_mode, $log, "\t[Salsify Attribute ID: " . $attribute->id . "] Kickoff's Salsify Attribute's Linked Isotope Attribute applied");
+    	                    
+    	                    // Link or Create Option
+    	                    $iso_attr = Attribute::findBy(['id = ?'], [$attribute->linked_isotope_attribute]);
+    	                    if($iso_attr->type == 'select' || $iso_attr->type == 'radio') {
+    	                        
+    	                        $this->debug($this->debug_mode, $log, "\t[Isotope Attribute ID: " . $iso_attr->id . "] Type detected as SELECT or RADIO, Isotope Attribute Option required");
+    	                        
+    	                        // Loop through comma separated attribute values
+    	                        $option_ids = array();
+    	                        $attribute_values = explode(", ", $attribute->attribute_value);
+    	                        foreach($attribute_values as $val) {
+    	                            
+    	                            // Try and find an existing Attribute Option
+    	                            $existing_option = AttributeOption::findOneBy(['tl_iso_attribute_option.pid=?', 'tl_iso_attribute_option.label=?'],[$attribute->linked_isotope_attribute, $val]);
+    	                            if($existing_option) {
+    	                                
+    	                                $option_ids[] = $option->id;
+    	                                $this->debug($this->debug_mode, $log, "\t[Isotope Attribute Option ID: " . $option->id . "] Existing Isotope Attribute Option for this Isotope Attribute found");
+    	                                
+    	                            } else {
+    	                                
+    	                                $new_option = new AttributeOption();
                     					$new_option->pid = $attribute->linked_isotope_attribute;
                     					$new_option->label = $val;
                     					$new_option->tstamp = time();
@@ -126,176 +121,114 @@ class SalsifyAttributeBackend extends Backend
                     					$new_option->save();
                     					
                     					$option_ids[] = $new_option->id;
-                						fwrite($myfile, "New Option Created: ".$new_option->id.", adding to option_ids array \n");
+                    					$this->debug($this->debug_mode, $log, "\t[Isotope Attribute Option ID: " . $new_option->id . "] New Isotope Attribute Option created");
+    	                            }
 
-                    				}
-		                            
-		                        }
-		                        
-		                        
+    	                            
+    	                        }
+    
                                 $attribute->linked_isotope_attribute_option = serialize($option_ids);
-            					fwrite($myfile, "Saving Linked Attribute Option serialized array \n");
-
- 
-		                    }
-		                    
-		                    
-		                    
+    	                    }
                             $save = true;
-		                }
+	                    }
 	                }
 	                
-	                
-	                
-	                
-	                
-	                
+
 	                /** GROUPING HERE **/
-	                
-    		        
-    		        // GROUPING - Spread to matching 'attribute_key'
+	                // If the Kickoff attribute has "grouping" checked and isotope product types assigned
     		        if($dc->activeRecord->is_grouping && $dc->activeRecord->isotope_product_type != null && $dc->activeRecord->isotope_product_type_variant != null) {
-
-                        if($isotope_product_type == '') {
-                            $isotope_product_type = $dc->activeRecord->isotope_product_type;
-                            $isotope_product_type_variant = $dc->activeRecord->isotope_product_type_variant;
-                        }
                         
-    		            // Apply the same settings to this matching SalsifyAttribute
-    		            $attribute->is_grouping = 1;
-    		            $attribute->isotope_product_type = $dc->activeRecord->isotope_product_type;
+                        // Save our Product Types for later
+                        $isotope_product_type = $dc->activeRecord->isotope_product_type;
+                        $isotope_product_type_variant = $dc->activeRecord->isotope_product_type_variant;
+                        
+                        // Apply the is_grouping and product type values
+                        $attribute->is_grouping = 1;
+                        $attribute->isotope_product_type = $dc->activeRecord->isotope_product_type;
     		            $attribute->isotope_product_type_variant = $dc->activeRecord->isotope_product_type_variant;
-
+    		            
+                        $save = true;
+                        $this->debug($this->debug_mode, $log, "\t[Salsify Attribute ID: ".$attribute->id."] 'is_grouping' applied");
+                        
                         // Add a +1 count to the value stored
                         $group_counter[$attribute->attribute_value] = $group_counter[$attribute->attribute_value] + 1;
-    		            
-    		            // Write to log
-	                    fwrite($myfile, "Grouping applied to SalsifyAttribute ID: " . $attribute->id . "\n");
-    		            
-    		            // Update the SalsifyProduct parent
+                        
+                        // Apply Variant Group to the parent Salsify Product
                         $salsify_product = SalsifyProduct::findOneBy(['tl_salsify_product.id=?'],[$attribute->pid]);
                         if($salsify_product != null) {
                             $salsify_product->variant_group = $attribute->attribute_value;
                             $salsify_product->save();
                             
-                            // Write to log
-	                        fwrite($myfile, "Updating Parent SalsifyProduct ID: " . $salsify_product->id . "\n");
+                            $this->debug($this->debug_mode, $log, "\t[Parent Salsify Product ID: ".$salsify_product->id."] Variant Group applied");
+
                         }
-    		            
-    		            // Flag for saving
-    		            $save = true;
+
     		        }
-    		        
-    		        
-    		        /** GROUPING HERE - END **/
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
-    		        
+
     		        // CATEGORY
     		        if($dc->activeRecord->is_cat) {
     		            $attribute->is_cat = 1;
     		            $save = true;
     		            
-    		            // Write to log
-	                    fwrite($myfile, "Category applied to SalsifyAttribute ID: " . $attribute->id . "\n");
-    		            
+    		            $this->debug($this->debug_mode, $log, "\t[Salsify Attribute ID: ".$attribute->id."] 'is_cat' applied");
     		        }
-    		        
     		        
     		        // CONTROL PUBLISHED
     		        if($dc->activeRecord->controls_published) {
     		            $attribute->controls_published = 1;
     		            $publish_tracker[$attribute->pid] = $attribute->attribute_value;
-    		            
-    		            
+
     		            $save = true;
     		            
-    		            // Write to log
-	                    fwrite($myfile, "Controls Published applied to SalsifyAttribute ID: " . $attribute->id . "\n");
-    		            
+    		            $this->debug($this->debug_mode, $log, "\t[Salsify Attribute ID: ".$attribute->id."] 'controls_published' applied");
     		        }
-    		        
-    		        
 		            
 		            // SAVE IF UPDATED
     		        if($save) {
     		            $attribute->save();
-    		            // Write to log
-    	               fwrite($myfile, "Saving SalsifyAttribute ID: " . $attribute->id . "\n\n");
+    		            
+    		            $this->debug($this->debug_mode, $log, "\t[Salsify Attribute ID: ".$attribute->id."] saved");
     		        }
 		        
+		            // Divider between products to make the log more readable
+		            $this->debug($this->debug_mode, $log, "- - - - - - - - - - - - - - - - - -");
 		        }
-		        
-		        
-
 		    }
 		    
-		   
-		   
-		   
-		   
-		   
-		   
-		   
-		   
-		   
-		   
-		   
-		   
-		   
-		   
-		   
-		   
+
 		   /** GROUPING HERE **/
 		   
-            // Update Grouping values once all other updates have processed
-            if($group_counter != null) {
+		   // If 'is_grouping' was applied to a Salsify Attribute, we should regroup all products
+            if($isotope_product_type && $isotope_product_type) {
+
+                $this->debug($this->debug_mode, $log, "Regrouping Updated Salsify Products");
+
                 
-                fwrite($myfile, "Grouping SalsifyProducts \n\n");
-                
-                $salsify_products = SalsifyProduct::findAll();
-                foreach($salsify_products as $prod) {
+                foreach($group_counter as $key => $val) {
+                    //echo "Key: " . $key . "<br>";
+                    //echo "Val: " . $val . "<br>";
                     
-                    if($group_counter[$prod->variant_group] == 1) {
-                        $prod->isotope_product_variant_type = 'single';
-                        $prod->isotope_product_type = $isotope_product_type;
+                    $salsify_products = SalsifyProduct::findBy(['tl_salsify_product.variant_group=?'],[$key]);
+                    if($salsify_products) {
+                        foreach($salsify_products as $salsify_product) {
+                            if($group_counter[$salsify_product->variant_group] == 1) {
+                                $salsify_product->isotope_product_variant_type = 'single';
+                                $salsify_product->isotope_product_type = $isotope_product_type;
+                                $this->debug($this->debug_mode, $log, "[Salsify Product ID: " . $salsify_product->id . "] Set as 'single' using Isotope Product Type ID: " . $isotope_product_type);
+                            } else {
+                                $salsify_product->isotope_product_variant_type = 'variant';
+                                $salsify_product->isotope_product_type = $isotope_product_type_variant;
+                                $this->debug($this->debug_mode, $log, "[Salsify Product ID: " . $salsify_product->id . "] Set as 'variant' using Isotope Product Type ID: " . $isotope_product_type_variant);
+                            }
+                            
+                            $salsify_product->isotope_product_type_linked = 'linked';
+                            $salsify_product->save();
                         
-                        fwrite($myfile, "SalsifyProduct ID: " . $prod->id . " set as 'single' using Isotope Product Type ID: " . $isotope_product_type . "\n\n");
-                        
-                    } else {
-                        $prod->isotope_product_variant_type = 'variant';
-                        $prod->isotope_product_type = $isotope_product_type_variant;
-                        
-                        fwrite($myfile, "SalsifyProduct ID: " . $prod->id . " set as 'variant' using Isotope Product Type ID: " . $isotope_product_type_variant . "\n\n");
-                        
+                        }
                     }
-                    $prod->isotope_product_type_linked = 'linked';
-                    $prod->save();
+                    
                 }
-                
+                //die();
             }
             
             /** GROUPING HERE - END **/
@@ -326,14 +259,13 @@ class SalsifyAttributeBackend extends Backend
                         $prod_to_unpublish->published = '';
                         $prod_to_unpublish->save();
                         
-                        fwrite($myfile, "SalsifyProduct Un-Published ID: " . $prod_to_unpublish->id . "\n");
-                        
+                        //$this->debug($this->debug_mode, $log, "SalsifyProduct Un-Published ID: " . $prod_to_unpublish->id);
                     }
                 }
             }
             
-            // Close our log file
-	        fclose($myfile);
+            if($this->debug_mode)
+	            fclose($log);
 
             // Redirect back to the list view
 		    $this->redirect($this->getReferer());
@@ -536,6 +468,18 @@ class SalsifyAttributeBackend extends Backend
 		return $varValue;
 	}
 	
+	
+	
+	
+	
+	
+	/** HELPER FUNCTIONS **/
+    function debug($debug_mode, $log, $message) {
+        if($debug_mode)
+            fwrite($log, $message . "\n");
+    }
+	
+	/*
 	function csvStringToArray(string $csvString, string $delimiter = ',', string $enclosure = '"', string $escape = '\\'): array
     {
         $rows = [];
@@ -550,6 +494,7 @@ class SalsifyAttributeBackend extends Backend
     
         return $rows;
     }
+    */
 	
 	
 }
