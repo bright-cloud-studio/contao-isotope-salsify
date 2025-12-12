@@ -127,9 +127,7 @@ class SalsifyAttributeBackend extends Backend
                     					
                     					$option_ids[] = $new_option->id;
                 						fwrite($myfile, "New Option Created: ".$new_option->id.", adding to option_ids array \n");
-                    					
-                    					//$attribute->linked_isotope_attribute_option = $new_option->id;
-                    					//fwrite($myfile, "New Option Created and Linked \n");
+
                     				}
 		                            
 		                        }
@@ -149,6 +147,10 @@ class SalsifyAttributeBackend extends Backend
 	                
 	                
 	                
+	                
+	                
+	                
+	                /** GROUPING HERE **/
 	                
     		        
     		        // GROUPING - Spread to matching 'attribute_key'
@@ -183,6 +185,32 @@ class SalsifyAttributeBackend extends Backend
     		            // Flag for saving
     		            $save = true;
     		        }
+    		        
+    		        
+    		        /** GROUPING HERE - END **/
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
+    		        
     		        
     		        
     		        
@@ -227,6 +255,22 @@ class SalsifyAttributeBackend extends Backend
 		    
 		   
 		   
+		   
+		   
+		   
+		   
+		   
+		   
+		   
+		   
+		   
+		   
+		   
+		   
+		   
+		   
+		   /** GROUPING HERE **/
+		   
             // Update Grouping values once all other updates have processed
             if($group_counter != null) {
                 
@@ -253,6 +297,24 @@ class SalsifyAttributeBackend extends Backend
                 }
                 
             }
+            
+            /** GROUPING HERE - END **/
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             
             
             
