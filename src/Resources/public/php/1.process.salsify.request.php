@@ -347,9 +347,11 @@
                     
                     
                     // Group Products
+                    // If any product here contained a grouping attribute, group all products again
+                    // All products need to be run in the event this product belongs to another one
                     if($group_counter != null) {
                         
-                        debug($debug_mode, $log, "Grouping Salsify Products");
+                        debug($debug_mode, $log, "Grouping All Salsify Products");
                         
                         $salsify_products = SalsifyProduct::findBy('pid', $request['id']);
                         foreach($salsify_products as $prod) {
@@ -364,7 +366,7 @@
                                 $prod->isotope_product_variant_type = 'single';
                                 $prod->isotope_product_type = $isotope_product_type;
                                 
-                                debug($debug_mode, $log, "SalsifyProduct ID: " . $prod->id . " set as 'single' using Isotope Product Type ID: " . $isotope_product_type);
+                                //debug($debug_mode, $log, "SalsifyProduct ID: " . $prod->id . " set as 'single' using Isotope Product Type ID: " . $isotope_product_type);
 
                             } else {
                                 
@@ -374,7 +376,7 @@
                                 $prod->isotope_product_variant_type = 'variant';
                                 $prod->isotope_product_type = $isotope_product_type_variant;
                                 
-                                debug($debug_mode, $log, "SalsifyProduct ID: " . $prod->id . " set as 'variant' using Isotope Product Type ID: " . $isotope_product_type_variant);
+                                //debug($debug_mode, $log, "SalsifyProduct ID: " . $prod->id . " set as 'variant' using Isotope Product Type ID: " . $isotope_product_type_variant);
 
                             }
                             $prod->isotope_product_type_linked = 'linked';
@@ -451,6 +453,7 @@
     function debug($debug_mode, $log, $message) {
         if($debug_mode)
             fwrite($log, $message . "\n");
+
         echo $message . "<br>";
     }
     
