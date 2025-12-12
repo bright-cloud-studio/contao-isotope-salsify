@@ -277,6 +277,36 @@ class SalsifyAttributeBackend extends Backend
 	}
 
 
+
+
+
+
+    public function autolinkIsotopeAttributes($href, $label, $title, $class, $attributes)
+    {
+        // Check if export triggered
+        if (Input::get('key') === 'autolink') {
+            echo "Autolink here!";
+            die();
+        }
+		
+        // Return button HTML
+        return '<a href="'.$this->addToUrl('key=autolink').'" class="'.$class.'" title="'.($title).'"'.$attributes.'>'
+            . ucfirst($label)
+            . '</a>';
+    }
+
+
+
+
+
+
+
+
+    
+
+
+
+    
     
     // Display error until all 'flags' are 
     public function generateStatusLabel($row, $label, $dc, $args)
