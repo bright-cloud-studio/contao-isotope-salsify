@@ -95,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default' => '{salsify_request_legend}, request_name, source_folder, isotope_name_key, isotope_sku_key; {website_root_legend}, website_root; {latest_file_legend}, file_url, file_date; {status_legend}, status, initial_linking_completed; {generated_products_legend}, generated_isotope_products;'
+        'default' => '{salsify_request_legend}, request_name, source_folder, file_url, file_date; {isotope_details_legend}, isotope_name_key, isotope_sku_key, isotope_publish_key, isotope_category_key, website_root, isotope_grouping_key, isotope_product_type, isotope_product_type_variant; {status_legend}, status, initial_linking_completed; {generated_products_legend}, generated_isotope_products;'
     ),
  
     // Fields
@@ -137,22 +137,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50'),
             'sql'                     => "varchar(255) default ''"
         ),
-        'isotope_name_key' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_name_key'],
-            'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) default ''"
-        ),
-        'isotope_sku_key' => array
-        (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_sku_key'],
-            'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50'),
-            'sql'                     => "varchar(255) default ''"
-        ),
-        
-        
+
         'file_url' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['file_url'],
@@ -171,7 +156,69 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'sql'                     => "varchar(20) NOT NULL default ''",
         ),
 
+        
+        'isotope_name_key' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_name_key'],
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "varchar(255) default ''"
+        ),
+        'isotope_sku_key' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_sku_key'],
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "varchar(255) default ''"
+        ),
 
+        'isotope_publish_key' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_publish_key'],
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "varchar(255) default ''"
+        ),
+
+        
+        'isotope_grouping_key' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_grouping_key'],
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "varchar(255) default ''"
+        ),
+        'isotope_product_type' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_product_type'],
+            'inputType'               => 'select',
+            'flag'                    => DataContainer::SORT_ASC,
+            'default'                 => NULL,
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w100 clr', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
+            'options_callback'	      => array('Bcs\Backend\SalsifyRequestBackend', 'getIsotopeProductTypes'),
+            'sql'                     => "int(10) unsigned default NULL"
+        ),
+        'isotope_product_type_variant' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_product_type_variant'],
+            'inputType'               => 'select',
+            'flag'                    => DataContainer::SORT_ASC,
+            'default'                 => NULL,
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w100 clr', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
+            'options_callback'	      => array('Bcs\Backend\SalsifyRequestBackend', 'getIsotopeProductTypes'),
+            'sql'                     => "int(10) unsigned default NULL"
+        ),
+        
+        
+        
+
+        'isotope_category_key' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_category_key'],
+            'inputType'               => 'text',
+            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "varchar(255) default ''"
+        ),
         'website_root' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['website_root'],
