@@ -142,7 +142,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['file_url'],
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w100 clr'),
+            'eval'                    => array('mandatory'=>false, 'tl_class'=>'w50'),
             'sql'                     => "varchar(255) default ''"
         ),
         'file_date' => array
