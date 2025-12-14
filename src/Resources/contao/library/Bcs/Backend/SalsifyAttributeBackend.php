@@ -276,17 +276,73 @@ class SalsifyAttributeBackend extends Backend
 		return $arrButtons;
 	}
 
-
-
-
-
-
     public function autolinkIsotopeAttributes($href, $label, $title, $class, $attributes)
     {
         // Check if export triggered
         if (Input::get('key') === 'autolink') {
-            echo "Autolink here!";
-            die();
+            
+            if (!empty($_SESSION['_contao_be_attributes']['filter']['tl_salsify_attribute']['request'])) {
+                
+                $salsify_request = $_SESSION['_contao_be_attributes']['filter']['tl_salsify_attribute']['request'];
+                
+                // Get all the Salsify Products that belong to this Salsify Request
+                $salsify_products = SalsifyProduct::findBy(['tl_salsify_product.pid = ?', 'tl_salsify_product.isotope_product_type IS NOT ?'], [$salsify_request, null]);
+                if($salsify_products) {
+                    foreach($salsify_products as $salsify_product) {
+                        
+                        // Get all Salsify Attributes that belong to this Salsify Product but have no Linked Isotope Attribute yet
+                        $salsify_attributes = SalsifyAttribute::findBy(['tl_salsify_attribute.pid = ?', 'tl_salsify_attribute.linked_isotope_attribute IS ?'], [$salsify_product->id, null]);
+                        if($salsify_attributes) {
+                            foreach($salsify_attributes as $salsify_attribute) {
+                                
+                                //echo "Salsify Attribute: " . $salsify_attribute->id . " - " . $salsify_attribute->attribute_key . "<br>";
+                                $linked_attributes = array();
+                                $pt = ProductType::findOneBy(['tl_iso_producttype.id=?'],[$salsify_product->isotope_product_type]);
+                                if($pt != null) {
+                                     if($pt->variant_attributes != null) {
+                                        foreach($pt->variant_attributes as $key => $attr) {
+                                            if($attr['enabled'] == '1') {
+                                                $linked_attributes[] = $key;
+                                            }
+                                        }
+                                    } else {
+                                        foreach($pt->attributes as $key => $attr) {
+                                            if($attr['enabled'] == '1') {
+                                                $linked_attributes[] = $key;
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                foreach($linked_attributes as $att) {
+                                    $isotope_attribute = Attribute::findBy(['tl_iso_attribute.field_name=?'],[$att]);
+                                    
+                                    if($isotope_attribute) {
+                                        $salsify_attribute->linked_isotope_attribute = $isotope_attribute->id;
+                                        $salsify_attribute->status = 'pass';
+                                        $salsify_attribute->save();
+                                    }
+                                    
+                                }
+                                
+                                
+                                
+                            }
+                        }
+                        
+                        
+                        
+                        
+                    }
+                }
+                
+                
+                
+                
+                
+            }
+            
+            
         }
 		
         // Return button HTML
@@ -295,19 +351,6 @@ class SalsifyAttributeBackend extends Backend
             . '</a>';
     }
 
-
-
-
-
-
-
-
-    
-
-
-
-    
-    
     // Display error until all 'flags' are 
     public function generateStatusLabel($row, $label, $dc, $args)
     {
