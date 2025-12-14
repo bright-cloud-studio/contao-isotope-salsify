@@ -215,9 +215,10 @@ $GLOBALS['TL_DCA']['tl_salsify_product'] = array
             'default'                 => 'single',
             'filter'                  => true,
             'search'                  => true,
-            'options'                  => array('single' => 'Single Product', 'variant' => 'Variant Product'),
-            'eval'                     => array('mandatory'=>false,'includeBlankOption'=>true, 'blankOptionLabel'=>'', 'multiple'=>false, 'tl_class'=>'w50'),
-            'sql'                      => "varchar(15) default NULL"
+            'default'                 => 'unassigned',
+            'options'                 => array('unassigned' => 'Unassigned','single' => 'Single Product', 'variant' => 'Variant Product'),
+            'eval'                    => array('mandatory'=>true, 'multiple'=>false, 'tl_class'=>'w50'),
+            'sql'                     => "varchar(15) NOT NULL default 'unassigned'"
         ),
         'last_update' => array
         (
