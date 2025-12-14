@@ -21,8 +21,7 @@
     if ($dbh->connect_error) {
         die("Connection failed: " . $dbh->connect_error);
     }
-    
-    $mapping = array();
+
     /** INITS AND INCLUDES - STOP **/
     
     
@@ -32,29 +31,42 @@
     // STAGE DATA //
     ////////////////
     
-    // Loop through SalsifyRequests
+    // Loop through Salsify Requests on Step Two
     $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_auto_linking']);
     if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
-		    // Loop through SalsifyProducts
-		    $salsify_products = SalsifyProduct::findBy(['pid = ?', 'published = ?'], [$sr->id, 1]);
+		    debug($debug_mode, $log, "[Checking SalsifyRequest] ID: ".$sr->id. " - " . $sr->request_name);
+		    
+		    // Loop through Salsify Products that belong to this Salsify Request
+		    $salsify_products = SalsifyProduct::findBy(['pid = ?'], [$sr->id]);
             if($salsify_products) {
                 foreach ($salsify_products as $sp)
         		{
-        		    // Loop through SalsifyAttributes
+        		    
+        		    debug($debug_mode, $log, "\t[Salsify Product ID: ".$sp->id."] Checking Salsify Attributes");
+        		    
+        		    // Loop through Salsify Attributes that belong to this Salsify Product
         		    $salsify_attributes = SalsifyAttribute::findBy(['pid = ?', 'published = ?'], [$sp->id, 1]);
                     if($salsify_attributes) {
                         foreach ($salsify_attributes as $sa)
                 		{
                 		    // If we have a linked attribute, save it to our mapping
-                		    if($sa->linked_isotope_attribute != '')
-                		        $mapping[$sp->isotope_product_type][$sa->attribute_key] = $sa->linked_isotope_attribute;
+                		    if($sa->linked_isotope_attribute == '') {
+                		        debug($debug_mode, $log, "\t\t[Salsify Attribute ID: ".$sa->id."][KEY: ".$sa->attribute_key."] Needs Linking");
+                		    }
+                		    
                 		}
                     }
                     
         		}
+            } else {
+                // Add a blank line between our Salsify Requests
+                debug($debug_mode, $log, "\tNo Salsify Products found");
             }
+            
+            // Add a blank line between our Salsify Requests
+            debug($debug_mode, $log, "- - - - - - - - - - - - - - - - - - - - - -\n");
 
 		}
     }
@@ -66,6 +78,7 @@
     
     
     // Loop through SalsifyAttributes
+    /*
     $unlinked_attributes = SalsifyAttribute::findBy(['tl_salsify_attribute.linked_isotope_attribute IS null'], []);
     if($unlinked_attributes) {
         foreach ($unlinked_attributes as $unlinked_sa)
@@ -160,6 +173,7 @@
             $sr->save();
 		}
     }
+    */
 
     // Close our logfile
     if($debug_mode)
