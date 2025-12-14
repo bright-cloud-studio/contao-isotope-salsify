@@ -233,6 +233,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'default'                 => 'awaiting_new_file',
             'options'                 => array(
                 'awaiting_new_file'           => 'Awaiting New File',
+                'awaiting_grouping'           => 'Awaiting Grouping',
                 'awaiting_auto_linking'       => 'Awaiting Auto-Linking',
                 'awaiting_cat_linking'        => 'Awaiting Category Linking',
                 'awaiting_iso_generation'     => 'Awaiting Isotope Generation',
