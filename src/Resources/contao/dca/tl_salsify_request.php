@@ -201,7 +201,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_grouping_key'],
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w100'),
+            'eval'                    => array('mandatory'=>true, 'tl_class'=>'clr w100'),
             'sql'                     => "varchar(255) default ''"
         ),
         'isotope_product_type' => array
