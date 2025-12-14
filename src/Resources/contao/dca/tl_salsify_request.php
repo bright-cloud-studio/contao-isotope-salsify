@@ -161,14 +161,14 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_name_key'],
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w33'),
+            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w100'),
             'sql'                     => "varchar(255) default ''"
         ),
         'isotope_sku_key' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_sku_key'],
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w33'),
+            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w100'),
             'sql'                     => "varchar(255) default ''"
         ),
 
@@ -176,7 +176,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_publish_key'],
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w33'),
+            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w100'),
             'sql'                     => "varchar(255) default ''"
         ),
 
@@ -201,7 +201,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['isotope_grouping_key'],
             'inputType'               => 'text',
-            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w33'),
+            'eval'                    => array('mandatory'=>true, 'tl_class'=>'w100'),
             'sql'                     => "varchar(255) default ''"
         ),
         'isotope_product_type' => array
@@ -210,7 +210,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'inputType'               => 'select',
             'flag'                    => DataContainer::SORT_ASC,
             'default'                 => NULL,
-            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w33', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w100', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
             'options_callback'	      => array('Bcs\Backend\SalsifyRequestBackend', 'getIsotopeProductTypes'),
             'sql'                     => "int(10) unsigned default NULL"
         ),
@@ -220,7 +220,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'inputType'               => 'select',
             'flag'                    => DataContainer::SORT_ASC,
             'default'                 => NULL,
-            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w33', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
+            'eval'                    => array('mandatory'=>false, 'multiple'=>false, 'tl_class'=>'w100', 'includeBlankOption'=>true, 'blankOptionLabel'=>''),
             'options_callback'	      => array('Bcs\Backend\SalsifyRequestBackend', 'getIsotopeProductTypes'),
             'sql'                     => "int(10) unsigned default NULL"
         ),
