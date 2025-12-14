@@ -8,10 +8,10 @@
     use Isotope\Model\AttributeOption;
     use pcrov\JsonReader\JsonReader;
     
-    $publish_tracker = array();
-    $group_counter = array();
-    $isotope_product_type = '';
-    $isotope_product_type_variant = '';
+    //$publish_tracker = array();
+    //$group_counter = array();
+    //$isotope_product_type = '';
+    //$isotope_product_type_variant = '';
     
     $debug_mode = true;
     if($debug_mode)
@@ -133,6 +133,7 @@
                     	$prod_count = 0;
                     	foreach($array_parent as $array_child) {
                     		$prod_count++;
+                    		
                     		// Get the data for the two Isotope required fields for an Isotope Product, only continue if we have them
                     		$required_sku = $array_child[$request['isotope_sku_key']][0];
                     		$required_name = $array_child[$request['isotope_name_key']][0];
@@ -176,14 +177,16 @@
                                     $salsify_attribute;
                                     $update_sa = SalsifyAttribute::findOneBy(['tl_salsify_attribute.pid=?', 'tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.request=?'],[$salsify_product->id, $key, $request['id']]);
                                     if($update_sa != null) {
+                                        
                                         // Existing SalsifyAttribute found
                                         debug($debug_mode, $log, "\tUpdate Salsify Attribute [ID: ".$update_sa->id."] [KEY: " . $key . "]");
                                         
-                                        // SECOND CONVERSION HERE
+                                        // FIRST CONVERSION HERE
                                         $update_sa->attribute_value = encode_non_url_string($val[0]);
                                         
                                         debug($debug_mode, $log, "\t\t[ID: ".$update_sa->id."] [KEY: " . $key . "] [VAL: " . $update_sa->attribute_value . "]");
                                         
+                                        /*
                                         // Add to Publish Tracker so it gets turned on at the end
                                         if($update_sa->controls_published) {
                                             $publish_tracker[$update_sa->pid] = $update_sa->attribute_value;
@@ -263,9 +266,18 @@
                                             $update_sa->linked_isotope_attribute_option = serialize($option_ids);
                                             $update_sa->status = 'pass';
                                         }
+                                        */
                                         
                                         $update_sa->tstamp = time();
                                         $update_sa->published = 1;
+                                        
+                                        // Match with Salsify Request's Isotope Category Key 
+                                        if($request['isotope_category_key'] == $key) {
+                                            debug($debug_mode, $log, "\t\t[ID: ".$update_sa->id."] [KEY: " . $key . "] Match with Salsify Request's Isotope Category Key");
+                                            $update_sa->is_cat = 1;
+                                        }
+                                        
+                                        
                                         $update_sa->save();
             
                                     } else {
@@ -279,16 +291,14 @@
                                         // First, start off with our linked attribute being null
                                         $salsify_attribute->linked_isotope_attribute = null;
                                         
+                                        /*
                                         // CONTROLS PUBLISHING
                                         $sa_controls_published = SalsifyAttribute::findOneBy(['tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.controls_published=?'],[$key, 1]);
                                         if($sa_controls_published) {
                                             $publish_tracker[$salsify_attribute->pid] = $salsify_attribute->attribute_value;
                                             $salsify_attribute->controls_published = 1;
                                         }
-                                        
 
-                                        // GROUPING
-                                        
                                         // get ALL SalsifyAttributes where the key matches and is checked as a grouping attribute
                                         $sa_groupings = SalsifyAttribute::findBy(['tl_salsify_attribute.attribute_key=?', 'tl_salsify_attribute.is_grouping=?'],[$key, 1]);
                                         if($sa_groupings) {
@@ -322,8 +332,16 @@
                                         if($sa_is_cat) {
                                             $salsify_attribute->is_cat = 1;
                                         }
+                                        */
     
                                         $salsify_attribute->tstamp = time();
+                                        
+                                        // Match with Salsify Request's Isotope Category Key 
+                                        if($request['isotope_category_key'] == $key) {
+                                            debug($debug_mode, $log, "\t\t[ID: ".$salsify_attribute->id."] [KEY: " . $key . "] Match with Salsify Request's Isotope Category Key");
+                                            $salsify_attribute->is_cat = 1;
+                                        }
+                                        
                                         $salsify_attribute->published = 1;
                                         $salsify_attribute->save();
                                         
@@ -345,7 +363,7 @@
                     /** PROCESS JSON FILE - START **/
                     
                     
-                    
+                    /*
                     // Group Products
                     // If any product here contained a grouping attribute, group all products again
                     // All products need to be run in the event this product belongs to another one
@@ -422,7 +440,7 @@
                             }
                         }
                     }
-                
+                    */
                 }
                 
             } else {
