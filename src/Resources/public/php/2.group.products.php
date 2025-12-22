@@ -45,7 +45,7 @@
 		    $salsify_products = SalsifyProduct::findBy(['pid = ?'], [$sr->id]);
             if($salsify_products) {
                 
-                debug($debug_mode, $log, "\tProducts Found: " . count($salsify_products));
+                debug($debug_mode, $log, "\tSalsify Products Found: " . count($salsify_products));
                 
                 foreach ($salsify_products as $sp)
         		{
@@ -90,7 +90,10 @@
             
             // Add a blank line between our Salsify Requests
             debug($debug_mode, $log, "- - - - - - - - - - - - - - - - - - - - - -\n");
-
+            
+            $sr->status = 'awaiting_auto_linking';
+            $sr->save();
+            
 		}
     }
     
