@@ -6,7 +6,7 @@
     
     $debug_mode = true;
     if($debug_mode)
-        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_four_'.date('m_d_y').'.txt', "a+") or die("Unable to open file!");
+        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_five_'.date('m_d_y').'.txt', "a+") or die("Unable to open file!");
 
     session_start();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
@@ -16,6 +16,11 @@
     $dbh = new mysqli("localhost", $db_info[0], $db_info[1], $db_info[2]);
     if ($dbh->connect_error) {
         die("Connection failed: " . $dbh->connect_error);
+    }
+    
+    if (!$dbh->set_charset("utf8mb4")) {
+        printf("Error loading character set utf8mb4: %s\n", $dbh->error);
+        exit();
     }
     
     // Store all of our products in data
@@ -150,7 +155,7 @@
                 $unpublish_product = Product::findOneBy(['tl_iso_product.id = ?'], [$unpublish_product_id]);
                 if($unpublish_product) {
                     
-                    debug($debug_mode, $log, "Isotope Product Found");
+                    debug($debug_mode, $log, "Unpublishing Isotope Product ID: " . $unpublish_product->id);
                     
                     $unpublish_product->published = '';
                     $unpublish_product->save();
@@ -208,6 +213,7 @@
                             
                             // Save our Isotope Product ID for linking to our SalsifyRequest
                             $generated_isotope_product_ids[] = $update_ip->id;
+                            debug($debug_mode, $log, "[STORING] Updated Isotope Product ID: ". $update_ip->id);
                             
                             
                         } else {
@@ -245,6 +251,7 @@
                             
                             // Save our Isotope Product ID for linking to our SalsifyRequest
                             $generated_isotope_product_ids[] = $prod_values_result->insertId;
+                            debug($debug_mode, $log, "[STORING] New Isotope Product ID: ". $prod_values_result->insertId);
                             
                         }
     
@@ -313,6 +320,7 @@
                                 
                                 // Save our Isotope Product ID for linking to our SalsifyRequest
                                 $generated_isotope_product_ids[] = $update_ip->id;
+                                debug($debug_mode, $log, "[STORING] Updated Isotope Product ID: ". $update_ip->id);
                                 
                             } else {
 
@@ -347,6 +355,7 @@
                                 
                                 // Save our Isotope Product ID for linking to our SalsifyRequest
                                 $generated_isotope_product_ids[] = $prod_values_result->insertId;
+                                debug($debug_mode, $log, "[STORING] New Isotope Product ID: ". $prod_values_result->insertId);
                                     
                             }
                             
@@ -405,8 +414,11 @@
                                 }
                                 // Save our Isotope Product ID for linking to our SalsifyRequest
                                 $generated_isotope_product_ids[] = $update_ip->id;
+                                debug($debug_mode, $log, "[STORING] Update Isotope Product ID: ". $update_ip->id);
                                 
                             } else {
+                                
+                                
                                 
                                 $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
                                 $parent_id = $prod_values_result->insertId;
@@ -439,6 +451,7 @@
                                 
                                 // Save our Isotope Product ID for linking to our SalsifyRequest
                                 $generated_isotope_product_ids[] = $prod_values_result->insertId;
+                                debug($debug_mode, $log, "[STORING] New Isotope Product ID: ". $prod_values_result->insertId);
                                     
                             }
                             
@@ -463,10 +476,12 @@
                             $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($variant)->execute($update_ip->id);
                             // Save our Isotope Product ID for linking to our SalsifyRequest
                             $generated_isotope_product_ids[] = $update_ip->id;
+                            debug($debug_mode, $log, "[STORING] Update Isotope Product ID: ". $update_ip->id);
                         } else {
                             $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($variant)->execute();
                             // Save our Isotope Product ID for linking to our SalsifyRequest
                             $generated_isotope_product_ids[] = $prod_values_result->insertId;
+                            debug($debug_mode, $log, "[STORING] New Isotope Product ID: ". $prod_values_result->insertId);
                         }
                     }
     
@@ -482,8 +497,8 @@
         
         // Update our SalsifyRequest by adding our linked Isotope Products
         if($our_request) {
-            $our_request->generated_isotope_products = $generated_isotope_product_ids;
-            $our_request->save();
+            //$our_request->generated_isotope_products = $generated_isotope_product_ids;
+            //$our_request->save();
         }
         
     }
