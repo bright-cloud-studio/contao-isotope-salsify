@@ -21,6 +21,7 @@
     if ($dbh->connect_error) {
         die("Connection failed: " . $dbh->connect_error);
     }
+    $step_completed = false;
     /** INITS AND INCLUDES - STOP **/
     
 
@@ -75,11 +76,6 @@
                         
                         $run_update = true;
                         $request['file_url'] = $latest_file_url;
-                        
-                        if($request['initial_linking_completed'] == '')
-                            $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', status='awaiting_initial_linking' WHERE id='".$request['id']."'")->execute();
-                        else
-                            $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', status='awaiting_auto_linking' WHERE id='".$request['id']."'")->execute();
                     }
                 }
 
@@ -148,7 +144,7 @@
                                     $update_sp->pid = $request['id'];
                             		$update_sp->tstamp = time();
                             		$update_sp->product_sku = $array_child[$request['isotope_sku_key']][0];
-                            		$update_sp->product_name = $array_child[$request['isotope_name_key']][0];
+                            		$update_sp->product_name = encode_non_url_string($array_child[$request['isotope_name_key']][0]);
                             		$update_sp->published = 1;
                             		$update_sp->save();
                             		$salsify_product = $update_sp;
@@ -161,7 +157,7 @@
                             		$salsify_product->pid = $request['id'];
                             		$salsify_product->tstamp = time();
                             		$salsify_product->product_sku = $array_child[$request['isotope_sku_key']][0];
-                            		$salsify_product->product_name = $array_child[$request['isotope_name_key']][0];
+                            		$salsify_product->product_name = encode_non_url_string($array_child[$request['isotope_name_key']][0]);
                             		$salsify_product->published = 1;
                             		$salsify_product->save();
                                 }
@@ -245,7 +241,11 @@
                     
                     } while ($reader->next() && $reader->depth() > $depth); // Read each sibling.
                     $reader->close();
-                    /** PROCESS JSON FILE - START **/
+                    /** PROCESS JSON FILE - END **/
+                    
+                    // Update our Salsify Request now that the step has completed
+                    $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $latest_file_url ."', file_date='" . $latest_file_date . "', status='awaiting_grouping' WHERE id='".$request['id']."'")->execute();
+                    
                 }
                 
             } else {
@@ -291,6 +291,9 @@
     
     function encode_non_url_string($string)
     {
+        
+        return $string;
+        /*
         // Use FILTER_VALIDATE_URL to check if the string is a valid URL.
         if (filter_var($string, FILTER_VALIDATE_URL)) {
             // If it's a URL, return the original string without encoding.
@@ -301,4 +304,5 @@
             // making the string safe to display in a web page.
             return htmlentities($string, ENT_QUOTES, 'UTF-8');
         }
+        */
     }
