@@ -26,9 +26,9 @@ class SalsifyAttributeBackend extends Backend
 
     public function addLinkMatchingAttributes($arrButtons, DataContainer $dc)
 	{
-
+        // BUGGED - TEMPORARLY DISABLED
 	    // If we have submiited the page
-		if (Input::post('link_similar') !== null && Input::post('FORM_SUBMIT') == 'tl_salsify_attribute')
+		if (1 == 2 && Input::post('link_similar') !== null && Input::post('FORM_SUBMIT') == 'tl_salsify_attribute')
 		{
 		    // Create log file
 		    if($this->debug_mode)
