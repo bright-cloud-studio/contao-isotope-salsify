@@ -5,7 +5,7 @@
     
     $debug_mode = true;
     if($debug_mode)
-        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_five_'.date('m_d_y').'.txt', "a+") or die("Unable to open file!");
+        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_six_'.date('m_d_y').'.txt', "a+") or die("Unable to open file!");
 
     session_start();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
