@@ -34,7 +34,7 @@
     if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
-		    //debug($debug_mode, $log, "[Checking SalsifyRequest] ID: ".$sr->id. " - " . $sr->request_name);
+		    debug($debug_mode, $log, "[Checking SalsifyRequest] ID: ".$sr->id. " - " . $sr->request_name);
 		    
 		    // Loop through Salsify Products that belong to this Salsify Request
 		    $salsify_products = SalsifyProduct::findBy(['pid = ?'], [$sr->id]);
@@ -43,7 +43,7 @@
                 foreach ($salsify_products as $sp)
         		{
         		    
-        		    //debug($debug_mode, $log, "\t[Salsify Product ID: " . $sp->id . "] Attempting Auto-Link on Salsify Attributes");
+        		    debug($debug_mode, $log, "\t[Salsify Product ID: " . $sp->id . "] Attempting Auto-Link on Salsify Attributes");
         		    
         		    // Find all Salsify Attributes for this Salsify Product
         		    $salsify_attributes = SalsifyAttribute::findBy(['pid = ?', 'linked_isotope_attribute IS ?'], [$sp->id, null]);
@@ -51,7 +51,7 @@
                         foreach($salsify_attributes as $sa) {
                             
                             $save = false;
-                            //debug($debug_mode, $log, "\t\t[Salsify Attribute ID: " . $sa->id . "] Seeking link for '" .$sa->attribute_key . "'");
+                            debug($debug_mode, $log, "\t\t[Salsify Attribute ID: " . $sa->id . "] Seeking link for '" .$sa->attribute_key . "'");
 
                             $iso_attr = null;
                             if($sp->isotope_product_variant_type == 'single') {
@@ -124,7 +124,7 @@
         	                            if($existing_option) {
         	                                
         	                                $option_ids[] = $existing_option->id;
-        	                                //debug($debug_mode, $log, "\t\t[Isotope Attribute Option ID: " . $existing_option->id . "] Existing Isotope Attribute Option for this Isotope Attribute found");
+        	                                debug($debug_mode, $log, "\t\t[Isotope Attribute Option ID: " . $existing_option->id . "] Existing Isotope Attribute Option for this Isotope Attribute found");
         	                                
         	                            } else {
         	                                
@@ -143,7 +143,7 @@
                         					$new_option->save();
                         					
                         					$option_ids[] = $new_option->id;
-                        					//debug($debug_mode, $log, "\t[Isotope Attribute Option ID: " . $new_option->id . "] New Isotope Attribute Option created");
+                        					debug($debug_mode, $log, "\t[Isotope Attribute Option ID: " . $new_option->id . "] New Isotope Attribute Option created");
         	                            }
     
         	                            
