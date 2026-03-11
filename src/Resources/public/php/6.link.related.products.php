@@ -1,9 +1,12 @@
 <?php
 
+    /********************************/
     /** INITS AND INCLUDES - START **/
-    use Bcs\Model\SalsifyRequest;
+    /********************************/
     
-    /* DEBUG STUFFS */
+    use Bcs\Model\SalsifyRequest;
+    use Isotope\Model\Product;
+    
     define('DEBUG_MODE', true);
     define('DEBUG_FILE', fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_six_'.date('m_d_y').'.txt', "a+"));
 
@@ -18,56 +21,44 @@
     }
 
     $linked = array();
+    
+    /*******************************/
     /** INITS AND INCLUDES - STOP **/
+    /*******************************/
     
-    
-    // Get Salsify Requests that are in the 'awaiting_cat_linking' state
+    // Get any SalsifyRequests that are on this step
     $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_related_linking']);
     if($salsify_requests) {
+        
+	    debug("[SalsifyRequest on 'awaiting_related_linking' Found] Processing all Isotope Products");
+
+	    // Empty the tl_iso_related_product table so we can start fresh
+        $reset_related_product_query =  "TRUNCATE TABLE tl_iso_related_product;";
+        $reset_related_product_result = $dbh->query($reset_related_product_query);
+        debug("[Table 'tl_iso_related_product'] Clearing existing database entries so we start fresh");
+
+        $isotope_products = Product::findBy(['tl_iso_product.pid!=?'], [-1]);
+        
+        if($isotope_products) {
+            debug("[Isotope Products Found] Looping through to find Related Products");
+            foreach($isotope_products as $isotope_product) {
+                debug("[Isotope Product ID: " . $isotope_product->id . "] Searching for Related Products", 1);
+                
+                // Get our Related Product SKUs, add them to $linked array for later processing
+                $cleaned = str_replace(' ', '', $isotope_product->related_products);
+                $cleaned = explode(",",$cleaned);
+                $linked[$isotope_product->id] = $cleaned;
+                
+                debug("[Isotope Product ID: " . $isotope_product->id . "] Adding SKUs to seek list: " . $isotope_product->related_products, 2);
+            }
+        }
+
+        // For each SalsifyRequest on this status, update them to the next step
         foreach ($salsify_requests as $sr)
 		{
-		    debug("[Salsify Request ID: $sr->id] Searching for Isotope Products - OUTDATED!");
-		    
-            // LOOP THROUGH PRODUCTS
-            $prod_query =  "SELECT * FROM tl_iso_product ORDER BY id ASC";
-            $prod_result = $dbh->query($prod_query);
-            if($prod_result) {
-                debug("[Isotope Products Found] Looping through to find Related Products");
-                while($prod = $prod_result->fetch_assoc()) {
-                    
-                    debug("[Isotope Product ID: " . $prod['id'] . "] Searching for Related Products", 1);
-                    
-                    $found = false;
-                    
-                    // Loop through all related product entries
-                    $related_query =  "SELECT * FROM tl_iso_related_product ORDER BY id ASC";
-                    $related_result = $dbh->query($related_query);
-                    if($related_result) {
-                        while($related = $related_result->fetch_assoc()) {
-                            // If one of our entries matches 
-                            if($prod['id'] == $related['pid']) {
-                                $found = true;
-                                debug("[Isotope Related Product ID: " . $related['id'] . "] Existing entry in Isotope Related Products found", 2);
-                            }
-                        }
-                    }
-                    
-                    // If we didnt find a related products entry yet, make one
-                    if(!$found) {
-                        $cleaned = str_replace(' ', '', $prod['related_products']);
-                        $cleaned = explode(",",$cleaned);
-        
-                        $linked[$prod['id']] = $cleaned;
-                        
-                        debug("[Isotope Product ID: " . $prod['id'] . "] No existing entry found. Adding to linked: " . $prod['related_products'], 2);
-                    }
-                }
-            }
-            
-            // Update the status of our Salsify Request and save it
-            $sr->status = 'awaiting_new_file';
+		    debug("[SalsifyRequest ID: ".$sr->id."] Moving SalsifyRequest to the next step");
+		    $sr->status = 'awaiting_new_file';
             //$sr->save();
-    
 		}
     }
 
@@ -77,36 +68,28 @@
     // Loop through $linked
     foreach($linked as $key => $skus) {
         
-        
-        debug("[KEY: " . $key . "]", 3);
+        debug("[Isotope Product ID: " . $key . "] Seeking Related Products", 3);
         
         $ids = array();
         foreach($skus as $sku) {
-            
-            debug("[SKU: " . $sku . "]", 4);
-            
-            $prod_query =  "SELECT * FROM tl_iso_product where sku='".$sku."' ORDER BY id ASC";
-            $prod_result = $dbh->query($prod_query);
-            if($prod_result) {
-                while($prod = $prod_result->fetch_assoc()) {
-                    
-                    $ids[] = $prod['id'];
-                    debug("[Isotope Product ID: " . $prod['id'] . "] Linked Product Found", 4);
-                }
+
+            $related_product = Product::findOneBy(['tl_iso_product.sku=?'], [$sku]);
+            if($related_product) {
+                $ids[] = $related_product->id;
+                debug("[Seeking Isotope Product by SKU: " . $sku . "] [FOUND Related Isotope Product ID: " . $related_product->id . "]", 4);
+            } else {
+                debug("[Seeking Isotope Product by SKU: " . $sku . "] [NO Isotope Product found for this SKU!]", 5);
             }
+
         }
         
         $rp = array();
         $rp['pid'] = $key;
         $rp['tstamp'] = time();
         $rp['category'] = 1;
-        
         $rp['products'] = implode(",", $ids);
-    
         $rp['productsOrder'] = serialize($ids);
         $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_related_product %s")->set($rp)->execute();
-        
-        debug("[PID: " . $rp['pid'] . "] Updating DB", 4);
     }
     
     // Empty out and reset (aka. TRUNCATE) the tl_iso_productcache table
@@ -117,7 +100,7 @@
     // Close our log file
     if(DEBUG_MODE)
         fclose(DEBUG_FILE);
-    
+        
     
     /** Helper Functions **/
     function debug($message, $indent_level = 0) {
