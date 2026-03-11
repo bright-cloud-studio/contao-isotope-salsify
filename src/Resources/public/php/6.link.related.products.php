@@ -3,9 +3,9 @@
     /** INITS AND INCLUDES - START **/
     use Bcs\Model\SalsifyRequest;
     
-    $debug_mode = true;
-    if($debug_mode)
-        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_six_'.date('m_d_y').'.txt', "a+") or die("Unable to open file!");
+    /* DEBUG STUFFS */
+    define('DEBUG_MODE', true);
+    define('DEBUG_FILE', fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_six_'.date('m_d_y').'.txt', "a+"));
 
     session_start();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
@@ -21,21 +21,21 @@
     /** INITS AND INCLUDES - STOP **/
     
     
-    
     // Get Salsify Requests that are in the 'awaiting_cat_linking' state
     $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_related_linking']);
     if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
-		    debug($debug_mode, $log, "Searching for Products generated from SalsifyRequest: ". $sr->id);
-
+		    debug("[Salsify Request ID: $sr->id] Searching for Isotope Products - OUTDATED!");
+		    
             // LOOP THROUGH PRODUCTS
             $prod_query =  "SELECT * FROM tl_iso_product ORDER BY id ASC";
             $prod_result = $dbh->query($prod_query);
             if($prod_result) {
+                debug("[Isotope Products Found] Looping through to find Related Products");
                 while($prod = $prod_result->fetch_assoc()) {
                     
-                    debug($debug_mode, $log, "Staging data for Product: ". $prod['id']);
+                    debug("[Isotope Product ID: " . $prod['id'] . "] Searching for Related Products", 1);
                     
                     $found = false;
                     
@@ -45,8 +45,10 @@
                     if($related_result) {
                         while($related = $related_result->fetch_assoc()) {
                             // If one of our entries matches 
-                            if($prod['id'] == $related['pid'])
+                            if($prod['id'] == $related['pid']) {
                                 $found = true;
+                                debug("[Isotope Related Product ID: " . $related['id'] . "] Existing entry in Isotope Related Products found", 2);
+                            }
                         }
                     }
                     
@@ -56,24 +58,32 @@
                         $cleaned = explode(",",$cleaned);
         
                         $linked[$prod['id']] = $cleaned;
+                        
+                        debug("[Isotope Product ID: " . $prod['id'] . "] No existing entry found. Adding to linked: " . $prod['related_products'], 2);
                     }
                 }
             }
             
             // Update the status of our Salsify Request and save it
             $sr->status = 'awaiting_new_file';
-            $sr->save();
+            //$sr->save();
     
 		}
     }
 
     
+    debug("Looping through linked array", 3);
     
     // Loop through $linked
     foreach($linked as $key => $skus) {
         
+        
+        debug("[KEY: " . $key . "]", 3);
+        
         $ids = array();
         foreach($skus as $sku) {
+            
+            debug("[SKU: " . $sku . "]", 4);
             
             $prod_query =  "SELECT * FROM tl_iso_product where sku='".$sku."' ORDER BY id ASC";
             $prod_result = $dbh->query($prod_query);
@@ -81,6 +91,7 @@
                 while($prod = $prod_result->fetch_assoc()) {
                     
                     $ids[] = $prod['id'];
+                    debug("[Isotope Product ID: " . $prod['id'] . "] Linked Product Found", 4);
                 }
             }
         }
@@ -94,6 +105,8 @@
     
         $rp['productsOrder'] = serialize($ids);
         $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_related_product %s")->set($rp)->execute();
+        
+        debug("[PID: " . $rp['pid'] . "] Updating DB", 4);
     }
     
     // Empty out and reset (aka. TRUNCATE) the tl_iso_productcache table
@@ -101,9 +114,20 @@
     $reset_productcache_result = $dbh->query($reset_productcache_query);
     
     
-    /** HELPER FUNCTIONS **/
-    function debug($debug_mode, $log, $message) {
-        if($debug_mode)
-            fwrite($log, $message . "\n");
-        echo $message . "<br>";
+    // Close our log file
+    if(DEBUG_MODE)
+        fclose(DEBUG_FILE);
+    
+    
+    /** Helper Functions **/
+    function debug($message, $indent_level = 0) {
+        if(DEBUG_MODE) {
+            $indent = str_repeat("\t", $indent_level);
+            $message = $indent . $message;
+            fwrite(DEBUG_FILE, $message . "\n");
+            echo $message . "<br>";
+            
+        } else {
+            fwrite(DEBUG_FILE, "DEBUG MODE not active" . "\n");
+        }
     }
