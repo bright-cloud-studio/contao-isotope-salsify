@@ -208,7 +208,7 @@
                                 $prod_cat['page_id'] = $cat;
                                 $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
                                 
-                                debug($debug_mode, $log, "ADDING to category: ". $cat);
+                                debug($debug_mode, $log, "ADDING Isotope Product ID: " . $prod_cat['pid'] . " to Page ID: ". $cat);
                             }
                             
                             // Save our Isotope Product ID for linking to our SalsifyRequest
@@ -230,6 +230,8 @@
                             foreach($cat_id as $cat) {
                                 $prod_cat['page_id'] = $cat;
                                 $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                                
+                                debug($debug_mode, $log, "ADDING Isotope Product ID: " . $prod_cat['pid'] . " to Page ID: ". $cat);
                             }
                             
                             // Second, create entry in the 'tl_product_price' table                    
@@ -316,6 +318,8 @@
                                 foreach($cat_id as $cat) {
                                     $prod_cat['page_id'] = $cat;
                                     $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                                    
+                                    debug($debug_mode, $log, "ADDING Isotope Product ID: " . $prod_cat['pid'] . " to Page ID: ". $cat);
                                 }
                                 
                                 // Save our Isotope Product ID for linking to our SalsifyRequest
@@ -334,6 +338,8 @@
                                 foreach($cat_id as $cat) {
                                     $prod_cat['page_id'] = $cat;
                                     $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                                    
+                                    debug($debug_mode, $log, "ADDING Isotope Product ID: " . $prod_cat['pid'] . " to Page ID: ". $cat);
                                 }
                                 
                                 // Second, create entry in the 'tl_product_price' table                    
@@ -406,20 +412,21 @@
                                 
                                 // First, create entry in the 'tl_product_pricetier" table
                                 $prod_cat = array();
-                                $prod_cat['pid'] = $prod_values_result->insertId;
+                                $prod_cat['pid'] = $parent_id;
                                 $prod_cat['tstamp'] = time();
                                 foreach($cat_id as $cat) {
                                     $prod_cat['page_id'] = $cat;
                                     $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                                    
+                                    debug($debug_mode, $log, "ADDING Isotope Product ID: " . $prod_cat['pid'] . " to Page ID: ". $cat);
+                                    
                                 }
                                 // Save our Isotope Product ID for linking to our SalsifyRequest
                                 $generated_isotope_product_ids[] = $update_ip->id;
                                 debug($debug_mode, $log, "[STORING] Update Isotope Product ID: ". $update_ip->id);
                                 
                             } else {
-                                
-                                
-                                
+
                                 $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
                                 $parent_id = $prod_values_result->insertId;
                                 
@@ -430,6 +437,7 @@
                                 foreach($cat_id as $cat) {
                                     $prod_cat['page_id'] = $cat;
                                     $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
+                                    debug($debug_mode, $log, "ADDING Isotope Product ID: " . $prod_cat['pid'] . " to Page ID: ". $cat);
                                 }
                                 
                                 // Second, create entry in the 'tl_product_price' table                    
