@@ -46,7 +46,7 @@
         		    debug($debug_mode, $log, "\t[Salsify Product ID: " . $sp->id . "] Attempting Auto-Link on Salsify Attributes");
         		    
         		    // Find all Salsify Attributes for this Salsify Product
-        		    $salsify_attributes = SalsifyAttribute::findBy(['pid = ?', 'linked_isotope_attribute IS ?'], [$sp->id, null]);
+        		    $salsify_attributes = SalsifyAttribute::findBy(['pid = ?'], [$sp->id]);
                     if($salsify_attributes) {
                         foreach($salsify_attributes as $sa) {
                             
@@ -54,51 +54,61 @@
                             debug($debug_mode, $log, "\t\t[Salsify Attribute ID: " . $sa->id . "] Seeking link for '" .$sa->attribute_key . "'");
 
                             $iso_attr = null;
-                            if($sp->isotope_product_variant_type == 'single') {
-                                // Single product, just look at the field name using the key
-                                $iso_attr = Attribute::findBy(['field_name = ?'], [$sa->attribute_key]);
-                            }
-                            else if($sp->isotope_product_variant_type == 'variant') {
+                            
+                            // If we are already have a linked Isotope Attribute
+                            if($sa->linked_isotope_attribute != null) {
+                                debug($debug_mode, $log, "\t\t\tLinked Isotope Attribute Found - ID: " . $sa->linked_isotope_attribute);
+                                $iso_attr = Attribute::findBy(['id = ?'], [$sa->linked_isotope_attribute]);
                                 
-                                // If this is a variant, try finding the _v version first
-                                debug($debug_mode, $log, "\t\t\tSeeking Variant version of Isotope Attribute: " . $sa->attribute_key . '_v');
-                                $v_att = Attribute::findOneBy(['field_name = ?'], [$sa->attribute_key . '_v']);
-                                if($v_att) {
+                            }
+                            // If we dont already have a linked Isotope Attribute
+                            else {
+                                if($sp->isotope_product_variant_type == 'single') {
+                                    // Single product, just look at the field name using the key
+                                    $iso_attr = Attribute::findBy(['field_name = ?'], [$sa->attribute_key]);
+                                }
+                                else if($sp->isotope_product_variant_type == 'variant') {
                                     
-                                    debug($debug_mode, $log, "\t\t\t\t[Variant] Variant Isotope Attribute ID ".$v_att->id." found, validating it belongs to Product Type (ID: " . $sp->isotope_product_type . ")" );
-                                    $linked_attributes = array();
-                                    $pt = ProductType::findOneBy(['tl_iso_producttype.id=?'],[$sp->isotope_product_type]);
-                                    if($pt != null) {
-                                         if($pt->variant_attributes != null) {
-                                            foreach($pt->variant_attributes as $key => $attr) {
-                                                if($attr['enabled'] == '1') {
-                                                    $linked_attributes[$key] = $linked_attributes[$key] + 1;
+                                    // If this is a variant, try finding the _v version first
+                                    debug($debug_mode, $log, "\t\t\tSeeking Variant version of Isotope Attribute: " . $sa->attribute_key . '_v');
+                                    $v_att = Attribute::findOneBy(['field_name = ?'], [$sa->attribute_key . '_v']);
+                                    if($v_att) {
+                                        
+                                        debug($debug_mode, $log, "\t\t\t\t[Variant] Variant Isotope Attribute ID ".$v_att->id." found, validating it belongs to Product Type (ID: " . $sp->isotope_product_type . ")" );
+                                        $linked_attributes = array();
+                                        $pt = ProductType::findOneBy(['tl_iso_producttype.id=?'],[$sp->isotope_product_type]);
+                                        if($pt != null) {
+                                             if($pt->variant_attributes != null) {
+                                                foreach($pt->variant_attributes as $key => $attr) {
+                                                    if($attr['enabled'] == '1') {
+                                                        $linked_attributes[$key] = $linked_attributes[$key] + 1;
+                                                    }
                                                 }
-                                            }
-                                        } else {
-                                            foreach($pt->attributes as $key => $attr) {
-                                                if($attr['enabled'] == '1') {
-                                                    $linked_attributes[$key] = $linked_attributes[$key] + 1;
+                                            } else {
+                                                foreach($pt->attributes as $key => $attr) {
+                                                    if($attr['enabled'] == '1') {
+                                                        $linked_attributes[$key] = $linked_attributes[$key] + 1;
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                    
-                                    debug($debug_mode, $log, "\t\t\t\t\t[VALID CHECK] [KEY: " . $sa->attribute_key. "_v" . "] " . $linked_attributes[$sa->attribute_key. "_v"]);
-                                    if($linked_attributes[$sa->attribute_key . "_v"] >= 1) {
-                                        debug($debug_mode, $log, "\t\t\t\t\t[Variant] VALID!");
-                                        $iso_attr = $v_att;
+                                        
+                                        debug($debug_mode, $log, "\t\t\t\t\t[VALID CHECK] [KEY: " . $sa->attribute_key. "_v" . "] " . $linked_attributes[$sa->attribute_key. "_v"]);
+                                        if($linked_attributes[$sa->attribute_key . "_v"] >= 1) {
+                                            debug($debug_mode, $log, "\t\t\t\t\t[Variant] VALID!");
+                                            $iso_attr = $v_att;
+                                        } else {
+                                            $iso_attr = Attribute::findBy(['field_name = ?'], [$sa->attribute_key]);
+                                            debug($debug_mode, $log, "\t\t\t[Variant] INVALID, Seeking normal Isotope Attribute (" . count($iso_attr) . ")");
+                                        }
+                                        
+                                        
                                     } else {
                                         $iso_attr = Attribute::findBy(['field_name = ?'], [$sa->attribute_key]);
-                                        debug($debug_mode, $log, "\t\t\t[Variant] INVALID, Seeking normal Isotope Attribute (" . count($iso_attr) . ")");
+                                        debug($debug_mode, $log, "\t\t\t[Variant] Seeking normal Isotope Attribute (" . count($iso_attr) . ")");
                                     }
                                     
-                                    
-                                } else {
-                                    $iso_attr = Attribute::findBy(['field_name = ?'], [$sa->attribute_key]);
-                                    debug($debug_mode, $log, "\t\t\t[Variant] Seeking normal Isotope Attribute (" . count($iso_attr) . ")");
                                 }
-                                
                             }
 
                             
@@ -119,12 +129,15 @@
         	                        $attribute_values = explode(", ", $sa->attribute_value);
         	                        foreach($attribute_values as $val) {
         	                            
+        	                            debug($debug_mode, $log, "\t[Isotope Attribute Label] " . $val);
+        	                            
         	                            // Try and find an existing Attribute Option
         	                            $existing_option = AttributeOption::findOneBy(['tl_iso_attribute_option.pid=?', 'tl_iso_attribute_option.label=?'],[$sa->linked_isotope_attribute, $val]);
         	                            if($existing_option) {
         	                                
         	                                $option_ids[] = $existing_option->id;
         	                                debug($debug_mode, $log, "\t\t[Isotope Attribute Option ID: " . $existing_option->id . "] Existing Isotope Attribute Option for this Isotope Attribute found");
+        	                                debug($debug_mode, $log, "\t\t[Existing Option Label] " . $existing_option->label);
         	                                
         	                            } else {
         	                                
@@ -155,17 +168,6 @@
 
                             } else
                                 debug($debug_mode, $log, "\t\tNo Isotope Attribute found, awaiting manual linking");
-                            
-
-
-
-
-
-
-
-
-
-
 
                             if($save)
                                 $sa->save();
