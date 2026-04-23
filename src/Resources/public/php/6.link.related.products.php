@@ -95,11 +95,30 @@
     // Empty out and reset (aka. TRUNCATE) the tl_iso_productcache table
     $reset_productcache_query =  "TRUNCATE TABLE tl_iso_productcache;";
     $reset_productcache_result = $dbh->query($reset_productcache_query);
-    
-    
     // Close our log file
     if(DEBUG_MODE)
         fclose(DEBUG_FILE);
+
+    /*
+    $reset_productcache_query =  "TRUNCATE TABLE tl_iso_productcache;";
+    $reset_productcache_result = $dbh->query($reset_productcache_query);
+    fwrite(DEBUG_FILE, "Product Cache cleared" . "\n");
+    try {
+        if (class_exists('Contao\System')) {
+            $container = \Contao\System::getContainer();
+            if ($container->has('contao.cache.cache_manager')) {
+                $container->get('contao.cache.cache_manager')->emptyHttpCache();
+                debug("[Shared Cache] Successfully cleared the HTTP cache (Shared Cache).");
+                fwrite(DEBUG_FILE, "Shared Cache cleared" . "\n");
+            }
+        }
+    } catch (\Exception $e) {
+        debug("[Shared Cache Error] Could not clear HTTP cache: " . $e->getMessage());
+        fwrite(DEBUG_FILE, "Unable to clear Shared Cache" . "\n");
+    }
+    if(DEBUG_MODE)
+        fclose(DEBUG_FILE);
+    */
         
     
     /** Helper Functions **/
