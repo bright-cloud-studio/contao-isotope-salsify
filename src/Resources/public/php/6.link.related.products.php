@@ -58,7 +58,7 @@
 		{
 		    debug("[SalsifyRequest ID: ".$sr->id."] Moving SalsifyRequest to the next step");
 		    $sr->status = 'awaiting_new_file';
-            //$sr->save();
+            $sr->save();
 		}
     }
 
