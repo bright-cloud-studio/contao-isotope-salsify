@@ -298,7 +298,8 @@
                             }
                             
                             $parent['alias'] = generateAlias($key);
-                            $parent['sku'] = $parent['sku'] . "_parent";
+                            //$parent['sku'] = $parent['sku'] . "_parent";
+                            $parent['sku'] = generateSKU($key);
                             
                             // Check if this product already exists
                             $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$parent['sku']]);
@@ -397,7 +398,8 @@
                             }
                             
                             $parent['alias'] = generateAlias($key);
-                            $parent['sku'] = $parent['sku'] . "_parent";
+                            //$parent['sku'] = $parent['sku'] . "_parent";
+                            $parent['sku'] = generateSKU($key);
                             
                             // Check if this product already exists
                             $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$parent['sku']]);
@@ -508,8 +510,8 @@
         
         // Update our SalsifyRequest by adding our linked Isotope Products
         if($our_request) {
-            //$our_request->generated_isotope_products = $generated_isotope_product_ids;
-            //$our_request->save();
+            $our_request->generated_isotope_products = $generated_isotope_product_ids;
+            $our_request->save();
         }
         
     }
@@ -570,4 +572,33 @@
         $length_limited = substr($text, 0, $max_length);
         
         return $length_limited;
+    }
+    
+    // Used to get a clean SKU based off the group name. Returns the same as generateAlias but uses underscores instead of dashes
+    function generateSKU($text) {
+
+        // 1. Convert back to HTML so we can strip the tags out next
+        $text = html_entity_decode($text);
+
+        // 2. Replace tags with underscores
+        $text = preg_replace('/<[^>]*>/', '_', $text);
+
+        // 3. Convert to lowercase:
+        $text = strtolower($text);
+
+        $arrSearch = array('/[^\pN\pL \.\&\/_-]+/u', '/[ \.\&\/-]+/');
+		$arrReplace = array('', '_');
+		$text = preg_replace($arrSearch, $arrReplace, $text);
+
+        // 4. Remove leading and trailing underscores:
+        $text = trim($text, '_');
+
+        // 5.  Handle empty strings:
+        if (empty($text)) {
+            $text = 'default_sku'; // Or any other default you prefer
+        }
+        $max_length = 125;
+        $length_limited = substr($text, 0, $max_length);
+
+        return $length_limited . "_parent";
     }
