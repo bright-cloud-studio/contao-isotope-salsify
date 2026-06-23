@@ -130,7 +130,6 @@
 		}
     }
     
-    
     /////////////////////
     // CREATE PRODUCTS //
     /////////////////////
@@ -170,6 +169,8 @@
         
         foreach($request as $key => $group) {
             
+            debug($debug_mode, $log, "[KEY] " . $key);
+            
             if(count($group) == 1) {
                 
                 debug($debug_mode, $log, "Single");
@@ -185,7 +186,9 @@
                         //////////////////////
                         // UPDATE OR INSERT //
                         //////////////////////
-    
+                        
+                        
+                        
                         // Check if this product already exists
                         $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$prod['sku']]);
                         if($update_ip != null) {
