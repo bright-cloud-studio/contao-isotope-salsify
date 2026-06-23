@@ -22,17 +22,13 @@
         die("Connection failed: " . $dbh->connect_error);
     }
 
-    /** INITS AND INCLUDES - STOP **/
-    
-    
-    
-    
     ////////////////
     // STAGE DATA //
     ////////////////
     
-    $grouping_counter = array();
+    //asdhg
     
+    $grouping_counter = array();
     
     // Loop through Salsify Requests on Step Two
     $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_grouping']);
