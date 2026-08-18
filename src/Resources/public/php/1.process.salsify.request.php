@@ -137,6 +137,13 @@
                     		    debug($debug_mode, $log, "Required fields in Salsify Request are empty, not processing Salsify File");
                     		} else {
 
+                                // Decide the publish state from the key named on the Salsify Request. Everything
+                                // was unpublished above, so this is what turns a product back on - 'false' or an
+                                // empty value leaves it off and step five never stages it for Isotope generation
+                                $publish_value = $array_child[$request['isotope_publish_key']][0] ?? '';
+                                $publish_product = ($publish_value == 'false' || $publish_value == '') ? '' : 1;
+
+                                debug($debug_mode, $log, "[SKU: " . $required_sku . "] Publish key '" . $request['isotope_publish_key'] . "' = '" . $publish_value . "' -> " . ($publish_product ? "PUBLISHED" : "UNPUBLISHED"));
 
                                 $salsify_product;
                                 $update_sp = SalsifyProduct::findOneBy(['tl_salsify_product.product_sku=?'],[$array_child[$request['isotope_sku_key']][0]]);
@@ -148,7 +155,7 @@
                             		$update_sp->tstamp = time();
                             		$update_sp->product_sku = $array_child[$request['isotope_sku_key']][0];
                             		$update_sp->product_name = encode_non_url_string($array_child[$request['isotope_name_key']][0]);
-                            		$update_sp->published = 1;
+                            		$update_sp->published = $publish_product;
                             		$update_sp->save();
                             		$salsify_product = $update_sp;
 
@@ -161,7 +168,7 @@
                             		$salsify_product->tstamp = time();
                             		$salsify_product->product_sku = $array_child[$request['isotope_sku_key']][0];
                             		$salsify_product->product_name = encode_non_url_string($array_child[$request['isotope_name_key']][0]);
-                            		$salsify_product->published = 1;
+                            		$salsify_product->published = $publish_product;
                             		$salsify_product->save();
                                 }
 
