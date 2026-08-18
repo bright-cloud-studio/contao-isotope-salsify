@@ -83,17 +83,18 @@ class SalsifyRequestBackend extends Backend
     public function getIsotopeProducts(DataContainer $dc) { 
         
         $checkbox_options = array();
-        
 
-        $products = SalsifyProduct::findBy(['pid = ?'], [$dc->activeRecord->id]);
-        if($products) {
-            foreach($products as $sp) {
-                $product = Product::findOneBy(['tl_iso_product.name = ?'], [$sp->product_name]);
-                    if($product)
-                        $checkbox_options = $checkbox_options + array($product->id => $product->name);
-            }
+        // Label straight from the IDs the import recorded. Matching by name skipped the
+        // generated variant parents - they are named after the grouping value, so no
+        // SalsifyProduct carries that name and they rendered as "Unknown option"
+        $generated = StringUtil::deserialize($dc->activeRecord->generated_isotope_products, true);
+
+        foreach($generated as $id) {
+            $product = Product::findOneBy(['tl_iso_product.id = ?'], [$id]);
+            if($product)
+                $checkbox_options[$product->id] = $product->name;
         }
-        
+
 		return $checkbox_options;
 	}
     
