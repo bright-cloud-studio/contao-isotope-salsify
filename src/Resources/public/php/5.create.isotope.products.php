@@ -151,14 +151,14 @@
         
         if($our_request) {
             foreach(unserialize($our_request->generated_isotope_products) as $unpublish_product_id) {
-                $unpublish_product = Product::findOneBy(['tl_iso_product.id = ?'], [$unpublish_product_id]);
-                if($unpublish_product) {
-                    
-                    debug($debug_mode, $log, "Unpublishing Isotope Product ID: " . $unpublish_product->id);
-                    
-                    $unpublish_product->published = '';
-                    $unpublish_product->save();
-                }
+
+                debug($debug_mode, $log, "Unpublishing Isotope Product ID: " . $unpublish_product_id);
+
+                // Write straight to the table. Isotope's Product model drops 'published' when
+                // saving a variant row, so the model save left every variant published while
+                // top level products unpublished correctly - the staging path below already
+                // uses raw SQL for the same reason
+                \Database::getInstance()->prepare("UPDATE tl_iso_product SET tstamp=?, published='' WHERE id=?")->execute(time(), $unpublish_product_id);
             }
         }
         
