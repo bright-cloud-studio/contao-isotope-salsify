@@ -226,9 +226,12 @@
                             // Else, continue like normal
                             
                             $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($prod)->execute();
-                            
+                            // Capture the new ID now - 'insertId' reports the connection's last insert at read
+                            // time, so the category and price INSERTs below would overwrite it
+                            $new_product_id = $prod_values_result->insertId;
+
                             $prod_cat = array();
-                            $prod_cat['pid'] = $prod_values_result->insertId;
+                            $prod_cat['pid'] = $new_product_id;
                             $prod_cat['tstamp'] = time();
                             foreach($cat_id as $cat) {
                                 $prod_cat['page_id'] = $cat;
@@ -239,7 +242,7 @@
                             
                             // Second, create entry in the 'tl_product_price' table                    
                             $price = array();
-                            $price['pid'] = $prod_values_result->insertId;
+                            $price['pid'] = $new_product_id;
                             $price['tstamp'] = time();
                             $price['tax_class'] = 1;
                             $price['config_id'] = 0;
@@ -255,8 +258,8 @@
                             $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
                             
                             // Save our Isotope Product ID for linking to our SalsifyRequest
-                            $generated_isotope_product_ids[] = $prod_values_result->insertId;
-                            debug($debug_mode, $log, "[STORING] New Isotope Product ID: ". $prod_values_result->insertId);
+                            $generated_isotope_product_ids[] = $new_product_id;
+                            debug($debug_mode, $log, "[STORING] New Isotope Product ID: ". $new_product_id);
                             
                         }
     
@@ -333,11 +336,15 @@
                             } else {
 
                                 $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
-                                $parent_id = $prod_values_result->insertId;
+                                // Capture the new ID now - 'insertId' reports the connection's last insert at read
+                                // time, so the category and price INSERTs below would overwrite it
+                                $new_product_id = $prod_values_result->insertId;
+
+                                $parent_id = $new_product_id;
 
                                  // First, create entry in the 'tl_product_pricetier" table
                                 $prod_cat = array();
-                                $prod_cat['pid'] = $prod_values_result->insertId;
+                                $prod_cat['pid'] = $new_product_id;
                                 $prod_cat['tstamp'] = time();
                                 foreach($cat_id as $cat) {
                                     $prod_cat['page_id'] = $cat;
@@ -348,7 +355,7 @@
                                 
                                 // Second, create entry in the 'tl_product_price' table                    
                                 $price = array();
-                                $price['pid'] = $prod_values_result->insertId;
+                                $price['pid'] = $new_product_id;
                                 $price['tstamp'] = time();
                                 $price['tax_class'] = 1;
                                 $price['config_id'] = 0;
@@ -364,8 +371,8 @@
                                 $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
                                 
                                 // Save our Isotope Product ID for linking to our SalsifyRequest
-                                $generated_isotope_product_ids[] = $prod_values_result->insertId;
-                                debug($debug_mode, $log, "[STORING] New Isotope Product ID: ". $prod_values_result->insertId);
+                                $generated_isotope_product_ids[] = $new_product_id;
+                                debug($debug_mode, $log, "[STORING] New Isotope Product ID: ". $new_product_id);
                                     
                             }
                             
@@ -433,11 +440,15 @@
                             } else {
 
                                 $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
-                                $parent_id = $prod_values_result->insertId;
+                                // Capture the new ID now - 'insertId' reports the connection's last insert at read
+                                // time, so the category and price INSERTs below would overwrite it
+                                $new_product_id = $prod_values_result->insertId;
+
+                                $parent_id = $new_product_id;
                                 
                                 // First, create entry in the 'tl_product_pricetier" table
                                 $prod_cat = array();
-                                $prod_cat['pid'] = $prod_values_result->insertId;
+                                $prod_cat['pid'] = $new_product_id;
                                 $prod_cat['tstamp'] = time();
                                 foreach($cat_id as $cat) {
                                     $prod_cat['page_id'] = $cat;
@@ -447,7 +458,7 @@
                                 
                                 // Second, create entry in the 'tl_product_price' table                    
                                 $price = array();
-                                $price['pid'] = $prod_values_result->insertId;
+                                $price['pid'] = $new_product_id;
                                 $price['tstamp'] = time();
                                 $price['tax_class'] = 1;
                                 $price['config_id'] = 0;
@@ -463,8 +474,8 @@
                                 $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
                                 
                                 // Save our Isotope Product ID for linking to our SalsifyRequest
-                                $generated_isotope_product_ids[] = $prod_values_result->insertId;
-                                debug($debug_mode, $log, "[STORING] New Isotope Product ID: ". $prod_values_result->insertId);
+                                $generated_isotope_product_ids[] = $new_product_id;
+                                debug($debug_mode, $log, "[STORING] New Isotope Product ID: ". $new_product_id);
                                     
                             }
                             
@@ -492,9 +503,12 @@
                             debug($debug_mode, $log, "[STORING] Update Isotope Product ID: ". $update_ip->id);
                         } else {
                             $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($variant)->execute();
+                            // Capture the new ID immediately, same as the branches above
+                            $new_product_id = $prod_values_result->insertId;
+
                             // Save our Isotope Product ID for linking to our SalsifyRequest
-                            $generated_isotope_product_ids[] = $prod_values_result->insertId;
-                            debug($debug_mode, $log, "[STORING] New Isotope Product ID: ". $prod_values_result->insertId);
+                            $generated_isotope_product_ids[] = $new_product_id;
+                            debug($debug_mode, $log, "[STORING] New Isotope Product ID: ". $new_product_id);
                         }
                     }
     
