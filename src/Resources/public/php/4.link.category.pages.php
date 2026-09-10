@@ -22,12 +22,9 @@
     }
     /** INITS AND INCLUDES - STOP **/
 
-    
-    
     //////////////////////////////////////////////////
     // AUTO-LINK Category Pages to Salsify Products //
     //////////////////////////////////////////////////
-
 
     // Get Salsify Requests that are in the 'awaiting_cat_linking' state
     $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_cat_linking']);
@@ -35,7 +32,7 @@
     if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
-		    debug($debug_mode, $log, "Getting Salsify Products for Salsify Request: ". $sr->id);
+		    debugStepFour($debug_mode, $log, "Getting Salsify Products for Salsify Request: ". $sr->id);
             
             // Loop through all Salsify Products that belong to this Salsify Request
             $sp_query =  "SELECT * FROM tl_salsify_product WHERE pid='".$sr->id."' ORDER BY id ASC";
@@ -43,7 +40,7 @@
             if($sp_result) {
                 while($product = $sp_result->fetch_assoc()) {
                     
-                    debug($debug_mode, $log, "Processing Salsify Product ID: ". $product['id']);
+                    debugStepFour($debug_mode, $log, "Processing Salsify Product ID: ". $product['id']);
                     
                     // loop through each attribute
                     $sa_query =  "SELECT * FROM tl_salsify_attribute WHERE pid='".$product['id']."' AND is_cat='1' ORDER BY id ASC";
@@ -51,7 +48,7 @@
                     if($sa_result) {
                         while($attribute = $sa_result->fetch_assoc()) {
                             
-                            debug($debug_mode, $log, "Processing Salsify Attribute ID: ". $attribute['id']);
+                            debugStepFour($debug_mode, $log, "Processing Salsify Attribute ID: ". $attribute['id']);
                             
                             // Break our value down into CSV stuffs
                             $page_titles = explode(", ", $attribute['attribute_value']);
@@ -61,7 +58,7 @@
                             // Loop through all of our titles
                             foreach($page_titles as $title) {
                                 
-                                debug($debug_mode, $log, "Attempting to find Page titled: ". $title);
+                                debugStepFour($debug_mode, $log, "Attempting to find Page titled: ". $title);
                                 
                                 // Find a page with this title
                                 $page_query =  "SELECT * FROM tl_page WHERE title='".$title."' AND published='1' ORDER BY id ASC";
@@ -69,14 +66,14 @@
                                 if($page_result) {
                                     while($page = $page_result->fetch_assoc()) {
                                         
-                                        debug($debug_mode, $log, "Page FOUND titled: ". $page['title']);
+                                        debugStepFour($debug_mode, $log, "Page FOUND titled: ". $page['title']);
                                         
                                         // Validate that this page belongs to the selected root
                                         $page_type = $page['type'];
                                         $pid = $page['pid'];
                                         $id = $page['id'];
                                         
-                                        debug($debug_mode, $log, "Validating this page belongs to selected root");
+                                        debugStepFour($debug_mode, $log, "Validating this page belongs to selected root");
                                         
                                         // while we dont have the root page
                                         while ($page_type != 'root') {
@@ -98,11 +95,11 @@
                                         
                                         if($root == $id) {
                                             
-                                            debug($debug_mode, $log, "Validation success, belongs to our selected Root");
+                                            debugStepFour($debug_mode, $log, "Validation success, belongs to our selected Root");
                                                 
                                             $page_ids[] = $page['id'];
                                         } else {
-                                            debug($debug_mode, $log, "Validation failed...");
+                                            debugStepFour($debug_mode, $log, "Validation failed...");
                                         }
                                         
                                     }
@@ -115,7 +112,7 @@
                                 
                                 $page_csv = numbersArrayToCsv($page_ids);
                                 
-                                debug($debug_mode, $log, "Adding SalsifyProduct to the following pages: ". $page_csv);
+                                debugStepFour($debug_mode, $log, "Adding SalsifyProduct to the following pages: ". $page_csv);
                                 
                                 $update =  "update tl_salsify_attribute set category_page='".$page_csv."' WHERE id='".$attribute['id']."'";
                                 $result_update = $dbh->query($update);
@@ -143,9 +140,8 @@
         fclose($log);
     
     
-    
     /** HELPER FUNCTIONS **/
-    function debug($debug_mode, $log, $message) {
+    function debugStepFour($debug_mode, $log, $message) {
         if($debug_mode)
             fwrite($log, $message . "\n");
         echo $message . "<br>";
