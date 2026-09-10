@@ -31,7 +31,7 @@
     if($sr_result) {
         while($request = $sr_result->fetch_assoc()) {
 
-            debug($debug_mode, $log, "[Checking SalsifyRequest] ID: ".$request['id']. " - " . $request['request_name']);
+            debugStepOne($debug_mode, $log, "[Checking SalsifyRequest] ID: ".$request['id']. " - " . $request['request_name']);
 
             // Tracks if we have found a newer file and need to run it
             $run_update = false;
@@ -51,14 +51,14 @@
                 $next_file_url = '';
                 $next_file_date = '';
 
-                debug($debug_mode, $log, "Looping through Files found in Folder");
+                debugStepOne($debug_mode, $log, "Looping through Files found in Folder");
 
                 // Collect each file's modification date so we can walk them in order
                 $file_dates = array();
                 foreach($files as $file) {
                     $file_dates[$file] = filemtime($folder . "/" . $file);
 
-                    debug($debug_mode, $log, "File: " . $file . " - Date: " . $file_dates[$file]);
+                    debugStepOne($debug_mode, $log, "File: " . $file . " - Date: " . $file_dates[$file]);
                 }
 
                 // Sort oldest-first, falling back to filename when dates match
@@ -76,7 +76,7 @@
 
                 if($next_file_date) {
 
-                    debug($debug_mode, $log, "Next unprocessed Salsify file found: " . $next_file_url);
+                    debugStepOne($debug_mode, $log, "Next unprocessed Salsify file found: " . $next_file_url);
 
                     $run_update = true;
                     $request['file_url'] = $next_file_url;
@@ -85,32 +85,32 @@
                 // New file found, process it
                 if($run_update) {
 
-                    debug($debug_mode, $log, "Processing new Salsify File");
+                    debugStepOne($debug_mode, $log, "Processing new Salsify File");
 
                     // Unpublish all SalsifyProducts that belong to this request
-                    debug($debug_mode, $log, "Unpublishing Salsify Products linked to this Salsify Request");
+                    debugStepOne($debug_mode, $log, "Unpublishing Salsify Products linked to this Salsify Request");
                     $existing_salsify_products = SalsifyProduct::findBy('pid', $request['id']);
                     if($existing_salsify_products) {
                         foreach($existing_salsify_products as $existing_salsify_product) {
                             $existing_salsify_product->published = '';
                             $existing_salsify_product->save();
                         }
-                        debug($debug_mode, $log, "Salsify Products Unpublished: " . count($existing_salsify_products));
+                        debugStepOne($debug_mode, $log, "Salsify Products Unpublished: " . count($existing_salsify_products));
                     }
 
                     // Unpublish all SalsifyProducts that belong to this request
-                    debug($debug_mode, $log, "Unpublishing Salsify Attributes linked to this Salsify Request");
+                    debugStepOne($debug_mode, $log, "Unpublishing Salsify Attributes linked to this Salsify Request");
                     $existing_salsify_attributes = SalsifyAttribute::findBy('request', $request['id']);
                     if($existing_salsify_attributes) {
                         foreach($existing_salsify_attributes as $existing_salsify_attribute) {
                             $existing_salsify_attribute->published = '';
                             $existing_salsify_attribute->save();
                         }
-                        debug($debug_mode, $log, "Salsify Attributes Unpublished: " . count($existing_salsify_attributes));
+                        debugStepOne($debug_mode, $log, "Salsify Attributes Unpublished: " . count($existing_salsify_attributes));
                     }
 
                     // Add a blank line to our debug log before moving on to product generation
-                    debug($debug_mode, $log, "");
+                    debugStepOne($debug_mode, $log, "");
 
                     /** PROCESS JSON FILE - START **/
                     $reader = new JsonReader();
@@ -134,7 +134,7 @@
                     		$required_sku = $array_child[$request['isotope_sku_key']][0];
                     		$required_name = $array_child[$request['isotope_name_key']][0];
                     		if($required_sku == '' || $required_name == '') {
-                    		    debug($debug_mode, $log, "Required fields in Salsify Request are empty, not processing Salsify File");
+                    		    debugStepOne($debug_mode, $log, "Required fields in Salsify Request are empty, not processing Salsify File");
                     		} else {
 
                                 // Decide the publish state from the key named on the Salsify Request. Everything
@@ -143,13 +143,13 @@
                                 $publish_value = $array_child[$request['isotope_publish_key']][0] ?? '';
                                 $publish_product = ($publish_value == 'false' || $publish_value == '') ? '' : 1;
 
-                                debug($debug_mode, $log, "[SKU: " . $required_sku . "] Publish key '" . $request['isotope_publish_key'] . "' = '" . $publish_value . "' -> " . ($publish_product ? "PUBLISHED" : "UNPUBLISHED"));
+                                debugStepOne($debug_mode, $log, "[SKU: " . $required_sku . "] Publish key '" . $request['isotope_publish_key'] . "' = '" . $publish_value . "' -> " . ($publish_product ? "PUBLISHED" : "UNPUBLISHED"));
 
                                 $salsify_product;
                                 $update_sp = SalsifyProduct::findOneBy(['tl_salsify_product.product_sku=?'],[$array_child[$request['isotope_sku_key']][0]]);
                                 if($update_sp != null) {
                                     // Existing Salsify Product Found
-                                    debug($debug_mode, $log, "Update Salsify Product [SKU: " . $array_child[$request['isotope_sku_key']][0] . "]");
+                                    debugStepOne($debug_mode, $log, "Update Salsify Product [SKU: " . $array_child[$request['isotope_sku_key']][0] . "]");
 
                                     $update_sp->pid = $request['id'];
                             		$update_sp->tstamp = time();
@@ -161,7 +161,7 @@
 
                                 } else {
                                     // New Salsify Product
-                                    debug($debug_mode, $log, "Create Salsify Product [SKU: " . $array_child[$request['isotope_sku_key']][0] . "]");
+                                    debugStepOne($debug_mode, $log, "Create Salsify Product [SKU: " . $array_child[$request['isotope_sku_key']][0] . "]");
 
                             		$salsify_product = new SalsifyProduct();
                             		$salsify_product->pid = $request['id'];
@@ -182,24 +182,24 @@
                                     if($update_sa != null) {
 
                                         // Existing SalsifyAttribute found
-                                        debug($debug_mode, $log, "\tUpdate Salsify Attribute [ID: ".$update_sa->id."] [KEY: " . $key . "]");
+                                        debugStepOne($debug_mode, $log, "\tUpdate Salsify Attribute [ID: ".$update_sa->id."] [KEY: " . $key . "]");
 
                                         // FIRST CONVERSION HERE
                                         $update_sa->attribute_value = encode_non_url_string($val[0]);
                                         $update_sa->tstamp = time();
                                         $update_sa->published = 1;
 
-                                        debug($debug_mode, $log, "\t\t[ID: ".$update_sa->id."] [KEY: " . $key . "] [VAL: " . $update_sa->attribute_value . "]");
+                                        debugStepOne($debug_mode, $log, "\t\t[ID: ".$update_sa->id."] [KEY: " . $key . "] [VAL: " . $update_sa->attribute_value . "]");
                                         if($request['isotope_category_key'] == $key) {
-                                            debug($debug_mode, $log, "\t\t[ID: ".$update_sa->id."] [KEY: " . $key . "] Applying 'Category' from Salsify Request's Isotope Category Key");
+                                            debugStepOne($debug_mode, $log, "\t\t[ID: ".$update_sa->id."] [KEY: " . $key . "] Applying 'Category' from Salsify Request's Isotope Category Key");
                                             $update_sa->is_cat = 1;
                                         }
                                         if($request['isotope_grouping_key'] == $key) {
-                                            debug($debug_mode, $log, "\t\t[ID: ".$update_sa->id."] [KEY: " . $key . "] Applying 'Grouping' from Salsify Request's Isotope Grouping Key");
+                                            debugStepOne($debug_mode, $log, "\t\t[ID: ".$update_sa->id."] [KEY: " . $key . "] Applying 'Grouping' from Salsify Request's Isotope Grouping Key");
                                             $update_sa->is_grouping = 1;
                                         }
                                         if($request['isotope_publish_key'] == $key) {
-                                            debug($debug_mode, $log, "\t\t[ID: ".$update_sa->id."] [KEY: " . $key . "] Applying 'Publish' from Salsify Request's Isotope Publish Key");
+                                            debugStepOne($debug_mode, $log, "\t\t[ID: ".$update_sa->id."] [KEY: " . $key . "] Applying 'Publish' from Salsify Request's Isotope Publish Key");
                                             $update_sa->controls_published = 1;
                                         }
 
@@ -230,21 +230,21 @@
                                         $salsify_attribute->save();
 
                                         // Debug Messages
-                                        debug($debug_mode, $log, "\tCreate Salsify Attribute [ID: ".$salsify_attribute->id."] [KEY: " . $key . "]");
-                                        debug($debug_mode, $log, "\t\t[ID: ".$salsify_attribute->id."] [KEY: " . $key . "] [VAL: " . $salsify_attribute->attribute_value . "]");
+                                        debugStepOne($debug_mode, $log, "\tCreate Salsify Attribute [ID: ".$salsify_attribute->id."] [KEY: " . $key . "]");
+                                        debugStepOne($debug_mode, $log, "\t\t[ID: ".$salsify_attribute->id."] [KEY: " . $key . "] [VAL: " . $salsify_attribute->attribute_value . "]");
                                         if($request['isotope_category_key'] == $key)
-                                            debug($debug_mode, $log, "\t\t[ID: ".$salsify_attribute->id."] [KEY: " . $key . "] Applying 'Category' from Salsify Request's Isotope Category Key");
+                                            debugStepOne($debug_mode, $log, "\t\t[ID: ".$salsify_attribute->id."] [KEY: " . $key . "] Applying 'Category' from Salsify Request's Isotope Category Key");
                                         if($request['isotope_grouping_key'] == $key)
-                                            debug($debug_mode, $log, "\t\t[ID: ".$salsify_attribute->id."] [KEY: " . $key . "] Applying 'Grouping' from Salsify Request's Isotope Grouping Key");
+                                            debugStepOne($debug_mode, $log, "\t\t[ID: ".$salsify_attribute->id."] [KEY: " . $key . "] Applying 'Grouping' from Salsify Request's Isotope Grouping Key");
                                         if($request['isotope_publish_key'] == $key)
-                                            debug($debug_mode, $log, "\t\t[ID: ".$salsify_attribute->id."] [KEY: " . $key . "] Applying 'Publish' from Salsify Request's Isotope Publish Key");
+                                            debugStepOne($debug_mode, $log, "\t\t[ID: ".$salsify_attribute->id."] [KEY: " . $key . "] Applying 'Publish' from Salsify Request's Isotope Publish Key");
 
                                     }
 
                                 }
 
                                 // Add a blank line between products in the debug log
-                                debug($debug_mode, $log, "-------------------------------------------");
+                                debugStepOne($debug_mode, $log, "-------------------------------------------");
                     		}
 
                     	}
@@ -259,19 +259,19 @@
                 }
 
             } else {
-                debug($debug_mode, $log, "No Files found in the Folder");
+                debugStepOne($debug_mode, $log, "No Files found in the Folder");
             }
 
 
-            debug($debug_mode, $log, "Salsify Products updated: " . $prod_count);
+            debugStepOne($debug_mode, $log, "Salsify Products updated: " . $prod_count);
 
 
             // Add a blank line between our Salsify Requests
-            debug($debug_mode, $log, "- - - - - - - - - - - - - - - - - - - - - -\n");
+            debugStepOne($debug_mode, $log, "- - - - - - - - - - - - - - - - - - - - - -\n");
         }
     }
 
-    debug($debug_mode, $log, "Step One Completed");
+    debugStepOne($debug_mode, $log, "Step One Completed");
 
     if($debug_mode)
         fclose($log);
@@ -283,7 +283,7 @@
 
 
     /** HELPER FUNCTIONS **/
-    function debug($debug_mode, $log, $message) {
+    function debugStepOne($debug_mode, $log, $message) {
         if($debug_mode)
             fwrite($log, $message . "\n");
 
