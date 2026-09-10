@@ -34,7 +34,7 @@
     if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
-		    debug($debug_mode, $log, "[Checking SalsifyRequest] ID: ".$sr->id. " - " . $sr->request_name);
+		    debugStepThree($debug_mode, $log, "[Checking SalsifyRequest] ID: ".$sr->id. " - " . $sr->request_name);
 		    
 		    // Loop through Salsify Products that belong to this Salsify Request
 		    $salsify_products = SalsifyProduct::findBy(['pid = ?'], [$sr->id]);
@@ -43,7 +43,7 @@
                 foreach ($salsify_products as $sp)
         		{
         		    
-        		    debug($debug_mode, $log, "\t[Salsify Product ID: " . $sp->id . "] Attempting Auto-Link on Salsify Attributes");
+        		    debugStepThree($debug_mode, $log, "\t[Salsify Product ID: " . $sp->id . "] Attempting Auto-Link on Salsify Attributes");
         		    
         		    // Find all Salsify Attributes for this Salsify Product
         		    $salsify_attributes = SalsifyAttribute::findBy(['pid = ?'], [$sp->id]);
@@ -51,13 +51,13 @@
                         foreach($salsify_attributes as $sa) {
                             
                             $save = false;
-                            debug($debug_mode, $log, "\t\t[Salsify Attribute ID: " . $sa->id . "] Seeking link for '" .$sa->attribute_key . "'");
+                            debugStepThree($debug_mode, $log, "\t\t[Salsify Attribute ID: " . $sa->id . "] Seeking link for '" .$sa->attribute_key . "'");
 
                             $iso_attr = null;
                             
                             // If we are already have a linked Isotope Attribute
                             if($sa->linked_isotope_attribute != null) {
-                                debug($debug_mode, $log, "\t\t\tLinked Isotope Attribute Found - ID: " . $sa->linked_isotope_attribute);
+                                debugStepThree($debug_mode, $log, "\t\t\tLinked Isotope Attribute Found - ID: " . $sa->linked_isotope_attribute);
                                 $iso_attr = Attribute::findBy(['id = ?'], [$sa->linked_isotope_attribute]);
                                 
                             }
@@ -70,11 +70,11 @@
                                 else if($sp->isotope_product_variant_type == 'variant') {
                                     
                                     // If this is a variant, try finding the _v version first
-                                    debug($debug_mode, $log, "\t\t\tSeeking Variant version of Isotope Attribute: " . $sa->attribute_key . '_v');
+                                    debugStepThree($debug_mode, $log, "\t\t\tSeeking Variant version of Isotope Attribute: " . $sa->attribute_key . '_v');
                                     $v_att = Attribute::findOneBy(['field_name = ?'], [$sa->attribute_key . '_v']);
                                     if($v_att) {
                                         
-                                        debug($debug_mode, $log, "\t\t\t\t[Variant] Variant Isotope Attribute ID ".$v_att->id." found, validating it belongs to Product Type (ID: " . $sp->isotope_product_type . ")" );
+                                        debugStepThree($debug_mode, $log, "\t\t\t\t[Variant] Variant Isotope Attribute ID ".$v_att->id." found, validating it belongs to Product Type (ID: " . $sp->isotope_product_type . ")" );
                                         $linked_attributes = array();
                                         $pt = ProductType::findOneBy(['tl_iso_producttype.id=?'],[$sp->isotope_product_type]);
                                         if($pt != null) {
@@ -93,19 +93,19 @@
                                             }
                                         }
                                         
-                                        debug($debug_mode, $log, "\t\t\t\t\t[VALID CHECK] [KEY: " . $sa->attribute_key. "_v" . "] " . $linked_attributes[$sa->attribute_key. "_v"]);
+                                        debugStepThree($debug_mode, $log, "\t\t\t\t\t[VALID CHECK] [KEY: " . $sa->attribute_key. "_v" . "] " . $linked_attributes[$sa->attribute_key. "_v"]);
                                         if($linked_attributes[$sa->attribute_key . "_v"] >= 1) {
-                                            debug($debug_mode, $log, "\t\t\t\t\t[Variant] VALID!");
+                                            debugStepThree($debug_mode, $log, "\t\t\t\t\t[Variant] VALID!");
                                             $iso_attr = $v_att;
                                         } else {
                                             $iso_attr = Attribute::findBy(['field_name = ?'], [$sa->attribute_key]);
-                                            debug($debug_mode, $log, "\t\t\t[Variant] INVALID, Seeking normal Isotope Attribute (" . count($iso_attr) . ")");
+                                            debugStepThree($debug_mode, $log, "\t\t\t[Variant] INVALID, Seeking normal Isotope Attribute (" . count($iso_attr) . ")");
                                         }
                                         
                                         
                                     } else {
                                         $iso_attr = Attribute::findBy(['field_name = ?'], [$sa->attribute_key]);
-                                        debug($debug_mode, $log, "\t\t\t[Variant] Seeking normal Isotope Attribute (" . count($iso_attr) . ")");
+                                        debugStepThree($debug_mode, $log, "\t\t\t[Variant] Seeking normal Isotope Attribute (" . count($iso_attr) . ")");
                                     }
                                     
                                 }
@@ -122,22 +122,22 @@
                                 // Link or Create Option
         	                    if($iso_attr->type == 'select' || $iso_attr->type == 'radio') {
         	                        
-        	                        debug($debug_mode, $log, "\t[Isotope Attribute ID: " . $iso_attr->id . "] Isotope Attribute ID required, attempting Update or Creation");
+        	                        debugStepThree($debug_mode, $log, "\t[Isotope Attribute ID: " . $iso_attr->id . "] Isotope Attribute ID required, attempting Update or Creation");
         	                        
         	                        // Loop through comma separated attribute values
         	                        $option_ids = array();
         	                        $attribute_values = explode(", ", $sa->attribute_value);
         	                        foreach($attribute_values as $val) {
         	                            
-        	                            debug($debug_mode, $log, "\t[Isotope Attribute Label] " . $val);
+        	                            debugStepThree($debug_mode, $log, "\t[Isotope Attribute Label] " . $val);
         	                            
         	                            // Try and find an existing Attribute Option
         	                            $existing_option = AttributeOption::findOneBy(['tl_iso_attribute_option.pid=?', 'tl_iso_attribute_option.label=?'],[$sa->linked_isotope_attribute, $val]);
         	                            if($existing_option) {
         	                                
         	                                $option_ids[] = $existing_option->id;
-        	                                debug($debug_mode, $log, "\t\t[Isotope Attribute Option ID: " . $existing_option->id . "] Existing Isotope Attribute Option for this Isotope Attribute found");
-        	                                debug($debug_mode, $log, "\t\t[Existing Option Label] " . $existing_option->label);
+        	                                debugStepThree($debug_mode, $log, "\t\t[Isotope Attribute Option ID: " . $existing_option->id . "] Existing Isotope Attribute Option for this Isotope Attribute found");
+        	                                debugStepThree($debug_mode, $log, "\t\t[Existing Option Label] " . $existing_option->label);
         	                                
         	                            } else {
         	                                
@@ -151,12 +151,12 @@
                         					
                         					// Sorting
                         					$new_option->sorting = generateSortNumber($sa->attribute_value);
-                        					debug($debug_mode, $log, "\t\t\t[Sorting Number for: " . $sa->attribute_value . "]: " . $new_option->sorting);
+                        					debugStepThree($debug_mode, $log, "\t\t\t[Sorting Number for: " . $sa->attribute_value . "]: " . $new_option->sorting);
 
                         					$new_option->save();
                         					
                         					$option_ids[] = $new_option->id;
-                        					debug($debug_mode, $log, "\t[Isotope Attribute Option ID: " . $new_option->id . "] New Isotope Attribute Option created");
+                        					debugStepThree($debug_mode, $log, "\t[Isotope Attribute Option ID: " . $new_option->id . "] New Isotope Attribute Option created");
         	                            }
     
         	                            
@@ -167,7 +167,7 @@
                                 
 
                             } else
-                                debug($debug_mode, $log, "\t\tNo Isotope Attribute found, awaiting manual linking");
+                                debugStepThree($debug_mode, $log, "\t\tNo Isotope Attribute found, awaiting manual linking");
 
                             if($save)
                                 $sa->save();
@@ -175,18 +175,18 @@
                     }
                     
                     
-                    debug($debug_mode, $log, "\t- - - - - - - - - - - - - - - - - -");
+                    debugStepThree($debug_mode, $log, "\t- - - - - - - - - - - - - - - - - -");
         		}
 
         		
 
             } else {
                 // Add a blank line between our Salsify Requests
-                debug($debug_mode, $log, "\tNo Salsify Products found");
+                debugStepThree($debug_mode, $log, "\tNo Salsify Products found");
             }
             
             // Add a blank line between our Salsify Requests
-            debug($debug_mode, $log, "- - - - - - - - - - - - - - - - - - - - - -\n");
+            debugStepThree($debug_mode, $log, "- - - - - - - - - - - - - - - - - - - - - -\n");
         
             $sr->status = 'awaiting_cat_linking';
             $sr->save();
@@ -201,7 +201,7 @@
         
         
     /** HELPER FUNCTIONS **/
-    function debug($debug_mode, $log, $message) {
+    function debugStepThree($debug_mode, $log, $message) {
         if($debug_mode)
             fwrite($log, $message . "\n");
         echo $message . "<br>";
