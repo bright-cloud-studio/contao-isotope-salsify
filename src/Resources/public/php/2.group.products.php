@@ -35,13 +35,13 @@
     if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
-		    debug($debug_mode, $log, "[Checking SalsifyRequest] ID: ".$sr->id. " - " . $sr->request_name);
+		    debugStepTwo($debug_mode, $log, "[Checking SalsifyRequest] ID: ".$sr->id. " - " . $sr->request_name);
 		    
 		    // Loop through Salsify Products that belong to this Salsify Request
 		    $salsify_products = SalsifyProduct::findBy(['pid = ?'], [$sr->id]);
             if($salsify_products) {
                 
-                debug($debug_mode, $log, "\tSalsify Products Found: " . count($salsify_products));
+                debugStepTwo($debug_mode, $log, "\tSalsify Products Found: " . count($salsify_products));
                 
                 foreach ($salsify_products as $sp)
         		{
@@ -53,7 +53,7 @@
                         // Find all Salsify Attributes that are grouping with the same value, that arent our kickoff one
                         $others_in_group = SalsifyAttribute::findBy(['id != ?', 'attribute_value = ?', 'is_grouping = ?'], [$salsify_attribute->id, $salsify_attribute->attribute_value, 1]);
                         if($others_in_group) {
-                            debug($debug_mode, $log, "\t[Salsify Product ID: " . $sp->id . "] [Group: ".$salsify_attribute->attribute_value."] Detected as Variant Product");
+                            debugStepTwo($debug_mode, $log, "\t[Salsify Product ID: " . $sp->id . "] [Group: ".$salsify_attribute->attribute_value."] Detected as Variant Product");
                             
                             // Salsify Product is Variant
                             $sp->variant_group = $salsify_attribute->attribute_value;
@@ -62,7 +62,7 @@
                             $sp->save();
                             
                         } else {
-                            debug($debug_mode, $log, "\t[Salsify Product ID: " . $sp->id . "] Detected as Single Product");
+                            debugStepTwo($debug_mode, $log, "\t[Salsify Product ID: " . $sp->id . "] Detected as Single Product");
                             
                             // Salsify Product is Single Product
                             $sp->variant_group = $salsify_attribute->attribute_value;
@@ -70,9 +70,7 @@
                             $sp->isotope_product_type = $sr->isotope_product_type;
                             $sp->save();
                         }
-                        
-                        //$grouping_counter[$salsify_attribute->attribute_value] += 1;
-                        //debug($debug_mode, $log, "\t[Grouping: ".$salsify_attribute->attribute_value."] Total In Group: " . $grouping_counter[$salsify_attribute->attribute_value]);
+
                     }
 
         		}
@@ -81,11 +79,11 @@
 
             } else {
                 // Add a blank line between our Salsify Requests
-                debug($debug_mode, $log, "\tNo Salsify Products found");
+                debugStepTwo($debug_mode, $log, "\tNo Salsify Products found");
             }
             
             // Add a blank line between our Salsify Requests
-            debug($debug_mode, $log, "- - - - - - - - - - - - - - - - - - - - - -\n");
+            debugStepTwo($debug_mode, $log, "- - - - - - - - - - - - - - - - - - - - - -\n");
             
             $sr->status = 'awaiting_auto_linking';
             $sr->save();
@@ -101,7 +99,7 @@
         
         
     /** HELPER FUNCTIONS **/
-    function debug($debug_mode, $log, $message) {
+    function debugStepTwo($debug_mode, $log, $message) {
         if($debug_mode)
             fwrite($log, $message . "\n");
         echo $message . "<br>";
