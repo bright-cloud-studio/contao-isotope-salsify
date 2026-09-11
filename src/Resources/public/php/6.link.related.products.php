@@ -91,6 +91,10 @@
 		{
 		    debugStepSix("[SalsifyRequest ID: ".$sr->id."] Moving SalsifyRequest to the next step");
 		    $sr->status = 'awaiting_new_file';
+
+            // Stamp the finished import so step seven sends the completed report
+            $sr->completed_tstamp = time();
+            $sr->completed_notified = '';
             $sr->save();
 		}
     }
