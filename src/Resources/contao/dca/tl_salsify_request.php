@@ -95,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default' => '{salsify_request_legend}, request_name, source_folder, file_url, file_date; {isotope_details_legend}, isotope_name_key, isotope_sku_key, isotope_publish_key, isotope_category_key, website_root, isotope_grouping_key, isotope_product_type, isotope_product_type_variant; {status_legend}, status, initial_linking_completed; {generated_products_legend}, generated_isotope_products;'
+        'default' => '{salsify_request_legend}, request_name, source_folder, file_url, file_date; {isotope_details_legend}, isotope_name_key, isotope_sku_key, isotope_publish_key, isotope_category_key, website_root, isotope_grouping_key, isotope_product_type, isotope_product_type_variant; {status_legend}, status, initial_linking_completed, notification; {generated_products_legend}, generated_isotope_products;'
     ),
  
     // Fields
@@ -249,6 +249,32 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'inputType'               => 'checkbox',
             'default'				  => '',
             'eval'                    => array('multiple'=>false, 'chosen'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "char(1) NOT NULL default ''"
+        ),
+        'notification' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['notification'],
+            'inputType'               => 'select',
+            'options_callback'        => array('Bcs\Backend\SalsifyRequestBackend', 'getNotifications'),
+            'eval'                    => array('includeBlankOption'=>true, 'chosen'=>true, 'tl_class'=>'clr w50'),
+            'sql'                     => "int(10) unsigned NOT NULL default 0"
+        ),
+
+        // Stall watchdog bookkeeping - written only by step seven, never edited by hand
+        'stall_status' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['stall_status'],
+            'sql'                     => "varchar(30) NOT NULL default ''"
+        ),
+        'stall_tstamp' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['stall_tstamp'],
+            'eval'                    => array('rgxp'=>'datim'),
+            'sql'                     => "int(10) unsigned NOT NULL default 0"
+        ),
+        'stall_notified' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['stall_notified'],
             'sql'                     => "char(1) NOT NULL default ''"
         ),
 
