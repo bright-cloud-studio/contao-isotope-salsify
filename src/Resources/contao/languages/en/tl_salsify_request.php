@@ -35,6 +35,9 @@ $GLOBALS['TL_LANG']['tl_salsify_request']['notification']                 = arra
 $GLOBALS['TL_LANG']['tl_salsify_request']['stall_status']                 = array('Stall Status', 'The status step seven last saw this Salsify Request on. Set automatically.');
 $GLOBALS['TL_LANG']['tl_salsify_request']['stall_tstamp']                 = array('Stall Timer Started', 'When this Salsify Request arrived on its current status. Set automatically.');
 $GLOBALS['TL_LANG']['tl_salsify_request']['stall_notified']               = array('Stall Alert Sent', 'Set once an alert has gone out for the current stall so it only sends once, and cleared when the status moves. Set automatically.');
+$GLOBALS['TL_LANG']['tl_salsify_request']['completed_notification']       = array('Completed Notification', 'Notification Center notification sent when this Salsify Request finishes importing a file. Leave empty to turn completion reports off for this request.');
+$GLOBALS['TL_LANG']['tl_salsify_request']['completed_tstamp']             = array('Last Import Completed', 'When this Salsify Request last finished importing a file. Set automatically.');
+$GLOBALS['TL_LANG']['tl_salsify_request']['completed_notified']           = array('Completed Report Sent', 'Set once the report for the last finished import has gone out, so it only sends once. Set automatically.');
 
 $GLOBALS['TL_LANG']['tl_salsify_request']['generated_products_legend']    = 'Generated Isotope Product Details';
 $GLOBALS['TL_LANG']['tl_salsify_request']['generated_isotope_products']   = array('Generated Isotope Products', 'Checked Isotope Products were generated from a SalsifyProduct belonging to this SalsifyRequest');
