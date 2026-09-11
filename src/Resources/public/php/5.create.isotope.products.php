@@ -3,36 +3,36 @@
     /** INITS AND INCLUDES - START **/
     use Bcs\Model\SalsifyRequest;
     use Isotope\Model\Product;
-    
+
     $debug_mode = true;
     if($debug_mode)
         $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_five_'.date('m_d_y').'.txt', "a+") or die("Unable to open file!");
 
     session_start();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
-    
+
     $serializedData = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/../db.txt');
 	$db_info = unserialize($serializedData);
     $dbh = new mysqli("localhost", $db_info[0], $db_info[1], $db_info[2]);
     if ($dbh->connect_error) {
         die("Connection failed: " . $dbh->connect_error);
     }
-    
+
     if (!$dbh->set_charset("utf8mb4")) {
         printf("Error loading character set utf8mb4: %s\n", $dbh->error);
         exit();
     }
-    
+
     // Store all of our products in data
     $products = array();
-    
+
     // Get all the columns for the 'tl_iso_product' database, add to array with the default values
     $defaults = array();
     $default_query =  "DESCRIBE tl_iso_product";
     $default_result = $dbh->query($default_query);
     if($default_result) {
         while($default = $default_result->fetch_assoc()) {
-            
+
             if($default['Extra'] == 'auto_increment') {
             }
             else if($default['Null'] == 'YES') {
@@ -45,46 +45,46 @@
     /** INITS AND INCLUDES - STOP **/
 
 
-    
+
     ////////////////
     // STAGE DATA //
     ////////////////
-    
+
     debugStepFive($debug_mode, $log, "Staging Data");
-    
+
     // Get Salsify Requests that are in the 'awaiting_cat_linking' state
     $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_iso_generation']);
     if($salsify_requests) {
         foreach ($salsify_requests as $sr)
 		{
 		    debugStepFive($debug_mode, $log, "Getting Products in SalsifyRequest: ". $sr->id);
-    
+
             // Loop through the Salsify Products
             $prod_query =  "SELECT * FROM tl_salsify_product WHERE published='1' AND pid='".$sr->id."' ORDER BY id ASC";
             $prod_result = $dbh->query($prod_query);
             if($prod_result) {
                 while($prod = $prod_result->fetch_assoc()) {
-                    
+
                     debugStepFive($debug_mode, $log, "Getting Attributes for SalsifyProduct: ". $prod['id']);
-                    
+
                     // Apply our "default" database values to the product data. This starts us out as "default", then we plug in the SalsifyAttribute values to replace the defaults
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']] = $defaults;
-                    
+
                     $attr_query =  "SELECT * FROM tl_salsify_attribute WHERE pid='".$prod['id']."' AND published='1' ORDER BY id ASC";
                     $attr_result = $dbh->query($attr_query);
                     if($attr_result) {
                         while($attr = $attr_result->fetch_assoc()) {
-                            
+
                             // Apply our SalsifyAttribute values to our product's data
                             $prod_values[$attr['attribute_key']] = $attr['attribute_value'];
-                            
+
                             // If this product has a 'default_product_variant' attribute and it's set to 'true', set the fallback to 1 for this variant
                             if($attr['attribute_key'] == 'default_product_variant') {
                                 if($attr['attribute_value'] == 'true') {
                                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']]['fallback'] = 1;
                                 }
                             }
-        
+
                             $iso_attr_query =  "SELECT * FROM tl_iso_attribute WHERE id='".$attr['linked_isotope_attribute']."' ORDER BY id ASC";
                             $iso_attr_result = $dbh->query($iso_attr_query);
                             if($iso_attr_result) {
@@ -97,36 +97,32 @@
                                         $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']][$iso_attr['field_name']] = $attr['attribute_value'];
                                 }
                             }
-                            
+
                         }
                     }
-        
+
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']]['tstamp'] = time();
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']]['dateAdded'] = time();
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']]['type'] = $prod['isotope_product_type'];
-                    
+
                     $cat_array = explode(",", $prod['category_page']);
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']]['orderPages'] = serialize($cat_array);
-                    
+
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']]['name'] = $prod['product_name'];
-                    
+
                     // If alias is going to be too long, make note in log file
                     if(strlen($prod['product_name']) > 125) {
                         debugStepFive($debug_mode, $log, "Alias Truncated");
                     }
-                        
-                        
+
+
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']]['alias'] = generateAlias($prod['product_name']);
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']]['sku'] = $prod['product_sku'];
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']]['description'] = $prod_values['full_description'];
                     $products[$prod['pid']][$prod['variant_group']][$prod['product_sku']]['published'] = 1;
                 }
             }
-            
-            // Update the status of our Salsify Request and save it
-            //$sr->status = 'awaiting_related_linking';
-            //$sr->save();
-            
+
             // Nothing staged means the generation loop below never sees this request, so
             // advance it here. Otherwise the status change waits until the products are
             // actually written, letting a failure mid-generation retry this step
@@ -134,16 +130,16 @@
                 $sr->status = 'awaiting_related_linking';
                 $sr->save();
             }
-    
+
 		}
     }
-    
+
     /////////////////////
     // CREATE PRODUCTS //
     /////////////////////
-    
+
     debugStepFive($debug_mode, $log, "Generating Products");
-    
+
     // Tracks counts, displayed in Statistics section
     $count_single = 0;
     $count_variant = 0;
@@ -151,12 +147,12 @@
     $count_generated_parent = 0;
 
     foreach($products as $request_id => $request) {
-        
+
         // Unpublish Isotope Products that belong to this SalsifyRequest
         debugStepFive($debug_mode, $log, "Unpublishing Isotope Product created from SalsifyRequest: ".$request_id);
-        
+
         $our_request = SalsifyRequest::findBy(['id = ?'], [$request_id]);
-        
+
         if($our_request) {
             foreach(unserialize($our_request->generated_isotope_products) as $unpublish_product_id) {
 
@@ -169,48 +165,48 @@
                 \Database::getInstance()->prepare("UPDATE tl_iso_product SET tstamp=?, published='' WHERE id=?")->execute(time(), $unpublish_product_id);
             }
         }
-        
+
         debugStepFive($debug_mode, $log, "After Our Request");
-        
+
         // Tracks the IDs of the Isotope Products we generate, saving them will link our Isotope Products to our SalsifyRequest
         $generated_isotope_product_ids = array();
-        
+
         foreach($request as $key => $group) {
-            
+
             debugStepFive($debug_mode, $log, "[KEY] " . $key);
-            
+
             if(count($group) == 1) {
-                
+
                 debugStepFive($debug_mode, $log, "Single");
-                
+
                 // CREATE SINGLE PRODUCT
                 $count_single++;
                 foreach($group as $key2 => $prod) {
-                    
+
                     // If we have a Product Page selected
                     $cat_id = unserialize($prod['orderPages']);
                     if($cat_id[0]) {
-    
+
                         //////////////////////
                         // UPDATE OR INSERT //
                         //////////////////////
-                        
-                        
-                        
+
+
+
                         // Check if this product already exists
                         $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$prod['sku']]);
                         if($update_ip != null) {
-                            
+
                             debugStepFive($debug_mode, $log, "UPDATING single product: ". $update_ip->id);
-                            
+
                             // Update the product
                             $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($prod)->execute($update_ip->id);
-                            
+
                             // Delete all our entries in tl_iso_product_category
                             $result_delete_cats = $dbh->query("delete from tl_iso_product_category WHERE pid='".$update_ip->id."'");
-                            
+
                             debugStepFive($debug_mode, $log, "DELETING existing category links");
-                            
+
                             // re-add them
                             $prod_cat = array();
                             $prod_cat['pid'] = $update_ip->id;
@@ -218,21 +214,21 @@
                             foreach($cat_id as $cat) {
                                 $prod_cat['page_id'] = $cat;
                                 $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
-                                
+
                                 debugStepFive($debug_mode, $log, "ADDING Isotope Product ID: " . $prod_cat['pid'] . " to Page ID: ". $cat);
                             }
-                            
+
                             // Save our Isotope Product ID for linking to our SalsifyRequest
                             $generated_isotope_product_ids[] = $update_ip->id;
                             debugStepFive($debug_mode, $log, "[STORING] Updated Isotope Product ID: ". $update_ip->id);
-                            
-                            
+
+
                         } else {
-                            
+
                             debugStepFive($debug_mode, $log, "CREATING new product");
 
                             // Else, continue like normal
-                            
+
                             $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($prod)->execute();
                             // Capture the new ID now - 'insertId' reports the connection's last insert at read
                             // time, so the category and price INSERTs below would overwrite it
@@ -244,11 +240,11 @@
                             foreach($cat_id as $cat) {
                                 $prod_cat['page_id'] = $cat;
                                 $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
-                                
+
                                 debugStepFive($debug_mode, $log, "ADDING Isotope Product ID: " . $prod_cat['pid'] . " to Page ID: ". $cat);
                             }
-                            
-                            // Second, create entry in the 'tl_product_price' table                    
+
+                            // Second, create entry in the 'tl_product_price' table
                             $price = array();
                             $price['pid'] = $new_product_id;
                             $price['tstamp'] = time();
@@ -256,7 +252,7 @@
                             $price['config_id'] = 0;
                             $price['member_group'] = 0;
                             $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();
-                            
+
                             // First, create entry in the 'tl_product_pricetier" table
                             $priceTier = array();
                             $priceTier['pid'] = $priceResult->insertId;
@@ -264,68 +260,68 @@
                             $priceTier['min'] = 1;
                             $priceTier['price'] = '1.00';
                             $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
-                            
+
                             // Save our Isotope Product ID for linking to our SalsifyRequest
                             $generated_isotope_product_ids[] = $new_product_id;
                             debugStepFive($debug_mode, $log, "[STORING] New Isotope Product ID: ". $new_product_id);
-                            
+
                         }
-    
+
                     }
-                    
+
                 }
-                
+
             } else {
-                
+
                 debugStepFive($debug_mode, $log, "Variant");
-                
+
                 // CREATE VARIANT PRODUCT
-                
-                
-                
-    
+
+
+
+
                 // For now, we need to use the first loop to create the parent, track if it is that loop
                 $create_parent = true;
                 $parent_id = 0;
-                
+
                 // First, create a parent if we can. If not, continue
                 foreach($group as $key2 => $prod) {
-    
+
                     // CREATE PARENT PRODUCT
                     if($prod['default_product_variant'] == 'true') {
                         $count_default_kickup++;
-                        
+
                         $create_parent = false;
-                        
+
                         $cat_id = unserialize($prod['orderPages']);
                         if($cat_id[0]) {
-                            
+
                             $parent = $prod;
                             $parent['name'] = $key;
-                            
+
                             // If alias is going to be too long, make note in log file
                             if(strlen($key) > 125) {
                                 debugStepFive($debug_mode, $log, "TRUNCATING alias");
                             }
-                            
+
                             $parent['alias'] = generateAlias($key);
                             //$parent['sku'] = $parent['sku'] . "_parent";
                             $parent['sku'] = generateSKU($key);
-                            
+
                             // Check if this product already exists
                             $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$parent['sku']]);
                             if($update_ip != null) {
-                                
+
                                 debugStepFive($debug_mode, $log, "UPDATING variant parent product: ". $update_ip->id);
-                                
+
                                 $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($parent)->execute($update_ip->id);
                                 $parent_id = $update_ip->id;
-                                
+
                                 // Delete all our entries in tl_iso_product_category
                                 $result_delete_cats = $dbh->query("delete from tl_iso_product_category WHERE pid='".$update_ip->id."'");
-                                
+
                                 debugStepFive($debug_mode, $log, "DELETING existing category links");
-                                
+
                                 // First, create entry in the 'tl_product_pricetier" table
                                 $prod_cat = array();
                                 $prod_cat['pid'] = $parent_id;
@@ -333,14 +329,14 @@
                                 foreach($cat_id as $cat) {
                                     $prod_cat['page_id'] = $cat;
                                     $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
-                                    
+
                                     debugStepFive($debug_mode, $log, "ADDING Isotope Product ID: " . $prod_cat['pid'] . " to Page ID: ". $cat);
                                 }
-                                
+
                                 // Save our Isotope Product ID for linking to our SalsifyRequest
                                 $generated_isotope_product_ids[] = $update_ip->id;
                                 debugStepFive($debug_mode, $log, "[STORING] Updated Isotope Product ID: ". $update_ip->id);
-                                
+
                             } else {
 
                                 $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
@@ -357,11 +353,11 @@
                                 foreach($cat_id as $cat) {
                                     $prod_cat['page_id'] = $cat;
                                     $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
-                                    
+
                                     debugStepFive($debug_mode, $log, "ADDING Isotope Product ID: " . $prod_cat['pid'] . " to Page ID: ". $cat);
                                 }
-                                
-                                // Second, create entry in the 'tl_product_price' table                    
+
+                                // Second, create entry in the 'tl_product_price' table
                                 $price = array();
                                 $price['pid'] = $new_product_id;
                                 $price['tstamp'] = time();
@@ -369,7 +365,7 @@
                                 $price['config_id'] = 0;
                                 $price['member_group'] = 0;
                                 $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();
-                                
+
                                 // First, create entry in the 'tl_product_pricetier" table
                                 $priceTier = array();
                                 $priceTier['pid'] = $priceResult->insertId;
@@ -377,59 +373,59 @@
                                 $priceTier['min'] = 1;
                                 $priceTier['price'] = '1.00';
                                 $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
-                                
+
                                 // Save our Isotope Product ID for linking to our SalsifyRequest
                                 $generated_isotope_product_ids[] = $new_product_id;
                                 debugStepFive($debug_mode, $log, "[STORING] New Isotope Product ID: ". $new_product_id);
-                                    
+
                             }
-                            
+
                         }
                     }
                 }
-                
+
                 // Now, continue as normal.
                 // $create_parent will be set to false if the parent was made earlier
                 // If not, it will use the first product as our fallback.
-                
+
                 foreach($group as $key2 => $prod) {
                     $count_variant++;
-    
+
                     // CREATE PARENT PRODUCT
                     if($create_parent) {
                         $count_generated_parent++;
-                        
+
                         $create_parent = false;
-                        
+
                         $cat_id = unserialize($prod['orderPages']);
                         if($cat_id[0]) {
-                            
+
                             $parent = $prod;
                             $parent['name'] = $key;
-                            
+
                             // If the alias is too long, make note in log file
                             if(strlen($key) > 125) {
                                 debugStepFive($debug_mode, $log, "TRUNCATING alias");
                             }
-                            
+
                             $parent['alias'] = generateAlias($key);
                             //$parent['sku'] = $parent['sku'] . "_parent";
                             $parent['sku'] = generateSKU($key);
-                            
+
                             // Check if this product already exists
                             $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$parent['sku']]);
                             if($update_ip != null) {
-                                
+
                                 debugStepFive($debug_mode, $log, "UPDATING variant non-default parent product: ". $update_ip->id);
-                                
+
                                 $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($parent)->execute($update_ip->id);
                                 $parent_id = $update_ip->id;
-                                
+
                                 // Delete all our entries in tl_iso_product_category
                                 $result_delete_cats = $dbh->query("delete from tl_iso_product_category WHERE pid='".$update_ip->id."'");
-                                
+
                                 debugStepFive($debug_mode, $log, "DELETING existing category links");
-                                
+
                                 // First, create entry in the 'tl_product_pricetier" table
                                 $prod_cat = array();
                                 $prod_cat['pid'] = $parent_id;
@@ -437,14 +433,14 @@
                                 foreach($cat_id as $cat) {
                                     $prod_cat['page_id'] = $cat;
                                     $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
-                                    
+
                                     debugStepFive($debug_mode, $log, "ADDING Isotope Product ID: " . $prod_cat['pid'] . " to Page ID: ". $cat);
-                                    
+
                                 }
                                 // Save our Isotope Product ID for linking to our SalsifyRequest
                                 $generated_isotope_product_ids[] = $update_ip->id;
                                 debugStepFive($debug_mode, $log, "[STORING] Update Isotope Product ID: ". $update_ip->id);
-                                
+
                             } else {
 
                                 $prod_values_result = \Database::getInstance()->prepare("INSERT INTO tl_iso_product %s")->set($parent)->execute();
@@ -453,7 +449,7 @@
                                 $new_product_id = $prod_values_result->insertId;
 
                                 $parent_id = $new_product_id;
-                                
+
                                 // First, create entry in the 'tl_product_pricetier" table
                                 $prod_cat = array();
                                 $prod_cat['pid'] = $new_product_id;
@@ -463,8 +459,8 @@
                                     $prod_cat_results = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_category %s")->set($prod_cat)->execute();
                                     debugStepFive($debug_mode, $log, "ADDING Isotope Product ID: " . $prod_cat['pid'] . " to Page ID: ". $cat);
                                 }
-                                
-                                // Second, create entry in the 'tl_product_price' table                    
+
+                                // Second, create entry in the 'tl_product_price' table
                                 $price = array();
                                 $price['pid'] = $new_product_id;
                                 $price['tstamp'] = time();
@@ -472,7 +468,7 @@
                                 $price['config_id'] = 0;
                                 $price['member_group'] = 0;
                                 $priceResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_price %s")->set($price)->execute();
-                                
+
                                 // First, create entry in the 'tl_product_pricetier" table
                                 $priceTier = array();
                                 $priceTier['pid'] = $priceResult->insertId;
@@ -480,29 +476,29 @@
                                 $priceTier['min'] = 1;
                                 $priceTier['price'] = '1.00';
                                 $priceTierResult = \Database::getInstance()->prepare("INSERT INTO tl_iso_product_pricetier %s")->set($priceTier)->execute();
-                                
+
                                 // Save our Isotope Product ID for linking to our SalsifyRequest
                                 $generated_isotope_product_ids[] = $new_product_id;
                                 debugStepFive($debug_mode, $log, "[STORING] New Isotope Product ID: ". $new_product_id);
-                                    
+
                             }
-                            
+
                         }
                     }
-                    
+
                     // CREATE VARIANTS
                     $cat_id = unserialize($prod['orderPages']);
                     if($cat_id[0]) {
-                        
+
                         $variant = $prod;
                         $variant['pid'] = $parent_id;
                         $variant['type'] = 0;
                         $variant['orderPages'] = NULL;
-                        
+
                         // Check if this product already exists
                         $update_ip = Product::findOneBy(['tl_iso_product.sku=?'],[$variant['sku']]);
                         if($update_ip != null) {
-                            
+
                             debugStepFive($debug_mode, $log, "UPDATING variant product: ". $update_ip->id);
 
                             $prod_values_result = \Database::getInstance()->prepare("UPDATE tl_iso_product %s WHERE id=?")->set($variant)->execute($update_ip->id);
@@ -519,31 +515,25 @@
                             debugStepFive($debug_mode, $log, "[STORING] New Isotope Product ID: ". $new_product_id);
                         }
                     }
-    
+
                 }
-                
-                // Products are written, so it is now safe to move the SalsifyRequest on
-                if($our_request) {
-                    $our_request->generated_isotope_products = $generated_isotope_product_ids;
-                    $our_request->status = 'awaiting_related_linking';
-                    $our_request->save();
-                }
-                
+
             }
-            
-            
+
+
         }
-        
-        // Update our SalsifyRequest by adding our linked Isotope Products
+
+        // Products are written, so it is now safe to move the SalsifyRequest on
         if($our_request) {
             $our_request->generated_isotope_products = $generated_isotope_product_ids;
+            $our_request->status = 'awaiting_related_linking';
             $our_request->save();
         }
-        
+
     }
-    
-    
-    
+
+
+
     ////////////////
     // STATISTICS //
     ////////////////
@@ -558,48 +548,48 @@
     // Close our logfile
     if($debug_mode)
         fclose($log);
-    
-    
-    
-    
+
+
+
+
     /** HELPER FUNCTIONS **/
     function debugStepFive($debug_mode, $log, $message) {
         if($debug_mode)
             fwrite($log, $message . "\n");
         echo $message . "<br>";
     }
-    
+
     function generateAlias($text) {
-        
+
         // 1. Convert back to HTML so we can strip the tags out next
         $text = html_entity_decode($text);
-        
+
         // 2. Strip HTML tags
         //$text = strip_tags($text);
-        
+
         // 2. Replace tags with dashes
         $text = preg_replace('/<[^>]*>/', '-', $text);
-        
+
         // 3. Convert to lowercase:
         $text = strtolower($text);
-        
+
         $arrSearch = array('/[^\pN\pL \.\&\/_-]+/u', '/[ \.\&\/-]+/');
 		$arrReplace = array('', '-');
 		$text = preg_replace($arrSearch, $arrReplace, $text);
-    
+
         // 4. Remove leading and trailing underscores:
         $text = trim($text, '-');
-    
+
         // 5.  Handle empty strings:
         if (empty($text)) {
             $text = 'default_alias'; // Or any other default you prefer
         }
         $max_length = 125;
         $length_limited = substr($text, 0, $max_length);
-        
+
         return $length_limited;
     }
-    
+
     // Used to get a clean SKU based off the group name. Returns the same as generateAlias but uses underscores instead of dashes
     function generateSKU($text) {
 
