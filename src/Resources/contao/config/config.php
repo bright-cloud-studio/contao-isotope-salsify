@@ -39,3 +39,17 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['salsify']['salsify_stalled
     'email_recipient_bcc'  => array('admin_email'),
     'email_replyTo'        => array('admin_email')
 );
+
+/* Notification Center - report sent by step seven when a Salsify Request finishes an import */
+$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['salsify']['salsify_completed'] = array
+(
+    'recipients'           => array('admin_email'),
+    'email_subject'        => array('request_*', 'import_*', 'salsify_*', 'isotope_*'),
+    'email_text'           => array('request_*', 'import_*', 'salsify_*', 'isotope_*'),
+    'email_html'           => array('request_*', 'import_*', 'salsify_*', 'isotope_*'),
+    'email_sender_name'    => array('admin_email'),
+    'email_sender_address' => array('admin_email'),
+    'email_recipient_cc'   => array('admin_email'),
+    'email_recipient_bcc'  => array('admin_email'),
+    'email_replyTo'        => array('admin_email')
+);
