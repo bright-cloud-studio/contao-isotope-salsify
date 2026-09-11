@@ -95,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
     // Palettes
     'palettes' => array
     (
-        'default' => '{salsify_request_legend}, request_name, source_folder, file_url, file_date; {isotope_details_legend}, isotope_name_key, isotope_sku_key, isotope_publish_key, isotope_category_key, website_root, isotope_grouping_key, isotope_product_type, isotope_product_type_variant; {status_legend}, status, initial_linking_completed, notification; {generated_products_legend}, generated_isotope_products;'
+        'default' => '{salsify_request_legend}, request_name, source_folder, file_url, file_date; {isotope_details_legend}, isotope_name_key, isotope_sku_key, isotope_publish_key, isotope_category_key, website_root, isotope_grouping_key, isotope_product_type, isotope_product_type_variant; {status_legend}, status, initial_linking_completed, notification, completed_notification; {generated_products_legend}, generated_isotope_products;'
     ),
  
     // Fields
@@ -259,6 +259,14 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
             'eval'                    => array('includeBlankOption'=>true, 'chosen'=>true, 'tl_class'=>'clr w50'),
             'sql'                     => "int(10) unsigned NOT NULL default 0"
         ),
+        'completed_notification' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['completed_notification'],
+            'inputType'               => 'select',
+            'options_callback'        => array('Bcs\Backend\SalsifyRequestBackend', 'getCompletedNotifications'),
+            'eval'                    => array('includeBlankOption'=>true, 'chosen'=>true, 'tl_class'=>'w50'),
+            'sql'                     => "int(10) unsigned NOT NULL default 0"
+        ),
 
         // Stall watchdog bookkeeping - written only by step seven, never edited by hand
         'stall_status' => array
@@ -275,6 +283,19 @@ $GLOBALS['TL_DCA']['tl_salsify_request'] = array
         'stall_notified' => array
         (
             'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['stall_notified'],
+            'sql'                     => "char(1) NOT NULL default ''"
+        ),
+
+        // Completed report bookkeeping - step six stamps a finished import, step seven marks it reported
+        'completed_tstamp' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['completed_tstamp'],
+            'eval'                    => array('rgxp'=>'datim'),
+            'sql'                     => "int(10) unsigned NOT NULL default 0"
+        ),
+        'completed_notified' => array
+        (
+            'label'                   => &$GLOBALS['TL_LANG']['tl_salsify_request']['completed_notified'],
             'sql'                     => "char(1) NOT NULL default ''"
         ),
 
