@@ -14,6 +14,8 @@ use Bcs\Model\SalsifyAttribute;
 use Isotope\Model\Product;
 use Isotope\Model\ProductType;
 
+use NotificationCenter\Model\Notification;
+
 class SalsifyRequestBackend extends Backend
 {
     
@@ -178,6 +180,20 @@ class SalsifyRequestBackend extends Backend
         while($attributes->next()) {
             $attr = $attributes->row();
             $options[$attr['id']] = $attr['name'];
+        }
+        return $options;
+    }
+
+    // Build an array of the stalled-request notifications, KEY being the ID and VALUE the title. Only this
+    // type is offered so a request can't be pointed at an Isotope order or form email by mistake
+    public function getNotifications()
+    {
+        $options = array();
+        $notifications = Notification::findBy('type', 'salsify_stalled', array('order' => 'title'));
+        if($notifications) {
+            while($notifications->next()) {
+                $options[$notifications->id] = $notifications->title;
+            }
         }
         return $options;
     }
