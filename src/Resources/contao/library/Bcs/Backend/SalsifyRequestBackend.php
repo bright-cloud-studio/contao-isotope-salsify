@@ -184,12 +184,24 @@ class SalsifyRequestBackend extends Backend
         return $options;
     }
 
-    // Build an array of the stalled-request notifications, KEY being the ID and VALUE the title. Only this
-    // type is offered so a request can't be pointed at an Isotope order or form email by mistake
+    // Options for the Stall Notification dropdown
     public function getNotifications()
     {
+        return $this->getNotificationOptions('salsify_stalled');
+    }
+
+    // Options for the Completed Notification dropdown
+    public function getCompletedNotifications()
+    {
+        return $this->getNotificationOptions('salsify_completed');
+    }
+
+    // Build an array of one type's notifications, KEY being the ID and VALUE the title. Each dropdown only
+    // offers its own type so a request can't be pointed at an Isotope order or form email by mistake
+    private function getNotificationOptions($type)
+    {
         $options = array();
-        $notifications = Notification::findBy('type', 'salsify_stalled', array('order' => 'title'));
+        $notifications = Notification::findBy('type', $type, array('order' => 'title'));
         if($notifications) {
             while($notifications->next()) {
                 $options[$notifications->id] = $notifications->title;
