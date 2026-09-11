@@ -20,7 +20,8 @@
     "require":{
         "php": "^7.4 || ^8.0",
         "contao/core-bundle": "^4.13 || ^5.3",
-        "pcrov/jsonreader": "^1.0"
+        "pcrov/jsonreader": "^1.0",
+        "terminal42/notification_center": "^1.0"
     },
     "extra":{
         "contao-manager-plugin": "Bcs\\SalsifyBundle\\ContaoManager\\Plugin"
