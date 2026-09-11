@@ -31,6 +31,10 @@ $GLOBALS['TL_LANG']['tl_salsify_request']['flag_update']                  = arra
 $GLOBALS['TL_LANG']['tl_salsify_request']['status_legend']                = 'Status Details';
 $GLOBALS['TL_LANG']['tl_salsify_request']['status']                       = array('Status', 'Tracks the status of this Salsify Request, tracking which step of the process we are currently in');
 $GLOBALS['TL_LANG']['tl_salsify_request']['initial_linking_completed']    = array('Initial Linking Completed', 'When this is checked, we will enter the \'stay alive\' loop where we look for new json files and process them as they are detected');
+$GLOBALS['TL_LANG']['tl_salsify_request']['notification']                 = array('Stall Notification', 'Notification Center notification sent when this Salsify Request stays on the same step for too long. Leave empty to turn alerts off for this request.');
+$GLOBALS['TL_LANG']['tl_salsify_request']['stall_status']                 = array('Stall Status', 'The status step seven last saw this Salsify Request on. Set automatically.');
+$GLOBALS['TL_LANG']['tl_salsify_request']['stall_tstamp']                 = array('Stall Timer Started', 'When this Salsify Request arrived on its current status. Set automatically.');
+$GLOBALS['TL_LANG']['tl_salsify_request']['stall_notified']               = array('Stall Alert Sent', 'Set once an alert has gone out for the current stall so it only sends once, and cleared when the status moves. Set automatically.');
 
 $GLOBALS['TL_LANG']['tl_salsify_request']['generated_products_legend']    = 'Generated Isotope Product Details';
 $GLOBALS['TL_LANG']['tl_salsify_request']['generated_isotope_products']   = array('Generated Isotope Products', 'Checked Isotope Products were generated from a SalsifyProduct belonging to this SalsifyRequest');
