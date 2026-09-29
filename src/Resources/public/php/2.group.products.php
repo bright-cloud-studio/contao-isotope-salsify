@@ -51,7 +51,8 @@
                     if($salsify_attribute) {
                         
                         // Find all Salsify Attributes that are grouping with the same value, that arent our kickoff one
-                        $others_in_group = SalsifyAttribute::findBy(['id != ?', 'attribute_value = ?', 'is_grouping = ?'], [$salsify_attribute->id, $salsify_attribute->attribute_value, 1]);
+                        //$others_in_group = SalsifyAttribute::findBy(['id != ?', 'attribute_value = ?', 'is_grouping = ?'], [$salsify_attribute->id, $salsify_attribute->attribute_value, 1]);
+                        $others_in_group = SalsifyAttribute::findBy(['id != ?', 'attribute_value = ?', 'is_grouping = ?', 'published = ?', 'request = ?'], [$salsify_attribute->id, $salsify_attribute->attribute_value, 1, 1, $sr->id]);
                         if($others_in_group) {
                             debugStepTwo($debug_mode, $log, "\t[Salsify Product ID: " . $sp->id . "] [Group: ".$salsify_attribute->attribute_value."] Detected as Variant Product");
                             
@@ -75,7 +76,6 @@
 
         		}
 
-        		
 
             } else {
                 // Add a blank line between our Salsify Requests
