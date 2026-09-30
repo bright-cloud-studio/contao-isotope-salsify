@@ -4,9 +4,10 @@
     use Bcs\Model\SalsifyRequest;
     use Isotope\Model\Product;
 
+    // Holds the log path until the first message is written, then the open handle - so a
+    // run with nothing to process never creates or touches the day's log file
     $debug_mode = true;
-    if($debug_mode)
-        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_five_'.date('m_d_y').'.txt', "a+") or die("Unable to open file!");
+    $log = $_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_five_'.date('m_d_y').'.txt';
 
     session_start();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
@@ -50,11 +51,11 @@
     // STAGE DATA //
     ////////////////
 
-    debugStepFive($debug_mode, $log, "Staging Data");
-
-    // Get Salsify Requests that are in the 'awaiting_cat_linking' state
+    // Get Salsify Requests that are in the 'awaiting_iso_generation' state
     $salsify_requests = SalsifyRequest::findBy(['status = ?'], ['awaiting_iso_generation']);
     if($salsify_requests) {
+        debugStepFive($debug_mode, $log, "Staging Data");
+
         foreach ($salsify_requests as $sr)
 		{
 		    debugStepFive($debug_mode, $log, "Getting Products in SalsifyRequest: ". $sr->id);
@@ -138,7 +139,9 @@
     // CREATE PRODUCTS //
     /////////////////////
 
-    debugStepFive($debug_mode, $log, "Generating Products");
+    // Nothing is waiting on this step, so skip the log entirely
+    if($salsify_requests)
+        debugStepFive($debug_mode, $log, "Generating Products");
 
     // Tracks counts, displayed in Statistics section
     $count_single = 0;
@@ -539,23 +542,29 @@
     ////////////////
 
 
-    debugStepFive($debug_mode, $log, "Statistics");
-    debugStepFive($debug_mode, $log, "Single Products: " . $count_single);
-    debugStepFive($debug_mode, $log, "Variant Product: " . $count_variant);
-    debugStepFive($debug_mode, $log, "Default Product Variant used as Parent: " . $count_default_kickup);
-    debugStepFive($debug_mode, $log, "Parent generated from first variant: " . $count_generated_parent);
+    if($salsify_requests) {
+        debugStepFive($debug_mode, $log, "Statistics");
+        debugStepFive($debug_mode, $log, "Single Products: " . $count_single);
+        debugStepFive($debug_mode, $log, "Variant Product: " . $count_variant);
+        debugStepFive($debug_mode, $log, "Default Product Variant used as Parent: " . $count_default_kickup);
+        debugStepFive($debug_mode, $log, "Parent generated from first variant: " . $count_generated_parent);
+    }
 
-    // Close our logfile
-    if($debug_mode)
+    // Close our logfile, only opened if this run wrote to it
+    if(is_resource($log))
         fclose($log);
 
 
 
 
     /** HELPER FUNCTIONS **/
-    function debugStepFive($debug_mode, $log, $message) {
-        if($debug_mode)
+    function debugStepFive($debug_mode, &$log, $message) {
+        if($debug_mode) {
+            // Open the log on first write
+            if(!is_resource($log))
+                $log = fopen($log, "a+") or die("Unable to open file!");
             fwrite($log, $message . "\n");
+        }
         echo $message . "<br>";
     }
 
