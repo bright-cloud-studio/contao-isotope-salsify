@@ -8,7 +8,8 @@
     use Isotope\Model\Product;
 
     define('DEBUG_MODE', true);
-    define('DEBUG_FILE', fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_six_'.date('m_d_y').'.txt', "a+"));
+    // Only the path - the file is opened on the first write, so a run with nothing to process never creates the day's log file
+    define('DEBUG_FILE', $_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_six_'.date('m_d_y').'.txt');
 
     session_start();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
@@ -100,9 +101,9 @@
     }
 
 
-    // Close our log file
-    if(DEBUG_MODE)
-        fclose(DEBUG_FILE);
+    // Close our log file, only opened if this run wrote to it
+    if($handle = stepSixLog(false))
+        fclose($handle);
 
 
     /** Helper Functions **/
@@ -110,10 +111,18 @@
         if(DEBUG_MODE) {
             $indent = str_repeat("\t", $indent_level);
             $message = $indent . $message;
-            fwrite(DEBUG_FILE, $message . "\n");
+            fwrite(stepSixLog(), $message . "\n");
             echo $message . "<br>";
 
         } else {
-            fwrite(DEBUG_FILE, "DEBUG MODE not active" . "\n");
+            fwrite(stepSixLog(), "DEBUG MODE not active" . "\n");
         }
+    }
+
+    // Returns the log handle, opening it on first use. Pass false to get it only if already open
+    function stepSixLog($open = true) {
+        static $handle = null;
+        if($handle === null && $open)
+            $handle = fopen(DEBUG_FILE, "a+");
+        return $handle;
     }
