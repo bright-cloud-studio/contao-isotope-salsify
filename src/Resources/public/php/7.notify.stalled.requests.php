@@ -39,9 +39,10 @@
     // moves every minute or so on a minutely cron, so this leaves plenty of headroom
     $stallSeconds = 30 * 60;
 
+    // Holds the log path until the first message is written, then the open handle - so a
+    // run with nothing to process never creates the day's log file
     $debugMode = true;
-    if($debugMode)
-        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_seven_'.date('m_d_y').'.txt', "a+") or die("Unable to open file!");
+    $log = $_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_seven_'.date('m_d_y').'.txt';
     /** INITS AND INCLUDES - STOP **/
 
 
@@ -118,15 +119,19 @@
     }
 
     // Close our log file
-    if($debugMode)
+    if(is_resource($log))
         fclose($log);
 
 
     /** HELPER FUNCTIONS **/
-    function debugStepSeven($debugMode, $log, $message) {
+    function debugStepSeven($debugMode, &$log, $message) {
         // File only, unlike the other steps - echoing would make BugBuster log every run as 'failed'
-        if($debugMode)
+        if($debugMode) {
+            // Open the log on first write
+            if(!is_resource($log))
+                $log = fopen($log, "a+") or die("Unable to open file!");
             fwrite($log, $message . "\n");
+        }
     }
 
     // Gather the file and product counts for a finished import. Everything is read back from the database,
