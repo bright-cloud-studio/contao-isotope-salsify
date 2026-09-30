@@ -8,9 +8,10 @@
     use Isotope\Model\AttributeOption;
     use pcrov\JsonReader\JsonReader;
 
+    // Holds the log path until the first message is written, then the open handle - so a
+    // run with nothing to process never creates or touches the day's log file
     $debug_mode = true;
-    if($debug_mode)
-        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_one_'.date('m_d_y').'.txt', "a+") or die("Unable to open file!");
+    $log = $_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_one_'.date('m_d_y').'.txt';
 
     session_start();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
@@ -31,10 +32,9 @@
     if($sr_result) {
         while($request = $sr_result->fetch_assoc()) {
 
-            debugStepOne($debug_mode, $log, "[Checking SalsifyRequest] ID: ".$request['id']. " - " . $request['request_name']);
-
             // Tracks if we have found a newer file and need to run it
             $run_update = false;
+            $prod_count = 0;
 
             // Build complete folder address
             $folder = $_SERVER['DOCUMENT_ROOT'] . "/../files/" . $request['source_folder'];
@@ -51,14 +51,10 @@
                 $next_file_url = '';
                 $next_file_date = '';
 
-                debugStepOne($debug_mode, $log, "Looping through Files found in Folder");
-
                 // Collect each file's modification date so we can walk them in order
                 $file_dates = array();
                 foreach($files as $file) {
                     $file_dates[$file] = filemtime($folder . "/" . $file);
-
-                    debugStepOne($debug_mode, $log, "File: " . $file . " - Date: " . $file_dates[$file]);
                 }
 
                 // Sort oldest-first, falling back to filename when dates match
@@ -75,6 +71,13 @@
                 }
 
                 if($next_file_date) {
+
+                    // Only log the folder listing when there is a new file, otherwise every run repeats it
+                    debugStepOne($debug_mode, $log, "[Checking SalsifyRequest] ID: ".$request['id']. " - " . $request['request_name']);
+                    debugStepOne($debug_mode, $log, "Looping through Files found in Folder");
+                    foreach($file_dates as $file => $file_date) {
+                        debugStepOne($debug_mode, $log, "File: " . $file . " - Date: " . $file_date);
+                    }
 
                     debugStepOne($debug_mode, $log, "Next unprocessed Salsify file found: " . $next_file_url);
 
@@ -256,25 +259,25 @@
                     // Update our Salsify Request now that the step has completed
                     $dbh->prepare("UPDATE tl_salsify_request SET file_url='". $next_file_url ."', file_date='" . $next_file_date . "', status='awaiting_grouping' WHERE id='".$request['id']."'")->execute();
 
+                    debugStepOne($debug_mode, $log, "Salsify Products updated: " . $prod_count);
+
+                    // Add a blank line between our Salsify Requests
+                    debugStepOne($debug_mode, $log, "- - - - - - - - - - - - - - - - - - - - - -\n");
                 }
 
             } else {
+                debugStepOne($debug_mode, $log, "[Checking SalsifyRequest] ID: ".$request['id']. " - " . $request['request_name']);
                 debugStepOne($debug_mode, $log, "No Files found in the Folder");
+                debugStepOne($debug_mode, $log, "- - - - - - - - - - - - - - - - - - - - - -\n");
             }
-
-
-            debugStepOne($debug_mode, $log, "Salsify Products updated: " . $prod_count);
-
-
-            // Add a blank line between our Salsify Requests
-            debugStepOne($debug_mode, $log, "- - - - - - - - - - - - - - - - - - - - - -\n");
         }
     }
 
-    debugStepOne($debug_mode, $log, "Step One Completed");
-
-    if($debug_mode)
+    // Only close out the log if this run wrote to it
+    if(is_resource($log)) {
+        debugStepOne($debug_mode, $log, "Step One Completed");
         fclose($log);
+    }
 
 
 
@@ -283,9 +286,13 @@
 
 
     /** HELPER FUNCTIONS **/
-    function debugStepOne($debug_mode, $log, $message) {
-        if($debug_mode)
+    function debugStepOne($debug_mode, &$log, $message) {
+        if($debug_mode) {
+            // Open the log on first write
+            if(!is_resource($log))
+                $log = fopen($log, "a+") or die("Unable to open file!");
             fwrite($log, $message . "\n");
+        }
 
         echo $message . "<br>";
     }
