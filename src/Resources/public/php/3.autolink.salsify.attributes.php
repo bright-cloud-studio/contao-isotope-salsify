@@ -9,9 +9,10 @@
     use Isotope\Model\ProductType;
     use pcrov\JsonReader\JsonReader;
 
+    // Holds the log path until the first message is written, then the open handle - so a
+    // run with nothing to process never creates the day's log file
     $debug_mode = true;
-    if($debug_mode)
-        $log = fopen($_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_three_'.date('m_d_y').'.txt', "a+") or die("Unable to open file!");
+    $log = $_SERVER['DOCUMENT_ROOT'] . '/../salsify_logs/step_three_'.date('m_d_y').'.txt';
     
     session_start();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../vendor/autoload.php';
@@ -196,14 +197,18 @@
 
 
     // Close our logfile
-    if($debug_mode)
+    if(is_resource($log))
         fclose($log);
         
         
     /** HELPER FUNCTIONS **/
-    function debugStepThree($debug_mode, $log, $message) {
-        if($debug_mode)
+    function debugStepThree($debug_mode, &$log, $message) {
+        if($debug_mode) {
+            // Open the log on first write
+            if(!is_resource($log))
+                $log = fopen($log, "a+") or die("Unable to open file!");
             fwrite($log, $message . "\n");
+        }
         echo $message . "<br>";
     }
     
